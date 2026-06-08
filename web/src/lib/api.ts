@@ -1,0 +1,191 @@
+import jobsData from '../data/jobs.json';
+import companiesData from '../data/companies.json';
+import logsData from '../data/scrape_logs.json';
+
+// Type definitions to ensure TypeScript compiler satisfies previous interfaces
+interface Job {
+  id: string;
+  title: string;
+  companyName: string;
+  companyId: string;
+  location: string;
+  city: string;
+  state: string;
+  experienceLevel?: string;
+  yearsExperience?: number;
+  employmentType?: string;
+  skills: string[];
+  applyUrl: string;
+  jobUrl: string;
+  postedDate?: string;
+  remoteStatus?: 'Remote' | 'Hybrid' | 'Onsite' | 'Unknown';
+  createdAt: string;
+  keywords?: string[];
+  department?: string;
+  description: string;
+  dateScraped?: string;
+}
+
+// Convert untyped static data imports to typed arrays
+const typedJobs = jobsData as Job[];
+const typedCompanies = companiesData as any[];
+const typedLogs = logsData as any[];
+
+export async function fetchJobs(filters: {
+  page?: number;
+  limit?: number;
+  company?: string;
+  city?: string;
+  experienceLevel?: string;
+  employmentType?: string;
+  remoteStatus?: string;
+  search?: string;
+  sortBy?: string;
+} = {}) {
+  await new Promise(resolve => setTimeout(resolve, 50));
+
+  const page = filters.page || 1;
+  const limit = filters.limit || 10;
+  const sortBy = filters.sortBy || 'recent';
+
+  let list = [...typedJobs];
+
+  // Apply filters
+  if (filters.company) {
+    list = list.filter(j => j.companyId === filters.company);
+  }
+  if (filters.city) {
+    list = list.filter(j => j.city.toLowerCase() === filters.city?.toLowerCase());
+  }
+  if (filters.experienceLevel) {
+    list = list.filter(j => j.experienceLevel === filters.experienceLevel);
+  }
+  if (filters.employmentType) {
+    list = list.filter(j => j.employmentType === filters.employmentType);
+  }
+  if (filters.remoteStatus) {
+    list = list.filter(j => j.remoteStatus === filters.remoteStatus);
+  }
+
+  // Keywords filter
+  if (filters.search) {
+    const searchWord = filters.search.toLowerCase().trim();
+    list = list.filter(j => {
+      if (j.keywords && j.keywords.includes(searchWord)) {
+        return true;
+      }
+      return (
+        j.title.toLowerCase().includes(searchWord) ||
+        j.companyName.toLowerCase().includes(searchWord) ||
+        j.city.toLowerCase().includes(searchWord) ||
+        j.skills.some(s => s.toLowerCase().includes(searchWord)) ||
+        (j.department && j.department.toLowerCase().includes(searchWord))
+      );
+    });
+  }
+
+  // Sorting
+  if (sortBy === 'recent') {
+    list.sort((a, b) => {
+      const dateA = a.postedDate || a.createdAt;
+      const dateB = b.postedDate || b.createdAt;
+      return new Date(dateB).getTime() - new Date(dateA).getTime();
+    });
+  } else if (sortBy === 'oldest') {
+    list.sort((a, b) => {
+      const dateA = a.postedDate || a.createdAt;
+      const dateB = b.postedDate || b.createdAt;
+      return new Date(dateA).getTime() - new Date(dateB).getTime();
+    });
+  } else if (sortBy === 'company') {
+    list.sort((a, b) => a.companyName.localeCompare(b.companyName));
+  }
+
+  const totalJobs = list.length;
+  const offset = (page - 1) * limit;
+  const paginatedList = list.slice(offset, offset + limit);
+
+  return {
+    jobs: paginatedList,
+    pagination: {
+      page,
+      limit,
+      totalJobs,
+      totalPages: Math.ceil(totalJobs / limit)
+    }
+  };
+}
+
+export async function fetchJob(id: string) {
+  await new Promise(resolve => setTimeout(resolve, 50));
+  
+  const job = typedJobs.find(j => j.id === id);
+  if (!job) {
+    throw new Error('Job listing not found.');
+  }
+
+  const similarJobs = typedJobs
+    .filter(j => j.companyId === job.companyId && j.id !== id)
+    .slice(0, 3);
+
+  return {
+    job,
+    similarJobs
+  };
+}
+
+export async function fetchCompanies() {
+  await new Promise(resolve => setTimeout(resolve, 30));
+  const sortedComps = [...typedCompanies];
+  sortedComps.sort((a, b) => a.name.localeCompare(b.name));
+  return sortedComps;
+}
+
+export async function fetchFilters() {
+  await new Promise(resolve => setTimeout(resolve, 30));
+
+  const cities = new Set<string>();
+  const departments = new Set<string>();
+  const employmentTypes = new Set<string>();
+  const experienceLevels = new Set<string>();
+  const remoteStatuses = new Set<string>();
+
+  typedJobs.forEach(job => {
+    if (job.city) cities.add(job.city);
+    if (job.department) departments.add(job.department);
+    if (job.employmentType) employmentTypes.add(job.employmentType);
+    if (job.experienceLevel) experienceLevels.add(job.experienceLevel);
+    if (job.remoteStatus) remoteStatuses.add(job.remoteStatus);
+  });
+
+  return {
+    cities: Array.from(cities).sort(),
+    departments: Array.from(departments).sort(),
+    employmentTypes: Array.from(employmentTypes).sort(),
+    experienceLevels: Array.from(experienceLevels).sort(),
+    remoteStatuses: Array.from(remoteStatuses).sort()
+  };
+}
+
+// -------------------------------------------------------------
+// MOCKED ADMIN OPERATIONS (Static Fallbacks)
+// -------------------------------------------------------------
+
+export async function triggerRescrape(companyId: string = 'all') {
+  return {
+    message: "Data refresh runs locally on your MacBook! Run 'npm run scrape' in your terminal, then push changes to GitHub to redeploy to Vercel.",
+    success: true,
+    jobsFound: 0
+  };
+}
+
+export async function uploadExcelCompanies(companies: { company: string; url: string }[]) {
+  return {
+    message: "Admin imports are mocked. To update corporate listings, edit 'companies.xlsx' locally on your Mac, and run 'npm run scrape'.",
+    successCount: companies.length
+  };
+}
+
+export async function fetchScrapeLogs(limit: number = 30) {
+  return typedLogs.slice(0, limit);
+}

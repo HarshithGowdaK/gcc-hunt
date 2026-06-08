@@ -1,0 +1,28 @@
+# Node modules
+node_modules/
+**/node_modules/
+npm-debug.log*
+
+# Next.js build outputs
+.next/
+out/
+
+# Firebase emulator and logs
+.firebase/
+firebase-debug.log*
+firestore-debug.log*
+ui-debug.log*
+
+# Compiled functions output
+functions/lib/
+
+# Local credentials / configurations
+.env
+.env.local
+.env*.local
+*.pem
+service-account.json
+
+# Operating System files
+.DS_Store
+Thumbs.db

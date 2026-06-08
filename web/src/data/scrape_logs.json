@@ -1,0 +1,227 @@
+[
+  {
+    "id": "a4b61d4c-bd60-4350-b13a-fdeca4bb0fb0",
+    "companyId": "altair-engineering",
+    "companyName": "Altair Engineering",
+    "status": "success",
+    "jobsFound": 2,
+    "executionTime": 5240,
+    "timestamp": "2026-06-08T11:56:09.978Z"
+  },
+  {
+    "id": "ac0d8afb-aa7d-4eab-8e40-18d6455b58ca",
+    "companyId": "alphagrep",
+    "companyName": "Alphagrep",
+    "status": "success",
+    "jobsFound": 0,
+    "executionTime": 5118,
+    "timestamp": "2026-06-08T11:56:07.219Z"
+  },
+  {
+    "id": "db284d6e-36e3-4e19-9552-8bc48303c444",
+    "companyId": "alight-solutions",
+    "companyName": "Alight Solutions",
+    "status": "success",
+    "jobsFound": 5,
+    "executionTime": 9069,
+    "timestamp": "2026-06-08T11:56:07.154Z"
+  },
+  {
+    "id": "7428cd70-840a-48f5-bbb4-960c51543e54",
+    "companyId": "alation",
+    "companyName": "Alation",
+    "status": "success",
+    "jobsFound": 5,
+    "executionTime": 6719,
+    "timestamp": "2026-06-08T11:56:04.738Z"
+  },
+  {
+    "id": "0455127d-39a0-44df-a512-4eebc3278d15",
+    "companyId": "airwallex",
+    "companyName": "Airwallex",
+    "status": "success",
+    "jobsFound": 5,
+    "executionTime": 11041,
+    "timestamp": "2026-06-08T11:56:02.101Z"
+  },
+  {
+    "id": "e93bbc8f-d932-45b2-9901-5f6d7e8b384a",
+    "companyId": "akamai",
+    "companyName": "Akamai",
+    "status": "success",
+    "jobsFound": 2,
+    "executionTime": 4620,
+    "timestamp": "2026-06-08T11:55:58.085Z"
+  },
+  {
+    "id": "201bd10d-123b-4233-9bc5-61378bccfcda",
+    "companyId": "aiven",
+    "companyName": "Aiven",
+    "status": "success",
+    "jobsFound": 3,
+    "executionTime": 4925,
+    "timestamp": "2026-06-08T11:55:58.019Z"
+  },
+  {
+    "id": "4035b1fb-c4a0-473a-8ce4-a0d1a5d5f41b",
+    "companyId": "airbnb",
+    "companyName": "Airbnb",
+    "status": "success",
+    "jobsFound": 0,
+    "executionTime": 4217,
+    "timestamp": "2026-06-08T11:55:53.465Z"
+  },
+  {
+    "id": "91e25e95-6ba6-4796-8728-877ebc174b4f",
+    "companyId": "airtel-digital",
+    "companyName": "Airtel Digital",
+    "status": "success",
+    "jobsFound": 0,
+    "executionTime": 2434,
+    "timestamp": "2026-06-08T11:55:53.094Z"
+  },
+  {
+    "id": "5566e815-84e5-4539-b9a1-cc9576d1a579",
+    "companyId": "airbus",
+    "companyName": "Airbus",
+    "status": "failed",
+    "errors": "Request failed with status code 400",
+    "executionTime": 863,
+    "timestamp": "2026-06-08T11:55:51.060Z"
+  },
+  {
+    "id": "6a5e17e3-72eb-48ee-9554-100e5315e379",
+    "companyId": "adobe",
+    "companyName": "Adobe",
+    "status": "success",
+    "jobsFound": 5,
+    "executionTime": 8965,
+    "timestamp": "2026-06-08T11:55:50.659Z"
+  },
+  {
+    "id": "e3612bb8-ad60-4345-af1d-963b85b1bd51",
+    "companyId": "ansr",
+    "companyName": "ANSR",
+    "status": "success",
+    "jobsFound": 5,
+    "executionTime": 17620,
+    "timestamp": "2026-06-08T11:55:50.197Z"
+  },
+  {
+    "id": "cdb287ff-7a8b-4eb8-9488-cda3eff13179",
+    "companyId": "agoda",
+    "companyName": "Agoda",
+    "status": "success",
+    "jobsFound": 0,
+    "executionTime": 2294,
+    "timestamp": "2026-06-08T11:55:49.248Z"
+  },
+  {
+    "id": "646c91b9-424b-47a0-9b47-884c90584e21",
+    "companyId": "adyen",
+    "companyName": "Adyen",
+    "status": "success",
+    "jobsFound": 0,
+    "executionTime": 3662,
+    "timestamp": "2026-06-08T11:55:46.954Z"
+  },
+  {
+    "id": "2e054170-3932-4e2c-be05-97a8ea33395c",
+    "companyId": "abbvie",
+    "companyName": "AbbVie",
+    "status": "success",
+    "jobsFound": 5,
+    "executionTime": 7663,
+    "timestamp": "2026-06-08T11:55:43.292Z"
+  },
+  {
+    "id": "4810095c-516a-4a97-8f2f-b8a5d1732f4b",
+    "companyId": "adidas",
+    "companyName": "Adidas",
+    "status": "failed",
+    "errors": "page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://careers.adidas-group.com/jobs?location=%5B%7B%22country%22%3A%22India%22%7D%5D&offset=0&keywords=&location_manual=India\nCall log:\n\u001b[2m  - navigating to \"https://careers.adidas-group.com/jobs?location=%5B%7B%22country%22%3A%22India%22%7D%5D&offset=0&keywords=&location_manual=India\", waiting until \"domcontentloaded\"\u001b[22m\n",
+    "executionTime": 242,
+    "timestamp": "2026-06-08T11:55:41.694Z"
+  },
+  {
+    "id": "c3f1cd7e-9ba0-43da-b01d-5a7ce67f739e",
+    "companyId": "accenture",
+    "companyName": "Accenture",
+    "status": "success",
+    "jobsFound": 5,
+    "executionTime": 3349,
+    "timestamp": "2026-06-08T11:55:41.452Z"
+  },
+  {
+    "id": "1c4fb4b8-2fd4-4aae-b63c-a7aa606a91b6",
+    "companyId": "axa-xl",
+    "companyName": "AXA XL",
+    "status": "success",
+    "jobsFound": 0,
+    "executionTime": 2767,
+    "timestamp": "2026-06-08T11:55:38.103Z"
+  },
+  {
+    "id": "17821d58-70cb-4cc1-a5e2-19f1aad1228c",
+    "companyId": "adm",
+    "companyName": "ADM",
+    "status": "failed",
+    "errors": "page.goto: Timeout 20000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://sjobs.brassring.com/TGnewUI/Search/home/HomeWithPreLoad?partnerid=25416&siteid=5429&PageType=searchResults&SearchType=linkquery&LinkID=4393910#keyWordSearch=&Location%20Country=India\", waiting until \"domcontentloaded\"\u001b[22m\n",
+    "executionTime": 21378,
+    "timestamp": "2026-06-08T11:55:35.629Z"
+  },
+  {
+    "id": "adca8d8e-3ad5-4477-ac6a-2d894afa690c",
+    "companyId": "aveva",
+    "companyName": "AVEVA",
+    "status": "failed",
+    "errors": "Request failed with status code 400",
+    "executionTime": 1023,
+    "timestamp": "2026-06-08T11:55:35.336Z"
+  },
+  {
+    "id": "4d537a42-f5fe-47a1-81ba-10fa2ab68c80",
+    "companyId": "abb",
+    "companyName": "ABB",
+    "status": "success",
+    "jobsFound": 5,
+    "executionTime": 20065,
+    "timestamp": "2026-06-08T11:55:34.313Z"
+  },
+  {
+    "id": "dc679a02-3966-4979-b189-2493feb04d3a",
+    "companyId": "amd",
+    "companyName": "AMD",
+    "status": "success",
+    "jobsFound": 0,
+    "executionTime": 2992,
+    "timestamp": "2026-06-08T11:55:32.577Z"
+  },
+  {
+    "id": "70d93f63-6bfc-45f3-905e-15f10987e180",
+    "companyId": "aecom",
+    "companyName": "AECOM",
+    "status": "success",
+    "jobsFound": 5,
+    "executionTime": 11755,
+    "timestamp": "2026-06-08T11:55:29.585Z"
+  },
+  {
+    "id": "a00b852c-239f-49b6-9c1b-e5930d3570a8",
+    "companyId": "adp",
+    "companyName": "ADP",
+    "status": "success",
+    "jobsFound": 0,
+    "executionTime": 2550,
+    "timestamp": "2026-06-08T11:55:17.830Z"
+  },
+  {
+    "id": "50e782ca-bee7-49d7-ad47-9e0d3a6148f7",
+    "companyId": "3m",
+    "companyName": "3M",
+    "status": "failed",
+    "errors": "Request failed with status code 400",
+    "executionTime": 1046,
+    "timestamp": "2026-06-08T11:55:15.280Z"
+  }
+]

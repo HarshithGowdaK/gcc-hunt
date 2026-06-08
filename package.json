@@ -1,0 +1,10 @@
+{
+  "name": "gcc-hunt-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix web run dev",
+    "build": "npm --prefix web run build",
+    "scrape": "NODE_PATH=functions/node_modules node scripts/scrape_local.js"
+  }
+}
