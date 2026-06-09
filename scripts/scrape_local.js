@@ -15,7 +15,7 @@ try {
 
 // Environment variables
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
-const CRAWL_LIMIT = process.env.LIMIT || '50'; // defaults to 50, set to 'all' for complete run
+const CRAWL_LIMIT = process.env.LIMIT || 'all'; // Default to 'all' to scrape all companies in the sheet
 
 // Data output file paths
 const DATA_DIR = path.join(__dirname, '..', 'web', 'src', 'data');
@@ -93,39 +93,58 @@ function parseRemoteStatus(title, location, description) {
   return 'Unknown';
 }
 
-function extractExperience(description) {
-  const text = description.toLowerCase();
-  
+function extractExperience(description, title) {
+  const descText = description.toLowerCase();
+  const titleText = (title || '').toLowerCase();
+
+  // 1. Check title first (extremely specific and reliable indicators)
   if (
-    text.includes('fresher') || 
-    text.includes('no experience') || 
-    text.includes('0 years') || 
-    text.includes('0-1 years') || 
-    text.includes('graduate role') ||
-    text.includes('intern') || 
-    text.includes('junior developer')
+    titleText.includes('intern') || 
+    titleText.includes('trainee') || 
+    titleText.includes('fresher') || 
+    titleText.includes('graduate') ||
+    titleText.includes('entry level')
   ) {
     return { years: 0, level: 'Entry Level' };
   }
 
+  // 2. Scan description for years of experience numbers (e.g. 5+ years, 3-5 years)
   const regexes = [
     /(\d+)\s*(?:to|-)\s*(\d+)\s*years?/g,
-    /(\d+)\+?\s*years?\s*(?:of\s*)?experience/g
+    /(\d+)\+?\s*years?\s*(?:of\s*)?experience/g,
+    /experience\s*(?:of\s*)?(\d+)\+?\s*years?/g,
+    /(\d+)\s*yrs?\b/g
   ];
   let years;
   for (const regex of regexes) {
-    const match = regex.exec(text);
+    const match = regex.exec(descText);
     if (match) {
       years = parseInt(match[1], 10);
       break;
     }
   }
-  let level = 'Mid-Senior Level';
+
+  // 3. If years are found, categorize strictly based on years
   if (years !== undefined) {
+    let level = 'Mid-Senior Level';
     if (years <= 2) level = 'Entry Level';
     else if (years >= 8) level = 'Director / Lead';
+    return { years, level };
   }
-  return { years: years || 3, level };
+
+  // 4. Fallback: If no years parsed, check for fresher keywords using word boundary regexes
+  const hasEntryKeywords = 
+    /\b(fresher|trainee|intern|graduate)\b/i.test(descText) ||
+    descText.includes('no experience required') ||
+    descText.includes('entry-level role') ||
+    descText.includes('entry level role');
+
+  if (hasEntryKeywords) {
+    return { years: 0, level: 'Entry Level' };
+  }
+
+  // Default fallback if we cannot find details
+  return { years: 3, level: 'Mid-Senior Level' };
 }
 
 function extractSkills(title, description) {
@@ -321,9 +340,8 @@ async function scrapeWorkday(companyId, companyName, careersUrl) {
           remoteStatus = aiParsed.remoteStatus;
           empType = aiParsed.employmentType;
         } else {
-          // Rule-based fallback (exact descriptions)
           description = rawText;
-          exp = extractExperience(description);
+          exp = extractExperience(description, posting.title);
           skills = extractSkills(posting.title, description);
           remoteStatus = parseRemoteStatus(posting.title, posting.locationsText || '', description);
           empType = info.timeType || 'Full-time';
@@ -394,7 +412,7 @@ async function scrapeGreenhouse(companyId, companyName, careersUrl) {
       empType = aiParsed.employmentType;
     } else {
       description = rawText;
-      exp = extractExperience(description);
+      exp = extractExperience(description, posting.title);
       skills = extractSkills(posting.title, description);
       remoteStatus = parseRemoteStatus(posting.title, locationName, description);
     }
@@ -462,7 +480,7 @@ async function scrapeLever(companyId, companyName, careersUrl) {
       empType = aiParsed.employmentType;
     } else {
       description = rawText;
-      exp = extractExperience(description);
+      exp = extractExperience(description, posting.title);
       skills = extractSkills(posting.title, description);
       remoteStatus = parseRemoteStatus(posting.title, loc, description);
     }
@@ -510,7 +528,6 @@ async function scrapeGeneric(companyId, companyName, careersUrl) {
     await page.goto(careersUrl, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(2000);
 
-    // Heuristically verify if we are on a landing page rather than a job listings board
     let jobLinksCount = await page.evaluate(() => {
       const anchors = Array.from(document.querySelectorAll('a'));
       return anchors.filter(a => {
@@ -519,7 +536,6 @@ async function scrapeGeneric(companyId, companyName, careersUrl) {
       }).length;
     });
 
-    // Landing Page Redirection: Search for a link/button to redirect to the actual listings board
     if (jobLinksCount < 2) {
       console.log(`[Generic Scraper] Found few direct job links (${jobLinksCount}). Checking for "Search Positions" navigation links...`);
       const searchRedirectLink = await page.$(
@@ -540,7 +556,6 @@ async function scrapeGeneric(companyId, companyName, careersUrl) {
       }
     }
 
-    // Heuristically extract visible anchors again on search board page
     const rawJobs = await page.evaluate(() => {
       const results = [];
       const anchors = Array.from(document.querySelectorAll('a'));
@@ -558,7 +573,6 @@ async function scrapeGeneric(companyId, companyName, careersUrl) {
         if (!title && a.parentElement) title = a.parentElement.innerText.trim().split('\n')[0];
         if (!title || title.length < 5) continue;
 
-        // Parent climbing to identify locations
         let loc = 'India';
         let p = a.parentElement;
         let depth = 0;
@@ -581,7 +595,6 @@ async function scrapeGeneric(companyId, companyName, careersUrl) {
 
     console.log(`[Generic Scraper] Crawling details for ${Math.min(8, rawJobs.length)} filtered postings...`);
 
-    // Crawl details for valid India items
     for (const item of rawJobs.slice(0, 8)) {
       const normLoc = normalizeLocation(item.location) || normalizeLocation(item.title);
       if (!normLoc) continue;
@@ -597,10 +610,9 @@ async function scrapeGeneric(companyId, companyName, careersUrl) {
         const detailPage = await context.newPage();
         await detailPage.goto(item.url, { waitUntil: 'domcontentloaded', timeout: 12000 });
         
-        // Find main details card node to get exact description
         rawText = await detailPage.evaluate(() => {
           const mainNode = document.querySelector('main, article, [class*="job-details" i], [class*="description" i], [id*="description" i]');
-          if (mainNode) return mainNode.innerText;
+          if (mainNode) return (mainNode as HTMLElement).innerText;
           return document.body.innerText;
         });
         rawText = rawText.replace(/\s+/g, ' ').trim();
@@ -613,9 +625,8 @@ async function scrapeGeneric(companyId, companyName, careersUrl) {
           remoteStatus = aiParsed.remoteStatus;
           empType = aiParsed.employmentType;
         } else {
-          // Exact text match logic
           description = rawText;
-          exp = extractExperience(description);
+          exp = extractExperience(description, item.title);
           skills = extractSkills(item.title, description);
           remoteStatus = parseRemoteStatus(item.title, item.location, description);
         }
@@ -623,7 +634,7 @@ async function scrapeGeneric(companyId, companyName, careersUrl) {
         await detailPage.close();
       } catch (err) {
         description = rawText;
-        exp = extractExperience(description);
+        exp = extractExperience(description, item.title);
         skills = extractSkills(item.title, description);
       }
 
