@@ -13,11 +13,18 @@ try {
   process.exit(1);
 }
 
+// Environment variables
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
+const CRAWL_LIMIT = process.env.LIMIT || '50'; // defaults to 50, set to 'all' for complete run
+
 // Data output file paths
 const DATA_DIR = path.join(__dirname, '..', 'web', 'src', 'data');
 const JOBS_PATH = path.join(DATA_DIR, 'jobs.json');
 const COMPANIES_PATH = path.join(DATA_DIR, 'companies.json');
 const LOGS_PATH = path.join(DATA_DIR, 'scrape_logs.json');
+
+// Shared browser instance for generic scraping (reused to save memory)
+let sharedBrowser = null;
 
 // -------------------------------------------------------------
 // UTILITIES AND NORMALIZATION
@@ -88,6 +95,19 @@ function parseRemoteStatus(title, location, description) {
 
 function extractExperience(description) {
   const text = description.toLowerCase();
+  
+  if (
+    text.includes('fresher') || 
+    text.includes('no experience') || 
+    text.includes('0 years') || 
+    text.includes('0-1 years') || 
+    text.includes('graduate role') ||
+    text.includes('intern') || 
+    text.includes('junior developer')
+  ) {
+    return { years: 0, level: 'Entry Level' };
+  }
+
   const regexes = [
     /(\d+)\s*(?:to|-)\s*(\d+)\s*years?/g,
     /(\d+)\+?\s*years?\s*(?:of\s*)?experience/g
@@ -105,7 +125,7 @@ function extractExperience(description) {
     if (years <= 2) level = 'Entry Level';
     else if (years >= 8) level = 'Director / Lead';
   }
-  return { years, level };
+  return { years: years || 3, level };
 }
 
 function extractSkills(title, description) {
@@ -134,6 +154,120 @@ function detectATS(url) {
   if (lowerUrl.includes('lever.co')) return 'lever';
   if (lowerUrl.includes('greenhouse.io') || lowerUrl.includes('boards.greenhouse.io')) return 'greenhouse';
   return 'generic';
+}
+
+/**
+ * Classifies jobs into high-level industries based on title and department.
+ */
+function classifyIndustry(title, department) {
+  const text = `${title} ${department || ''}`.toLowerCase();
+  
+  if (
+    text.includes('software') || text.includes('developer') || text.includes('engineer') || 
+    text.includes('programmer') || text.includes('architect') || text.includes('tech') || 
+    text.includes('data') || text.includes('cloud') || text.includes('devops') || 
+    text.includes('system') || text.includes('infrastructure') || text.includes('security') ||
+    text.includes('coder') || text.includes('qa ') || text.includes('testing') || text.includes('network')
+  ) {
+    return 'Engineering & Technology';
+  }
+  
+  if (
+    text.includes('legal') || text.includes('law') || text.includes('counsel') || 
+    text.includes('compliance') || text.includes('attorney') || text.includes('patent') ||
+    text.includes('solicitor') || text.includes('paralegal')
+  ) {
+    return 'Legal & Law';
+  }
+  
+  if (
+    text.includes('finance') || text.includes('account') || text.includes('audit') || 
+    text.includes('tax') || text.includes('business analyst') || text.includes('portfolio') || 
+    text.includes('risk') || text.includes('analyst') || text.includes('consultant') ||
+    text.includes('treasury') || text.includes('billing') || text.includes('controller')
+  ) {
+    return 'Business & Finance';
+  }
+  
+  if (
+    text.includes('hr') || text.includes('recruiter') || text.includes('people') || 
+    text.includes('talent') || text.includes('operations') || text.includes('admin') || 
+    text.includes('facilities') || text.includes('human resources') || text.includes('coordinator')
+  ) {
+    return 'HR & Operations';
+  }
+  
+  if (
+    text.includes('marketing') || text.includes('sales') || text.includes('product manager') || 
+    text.includes('pr ') || text.includes('media') || text.includes('design') || 
+    text.includes('ux') || text.includes('ui') || text.includes('copywriter') ||
+    text.includes('branding') || text.includes('creative')
+  ) {
+    return 'Marketing, Product & Design';
+  }
+  
+  return 'Other / General';
+}
+
+// -------------------------------------------------------------
+// CHATGPT PARSING ENGINE
+// -------------------------------------------------------------
+
+async function parseJobPostingWithAI(text, jobTitle, jobLocation) {
+  if (!OPENAI_API_KEY) return null;
+  
+  try {
+    const cleanText = text.substring(0, 8000);
+    
+    console.log(`[ChatGPT API] Parsing job details for: "${jobTitle}"...`);
+    const res = await axios.post('https://api.openai.com/v1/chat/completions', {
+      model: 'gpt-4o-mini',
+      messages: [
+        {
+          role: 'system',
+          content: 'You are an HR parsing assistant. Extract job metadata from text and return a strict JSON format.'
+        },
+        {
+          role: 'user',
+          content: `Analyze this job posting and extract the following details in JSON format:
+1. "description": Extract the EXACT, COMPLETE job description details (responsibilities, requirements, technical criteria) VERBATIM from the page. Do NOT summarize, rewrite, or truncate the text. Simply exclude unrelated website cookies banners, headers, and footer menu navigation items. Preserve the exact vocabulary.
+2. "skills": String array of technical/non-technical tools mentioned.
+3. "yearsExperience": Minimum years of experience requested as a number. If it is for freshers, graduates, or trainees, specify 0.
+4. "experienceLevel": Specify either "Entry Level", "Mid-Senior Level", or "Director / Lead".
+5. "remoteStatus": Specify either "Remote", "Hybrid", "Onsite", or "Unknown".
+6. "employmentType": "Full-time", "Part-time", "Contract", or "Internship".
+
+Format output as valid JSON:
+{
+  "description": "...",
+  "skills": ["React", "Python"],
+  "yearsExperience": 0,
+  "experienceLevel": "Entry Level",
+  "remoteStatus": "Hybrid",
+  "employmentType": "Full-time"
+}
+
+Text:
+Title: ${jobTitle}
+Location: ${jobLocation}
+${cleanText}`
+        }
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.1
+    }, {
+      headers: {
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      timeout: 15000
+    });
+
+    return JSON.parse(res.data.choices[0].message.content);
+  } catch (error) {
+    console.warn(`[ChatGPT API] Parsing failed: ${error.message}. Falling back to rule-based heuristics.`);
+    return null;
+  }
 }
 
 // -------------------------------------------------------------
@@ -168,15 +302,35 @@ async function scrapeWorkday(companyId, companyName, careersUrl) {
     let skills = [];
     let exp = { level: 'Mid-Senior Level', years: 3 };
     let applyUrl = jobUrl;
+    let remoteStatus = 'Unknown';
+    let empType = 'Full-time';
+    let deptName = '';
 
     try {
       const detailRes = await axios.get(detailApiUrl, { timeout: 8000 });
       if (detailRes.data && detailRes.data.jobPostingInfo) {
         const info = detailRes.data.jobPostingInfo;
-        description = (info.jobDescription || '').replace(/<[^>]*>/g, '\n').replace(/\s+/g, ' ').trim();
-        exp = extractExperience(description);
-        skills = extractSkills(posting.title, description);
+        const rawText = (info.jobDescription || '').replace(/<[^>]*>/g, '\n').replace(/\s+/g, ' ').trim();
+        
+        // Attempt AI parse
+        const aiParsed = await parseJobPostingWithAI(rawText, posting.title, posting.locationsText);
+        if (aiParsed) {
+          description = aiParsed.description;
+          skills = aiParsed.skills;
+          exp = { level: aiParsed.experienceLevel, years: aiParsed.yearsExperience };
+          remoteStatus = aiParsed.remoteStatus;
+          empType = aiParsed.employmentType;
+        } else {
+          // Rule-based fallback (exact descriptions)
+          description = rawText;
+          exp = extractExperience(description);
+          skills = extractSkills(posting.title, description);
+          remoteStatus = parseRemoteStatus(posting.title, posting.locationsText || '', description);
+          empType = info.timeType || 'Full-time';
+        }
+
         if (info.applyUrl) applyUrl = info.applyUrl;
+        deptName = info.department || '';
       }
     } catch (e) {
       description = `Job posting available at ${jobUrl}`;
@@ -194,11 +348,13 @@ async function scrapeWorkday(companyId, companyName, careersUrl) {
       country: 'India',
       experienceLevel: exp.level,
       yearsExperience: exp.years,
-      employmentType: posting.timeType || 'Full-time',
+      employmentType: empType,
       skills,
       applyUrl,
       jobUrl,
-      remoteStatus: parseRemoteStatus(posting.title, posting.locationsText || '', description)
+      remoteStatus,
+      department: deptName,
+      industry: classifyIndustry(posting.title, deptName)
     });
   }
   return jobs;
@@ -220,9 +376,28 @@ async function scrapeGreenhouse(companyId, companyName, careersUrl) {
     const normLoc = normalizeLocation(locationName);
     if (!normLoc) continue;
 
-    const description = (posting.content || '').replace(/<[^>]*>/g, '\n').replace(/\s+/g, ' ').trim();
-    const exp = extractExperience(description);
-    const skills = extractSkills(posting.title, description);
+    const rawText = (posting.content || '').replace(/<[^>]*>/g, '\n').replace(/\s+/g, ' ').trim();
+    
+    let description = '';
+    let skills = [];
+    let exp = { level: 'Mid-Senior Level', years: 3 };
+    let remoteStatus = 'Unknown';
+    let empType = 'Full-time';
+    const deptName = posting.departments?.[0]?.name || '';
+
+    const aiParsed = await parseJobPostingWithAI(rawText, posting.title, locationName);
+    if (aiParsed) {
+      description = aiParsed.description;
+      skills = aiParsed.skills;
+      exp = { level: aiParsed.experienceLevel, years: aiParsed.yearsExperience };
+      remoteStatus = aiParsed.remoteStatus;
+      empType = aiParsed.employmentType;
+    } else {
+      description = rawText;
+      exp = extractExperience(description);
+      skills = extractSkills(posting.title, description);
+      remoteStatus = parseRemoteStatus(posting.title, locationName, description);
+    }
 
     jobs.push({
       id: generateJobId(companyId, posting.title, locationName, posting.absolute_url, posting.id?.toString()),
@@ -236,12 +411,13 @@ async function scrapeGreenhouse(companyId, companyName, careersUrl) {
       country: 'India',
       experienceLevel: exp.level,
       yearsExperience: exp.years,
-      employmentType: 'Full-time',
+      employmentType: empType,
       skills,
       applyUrl: posting.absolute_url,
       jobUrl: posting.absolute_url,
-      remoteStatus: parseRemoteStatus(posting.title, locationName, description),
-      department: posting.departments?.[0]?.name
+      remoteStatus,
+      department: deptName,
+      industry: classifyIndustry(posting.title, deptName)
     });
   }
   return jobs;
@@ -263,34 +439,53 @@ async function scrapeLever(companyId, companyName, careersUrl) {
     const normLoc = normalizeLocation(loc);
     if (!normLoc) continue;
 
-    let desc = posting.descriptionPlain || '';
+    let rawText = posting.descriptionPlain || '';
     if (posting.lists) {
       posting.lists.forEach(l => {
-        desc += `\n${l.text || ''}\n` + (l.content ? l.content.join('\n') : '');
+        rawText += `\n${l.text || ''}\n` + (l.content ? l.content.join('\n') : '');
       });
     }
 
-    const exp = extractExperience(desc);
-    const skills = extractSkills(posting.title, desc);
+    let description = '';
+    let skills = [];
+    let exp = { level: 'Mid-Senior Level', years: 3 };
+    let remoteStatus = 'Unknown';
+    let empType = posting.categories?.commitment || 'Full-time';
+    const deptName = posting.categories?.department || posting.categories?.team || '';
+
+    const aiParsed = await parseJobPostingWithAI(rawText, posting.title, loc);
+    if (aiParsed) {
+      description = aiParsed.description;
+      skills = aiParsed.skills;
+      exp = { level: aiParsed.experienceLevel, years: aiParsed.yearsExperience };
+      remoteStatus = aiParsed.remoteStatus;
+      empType = aiParsed.employmentType;
+    } else {
+      description = rawText;
+      exp = extractExperience(description);
+      skills = extractSkills(posting.title, description);
+      remoteStatus = parseRemoteStatus(posting.title, loc, description);
+    }
 
     jobs.push({
       id: generateJobId(companyId, posting.title, loc, posting.hostedUrl, posting.id),
       companyId,
       companyName,
       title: posting.title,
-      description: desc,
+      description,
       location: loc,
       city: normLoc.city,
       state: normLoc.state,
       country: 'India',
       experienceLevel: exp.level,
       yearsExperience: exp.years,
-      employmentType: posting.categories?.commitment || 'Full-time',
+      employmentType: empType,
       skills,
       applyUrl: posting.applyUrl || posting.hostedUrl,
       jobUrl: posting.hostedUrl,
-      remoteStatus: parseRemoteStatus(posting.title, loc, desc),
-      department: posting.categories?.department
+      remoteStatus,
+      department: deptName,
+      industry: classifyIndustry(posting.title, deptName)
     });
   }
   return jobs;
@@ -298,17 +493,54 @@ async function scrapeLever(companyId, companyName, careersUrl) {
 
 async function scrapeGeneric(companyId, companyName, careersUrl) {
   const jobs = [];
-  let browser;
-  try {
-    browser = await playwright.chromium.launch({ headless: true });
-    const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
-    const page = await context.newPage();
-    page.setDefaultTimeout(20000);
+  
+  if (!sharedBrowser) {
+    sharedBrowser = await playwright.chromium.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
+  }
 
+  const context = await sharedBrowser.newContext({ viewport: { width: 1280, height: 800 } });
+  const page = await context.newPage();
+  page.setDefaultTimeout(20000);
+
+  try {
+    console.log(`[Generic Scraper] Opening target URL: ${careersUrl}`);
     await page.goto(careersUrl, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(2000);
 
-    // Heuristically extract visible anchors
+    // Heuristically verify if we are on a landing page rather than a job listings board
+    let jobLinksCount = await page.evaluate(() => {
+      const anchors = Array.from(document.querySelectorAll('a'));
+      return anchors.filter(a => {
+        const href = a.href || '';
+        return /\/(job|jobs|posting|careers|vacancy|detail|position)\//i.test(href) || href.includes('detail');
+      }).length;
+    });
+
+    // Landing Page Redirection: Search for a link/button to redirect to the actual listings board
+    if (jobLinksCount < 2) {
+      console.log(`[Generic Scraper] Found few direct job links (${jobLinksCount}). Checking for "Search Positions" navigation links...`);
+      const searchRedirectLink = await page.$(
+        'a[href*="search" i] >> text="jobs", a >> text="Search Jobs", a >> text="Open Positions", a >> text="View Openings", a >> text="Job Openings", a >> text="Careers Portal", button >> text="Search Jobs", button >> text="View Jobs"'
+      );
+
+      if (searchRedirectLink) {
+        console.log('[Generic Scraper] Landing page redirect element found. Navigating...');
+        const href = await searchRedirectLink.getAttribute('href');
+        if (href) {
+          const targetUrl = href.startsWith('http') ? href : new URL(href, careersUrl).toString();
+          await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 20000 });
+          await page.waitForTimeout(2000);
+        } else {
+          await searchRedirectLink.click();
+          await page.waitForTimeout(4000);
+        }
+      }
+    }
+
+    // Heuristically extract visible anchors again on search board page
     const rawJobs = await page.evaluate(() => {
       const results = [];
       const anchors = Array.from(document.querySelectorAll('a'));
@@ -317,13 +549,16 @@ async function scrapeGeneric(companyId, companyName, careersUrl) {
         const href = a.href;
         if (!href || seen.has(href)) continue;
 
-        const isJob = /\/(job|jobs|posting|careers|vacancy|detail|position)\//i.test(href) || href.includes('detail');
+        const isJob = /\/(job|jobs|posting|careers|vacancy|detail|position)\//i.test(href) || 
+                      href.includes('detail') || 
+                      href.includes('career-detail');
         if (!isJob) continue;
 
         let title = a.innerText.trim();
         if (!title && a.parentElement) title = a.parentElement.innerText.trim().split('\n')[0];
         if (!title || title.length < 5) continue;
 
+        // Parent climbing to identify locations
         let loc = 'India';
         let p = a.parentElement;
         let depth = 0;
@@ -344,45 +579,77 @@ async function scrapeGeneric(companyId, companyName, careersUrl) {
       return results;
     });
 
-    for (const item of rawJobs.slice(0, 5)) {
+    console.log(`[Generic Scraper] Crawling details for ${Math.min(8, rawJobs.length)} filtered postings...`);
+
+    // Crawl details for valid India items
+    for (const item of rawJobs.slice(0, 8)) {
       const normLoc = normalizeLocation(item.location) || normalizeLocation(item.title);
       if (!normLoc) continue;
 
-      let desc = `Job listing available at ${item.url}`;
-      let exp = { level: 'Mid-Senior Level', years: 3 };
+      let rawText = `Job listing available at ${item.url}`;
+      let description = '';
       let skills = [];
+      let exp = { level: 'Mid-Senior Level', years: 3 };
+      let remoteStatus = 'Unknown';
+      let empType = 'Full-time';
 
       try {
         const detailPage = await context.newPage();
         await detailPage.goto(item.url, { waitUntil: 'domcontentloaded', timeout: 12000 });
-        desc = await detailPage.evaluate(() => document.body.innerText);
-        desc = desc.replace(/\s+/g, ' ').trim();
-        exp = extractExperience(desc);
-        skills = extractSkills(item.title, desc);
+        
+        // Find main details card node to get exact description
+        rawText = await detailPage.evaluate(() => {
+          const mainNode = document.querySelector('main, article, [class*="job-details" i], [class*="description" i], [id*="description" i]');
+          if (mainNode) return mainNode.innerText;
+          return document.body.innerText;
+        });
+        rawText = rawText.replace(/\s+/g, ' ').trim();
+        
+        const aiParsed = await parseJobPostingWithAI(rawText, item.title, item.location);
+        if (aiParsed) {
+          description = aiParsed.description;
+          skills = aiParsed.skills;
+          exp = { level: aiParsed.experienceLevel, years: aiParsed.yearsExperience };
+          remoteStatus = aiParsed.remoteStatus;
+          empType = aiParsed.employmentType;
+        } else {
+          // Exact text match logic
+          description = rawText;
+          exp = extractExperience(description);
+          skills = extractSkills(item.title, description);
+          remoteStatus = parseRemoteStatus(item.title, item.location, description);
+        }
+
         await detailPage.close();
-      } catch (err) {}
+      } catch (err) {
+        description = rawText;
+        exp = extractExperience(description);
+        skills = extractSkills(item.title, description);
+      }
 
       jobs.push({
         id: generateJobId(companyId, item.title, item.location, item.url),
         companyId,
         companyName,
         title: item.title,
-        description: desc,
+        description,
         location: item.location,
         city: normLoc.city,
         state: normLoc.state,
         country: 'India',
         experienceLevel: exp.level,
         yearsExperience: exp.years,
-        employmentType: 'Full-time',
+        employmentType: empType,
         skills,
         applyUrl: item.url,
         jobUrl: item.url,
-        remoteStatus: parseRemoteStatus(item.title, item.location, desc)
+        remoteStatus,
+        industry: classifyIndustry(item.title, '')
       });
     }
   } finally {
-    if (browser) await browser.close();
+    await page.close();
+    await context.close();
   }
   return jobs;
 }
@@ -395,6 +662,11 @@ async function runLocalScraper() {
   const startTime = Date.now();
   console.log('=== GCC Hunt Local Scraper ===');
   console.log(`Starting crawl at: ${new Date().toLocaleString()}`);
+  if (OPENAI_API_KEY) {
+    console.log('[AI Integration] ChatGPT GPT-4o-mini parser is ACTIVE.');
+  } else {
+    console.log('[AI Integration] ChatGPT is INACTIVE. (Set OPENAI_API_KEY environment variable to activate)');
+  }
 
   const excelPath = path.join(__dirname, '..', 'companies.xlsx');
   if (!fs.existsSync(excelPath)) {
@@ -456,14 +728,15 @@ async function runLocalScraper() {
   let failedCount = 0;
   let crawledJobsPool = [];
 
-  const batchLimit = 25; 
+  const limitValue = CRAWL_LIMIT.toLowerCase() === 'all' ? finalCompaniesList.length : parseInt(CRAWL_LIMIT) || 50;
+  
   const targetCompanies = finalCompaniesList
     .sort((a, b) => {
       const dateA = a.lastScraped ? new Date(a.lastScraped).getTime() : 0;
       const dateB = b.lastScraped ? new Date(b.lastScraped).getTime() : 0;
       return dateA - dateB;
     })
-    .slice(0, batchLimit);
+    .slice(0, limitValue);
 
   console.log(`\nReady to crawl a batch of ${targetCompanies.length} companies (concurrency: 3).`);
 
@@ -527,6 +800,10 @@ async function runLocalScraper() {
 
   const workers = Array(Math.min(3, targetCompanies.length)).fill(null).map(worker);
   await Promise.all(workers);
+
+  if (sharedBrowser) {
+    await sharedBrowser.close();
+  }
 
   const crawledComps = new Set(targetCompanies.filter(c => c.status === 'success').map(c => c.id));
   const crawledJobIds = new Set(crawledJobsPool.map(j => j.id));

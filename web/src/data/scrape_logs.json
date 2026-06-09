@@ -1,5 +1,455 @@
 [
   {
+    "id": "042447c6-6cc8-4ba6-9104-3be3c4c64e7a",
+    "companyId": "bristol-myers-squibb",
+    "companyName": "Bristol Myers Squibb",
+    "status": "success",
+    "jobsFound": 8,
+    "executionTime": 15634,
+    "timestamp": "2026-06-09T05:18:22.213Z"
+  },
+  {
+    "id": "4d21875d-3066-469c-8273-0101b8b53a62",
+    "companyId": "boomi",
+    "companyName": "Boomi",
+    "status": "success",
+    "jobsFound": 8,
+    "executionTime": 32293,
+    "timestamp": "2026-06-09T05:18:18.126Z"
+  },
+  {
+    "id": "687d8f85-786b-4158-9d44-83d24707a1fd",
+    "companyId": "broadcom",
+    "companyName": "Broadcom",
+    "status": "failed",
+    "errors": "Request failed with status code 400",
+    "executionTime": 897,
+    "timestamp": "2026-06-09T05:18:14.377Z"
+  },
+  {
+    "id": "f8c33d41-4b94-4fe7-8a99-126200a231b0",
+    "companyId": "brillio",
+    "companyName": "Brillio",
+    "status": "success",
+    "jobsFound": 8,
+    "executionTime": 12040,
+    "timestamp": "2026-06-09T05:18:13.480Z"
+  },
+  {
+    "id": "ae5da34b-2683-4f55-afd7-10954d1a117f",
+    "companyId": "bosch",
+    "companyName": "Bosch",
+    "status": "success",
+    "jobsFound": 0,
+    "executionTime": 11429,
+    "timestamp": "2026-06-09T05:18:06.579Z"
+  },
+  {
+    "id": "ab7ad23f-d09f-4bf4-8dd2-d1f933dc69b2",
+    "companyId": "bounteous-x-accolite",
+    "companyName": "Bounteous x Accolite",
+    "status": "success",
+    "jobsFound": 3,
+    "executionTime": 5416,
+    "timestamp": "2026-06-09T05:18:01.440Z"
+  },
+  {
+    "id": "1f5bacc3-cf29-432a-9f89-e9a1853ccecf",
+    "companyId": "blue-yonder",
+    "companyName": "Blue Yonder",
+    "status": "success",
+    "jobsFound": 8,
+    "executionTime": 10853,
+    "timestamp": "2026-06-09T05:17:56.023Z"
+  },
+  {
+    "id": "355a20ff-f42f-4b49-86fe-f34d6d15c3f6",
+    "companyId": "boeing",
+    "companyName": "Boeing",
+    "status": "success",
+    "jobsFound": 8,
+    "executionTime": 9322,
+    "timestamp": "2026-06-09T05:17:55.150Z"
+  },
+  {
+    "id": "21e05d45-8ad4-4398-afa2-fdd0a8f4d2a1",
+    "companyId": "black-veatch",
+    "companyName": "Black & Veatch",
+    "status": "success",
+    "jobsFound": 8,
+    "executionTime": 26487,
+    "timestamp": "2026-06-09T05:17:45.833Z"
+  },
+  {
+    "id": "682f0ec9-b642-45ca-ae95-0ba8c566844d",
+    "companyId": "blue-prism",
+    "companyName": "Blue Prism",
+    "status": "success",
+    "jobsFound": 0,
+    "executionTime": 3175,
+    "timestamp": "2026-06-09T05:17:45.828Z"
+  },
+  {
+    "id": "a16ada6b-50f9-44bb-bd0b-87340e544b63",
+    "companyId": "bloomberg",
+    "companyName": "Bloomberg",
+    "status": "success",
+    "jobsFound": 8,
+    "executionTime": 16717,
+    "timestamp": "2026-06-09T05:17:45.170Z"
+  },
+  {
+    "id": "a12018ee-dee5-4d50-ba9e-9b52b3e2c626",
+    "companyId": "blackrock",
+    "companyName": "BlackRock",
+    "status": "success",
+    "jobsFound": 8,
+    "executionTime": 14334,
+    "timestamp": "2026-06-09T05:17:42.653Z"
+  },
+  {
+    "id": "2a96af4d-5250-4256-8a05-81dddf595ff2",
+    "companyId": "blackline",
+    "companyName": "BlackLine",
+    "status": "success",
+    "jobsFound": 0,
+    "executionTime": 3924,
+    "timestamp": "2026-06-09T05:17:28.453Z"
+  },
+  {
+    "id": "75a6117c-8c16-4cf7-9de8-8877af66c345",
+    "companyId": "bio-rad-laboratories",
+    "companyName": "Bio-Rad Laboratories",
+    "status": "success",
+    "jobsFound": 8,
+    "executionTime": 13284,
+    "timestamp": "2026-06-09T05:17:28.319Z"
+  },
+  {
+    "id": "798ed04c-3fa2-4cf2-9aa2-f72b7741b96e",
+    "companyId": "blackberry-qnx",
+    "companyName": "BlackBerry QNX",
+    "status": "failed",
+    "errors": "Request failed with status code 400",
+    "executionTime": 655,
+    "timestamp": "2026-06-09T05:17:24.529Z"
+  },
+  {
+    "id": "8d541846-d7c2-4c6f-a71d-d5cad8f55877",
+    "companyId": "birlasoft",
+    "companyName": "Birlasoft",
+    "status": "success",
+    "jobsFound": 8,
+    "executionTime": 5304,
+    "timestamp": "2026-06-09T05:17:23.874Z"
+  },
+  {
+    "id": "3b483689-42bf-4d8a-b561-857188ffed2f",
+    "companyId": "bechtel",
+    "companyName": "Bechtel",
+    "status": "success",
+    "jobsFound": 8,
+    "executionTime": 12953,
+    "timestamp": "2026-06-09T05:17:19.346Z"
+  },
+  {
+    "id": "174f3aec-c4df-410d-98f9-13884f240f83",
+    "companyId": "baxter",
+    "companyName": "Baxter",
+    "status": "success",
+    "jobsFound": 8,
+    "executionTime": 22134,
+    "timestamp": "2026-06-09T05:17:18.570Z"
+  },
+  {
+    "id": "b676cb6e-602c-4a56-ae82-141860652ae4",
+    "companyId": "bharat-pe",
+    "companyName": "Bharat Pe",
+    "status": "success",
+    "jobsFound": 0,
+    "executionTime": 2361,
+    "timestamp": "2026-06-09T05:17:15.035Z"
+  },
+  {
+    "id": "aec65350-89c5-4316-bba0-e884a9890274",
+    "companyId": "barclays",
+    "companyName": "Barclays",
+    "status": "success",
+    "jobsFound": 8,
+    "executionTime": 22923,
+    "timestamp": "2026-06-09T05:17:12.674Z"
+  },
+  {
+    "id": "a3a3edf0-6efb-48e0-93ce-63d82b89a74c",
+    "companyId": "baker-hughes",
+    "companyName": "Baker Hughes",
+    "status": "success",
+    "jobsFound": 8,
+    "executionTime": 17575,
+    "timestamp": "2026-06-09T05:17:06.393Z"
+  },
+  {
+    "id": "a210bf28-e33c-4d4d-9f13-cbad34724a37",
+    "companyId": "barracuda-networks",
+    "companyName": "Barracuda Networks",
+    "status": "success",
+    "jobsFound": 0,
+    "executionTime": 2653,
+    "timestamp": "2026-06-09T05:16:56.436Z"
+  },
+  {
+    "id": "9aa6787d-21ff-4084-8021-18b8d3e0ad52",
+    "companyId": "bny-mellon",
+    "companyName": "BNY Mellon",
+    "status": "success",
+    "jobsFound": 4,
+    "executionTime": 14583,
+    "timestamp": "2026-06-09T05:16:53.783Z"
+  },
+  {
+    "id": "261418a5-6bf1-4d68-9b82-0df4b36afdbb",
+    "companyId": "bt-group",
+    "companyName": "BT Group",
+    "status": "success",
+    "jobsFound": 0,
+    "executionTime": 5255,
+    "timestamp": "2026-06-09T05:16:49.751Z"
+  },
+  {
+    "id": "26964554-e2e0-4d90-b998-1f2186df6d24",
+    "companyId": "bain-capability-network",
+    "companyName": "Bain Capability Network",
+    "status": "success",
+    "jobsFound": 0,
+    "executionTime": 2311,
+    "timestamp": "2026-06-09T05:16:48.818Z"
+  },
+  {
+    "id": "aae929c8-5e15-496b-aaaf-fd46a24d99e5",
+    "companyId": "bp",
+    "companyName": "BP",
+    "status": "success",
+    "jobsFound": 0,
+    "executionTime": 4874,
+    "timestamp": "2026-06-09T05:16:46.507Z"
+  },
+  {
+    "id": "8c872714-8dca-4d54-8778-3be3197c9918",
+    "companyId": "bcg",
+    "companyName": "BCG",
+    "status": "success",
+    "jobsFound": 8,
+    "executionTime": 26976,
+    "timestamp": "2026-06-09T05:16:44.496Z"
+  },
+  {
+    "id": "3721475e-9edb-4173-a2ff-bf4180c72593",
+    "companyId": "bmc-software",
+    "companyName": "BMC Software",
+    "status": "success",
+    "jobsFound": 8,
+    "executionTime": 17764,
+    "timestamp": "2026-06-09T05:16:41.633Z"
+  },
+  {
+    "id": "9887a1de-e258-47e3-b22d-df63cb1a1523",
+    "companyId": "auth0",
+    "companyName": "Auth0",
+    "status": "success",
+    "jobsFound": 8,
+    "executionTime": 43850,
+    "timestamp": "2026-06-09T05:16:39.200Z"
+  },
+  {
+    "id": "6dd8d860-20a9-47b2-aa9d-3610d5363bfe",
+    "companyId": "basf",
+    "companyName": "BASF",
+    "status": "success",
+    "jobsFound": 1,
+    "executionTime": 20840,
+    "timestamp": "2026-06-09T05:16:23.869Z"
+  },
+  {
+    "id": "bf92bb72-7ad8-4006-8adf-237a39431e5f",
+    "companyId": "avaloq",
+    "companyName": "Avaloq",
+    "status": "success",
+    "jobsFound": 8,
+    "executionTime": 14533,
+    "timestamp": "2026-06-09T05:16:17.520Z"
+  },
+  {
+    "id": "a4de2f9b-3b2f-4acf-aa31-79394a8778e5",
+    "companyId": "automation-anywhere",
+    "companyName": "Automation Anywhere",
+    "status": "failed",
+    "errors": "page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://www.automationanywhere.com/company/careers/all\nCall log:\n\u001b[2m  - navigating to \"https://www.automationanywhere.com/company/careers/all\", waiting until \"domcontentloaded\"\u001b[22m\n",
+    "executionTime": 770,
+    "timestamp": "2026-06-09T05:16:03.029Z"
+  },
+  {
+    "id": "3f33febd-6b18-4a22-b4ab-88efe0aa5e9a",
+    "companyId": "autodesk",
+    "companyName": "Autodesk",
+    "status": "failed",
+    "errors": "Request failed with status code 400",
+    "executionTime": 1307,
+    "timestamp": "2026-06-09T05:16:02.987Z"
+  },
+  {
+    "id": "1355c8fc-f231-4c83-9bf2-aa38f3bb504b",
+    "companyId": "atlassian",
+    "companyName": "Atlassian",
+    "status": "success",
+    "jobsFound": 8,
+    "executionTime": 7105,
+    "timestamp": "2026-06-09T05:16:02.259Z"
+  },
+  {
+    "id": "159ee1f1-a1d6-4e2e-ac6e-d2b9d2ee22c7",
+    "companyId": "astrazeneca",
+    "companyName": "AstraZeneca",
+    "status": "success",
+    "jobsFound": 8,
+    "executionTime": 21441,
+    "timestamp": "2026-06-09T05:16:01.679Z"
+  },
+  {
+    "id": "845a5902-02f5-44ea-936d-44f82fda8c82",
+    "companyId": "atkins-ralis",
+    "companyName": "Atkins Réalis",
+    "status": "success",
+    "jobsFound": 0,
+    "executionTime": 2295,
+    "timestamp": "2026-06-09T05:15:55.350Z"
+  },
+  {
+    "id": "3c0ef4ce-ef7d-4f44-a5d0-1e3183472573",
+    "companyId": "arm",
+    "companyName": "Arm",
+    "status": "success",
+    "jobsFound": 8,
+    "executionTime": 18027,
+    "timestamp": "2026-06-09T05:15:55.154Z"
+  },
+  {
+    "id": "c9b7a4a0-a1aa-4066-8e5b-49c1db6287ae",
+    "companyId": "ascendion",
+    "companyName": "Ascendion",
+    "status": "success",
+    "jobsFound": 8,
+    "executionTime": 15445,
+    "timestamp": "2026-06-09T05:15:53.055Z"
+  },
+  {
+    "id": "aa4bfb53-cd1a-4dec-9d9b-aa572cb34c3b",
+    "companyId": "aspentech",
+    "companyName": "AspenTech",
+    "status": "failed",
+    "errors": "Request failed with status code 400",
+    "executionTime": 897,
+    "timestamp": "2026-06-09T05:15:40.237Z"
+  },
+  {
+    "id": "341db2fd-ae7d-4bf7-aa2d-019d53a38d11",
+    "companyId": "arista-networks",
+    "companyName": "Arista Networks",
+    "status": "success",
+    "jobsFound": 0,
+    "executionTime": 2337,
+    "timestamp": "2026-06-09T05:15:39.339Z"
+  },
+  {
+    "id": "5186ee9c-e16d-40e4-83ca-b284b6cb5132",
+    "companyId": "armis",
+    "companyName": "Armis",
+    "status": "success",
+    "jobsFound": 24,
+    "executionTime": 376,
+    "timestamp": "2026-06-09T05:15:37.610Z"
+  },
+  {
+    "id": "fbda1582-e4f2-4e2e-bd66-e75ebc716d2b",
+    "companyId": "arctic-wolf",
+    "companyName": "Arctic Wolf",
+    "status": "failed",
+    "errors": "Request failed with status code 400",
+    "executionTime": 851,
+    "timestamp": "2026-06-09T05:15:37.234Z"
+  },
+  {
+    "id": "8d9b53fa-faf7-4b0f-806e-215d0a41866f",
+    "companyId": "apollo-global-management",
+    "companyName": "Apollo Global Management",
+    "status": "failed",
+    "errors": "Request failed with status code 400",
+    "executionTime": 784,
+    "timestamp": "2026-06-09T05:15:37.127Z"
+  },
+  {
+    "id": "fc6b8c16-7f1b-4144-b9c4-2f00b90594f7",
+    "companyId": "analog-devices",
+    "companyName": "Analog Devices",
+    "status": "failed",
+    "errors": "Request failed with status code 400",
+    "executionTime": 913,
+    "timestamp": "2026-06-09T05:15:37.002Z"
+  },
+  {
+    "id": "3c80b5e2-c490-424d-b351-8a184f51e43a",
+    "companyId": "amadeus",
+    "companyName": "Amadeus",
+    "status": "failed",
+    "errors": "Request failed with status code 400",
+    "executionTime": 632,
+    "timestamp": "2026-06-09T05:15:36.383Z"
+  },
+  {
+    "id": "bcb92140-1538-4c83-b767-0baa282c37ae",
+    "companyId": "alteryx",
+    "companyName": "Alteryx",
+    "status": "failed",
+    "errors": "Request failed with status code 400",
+    "executionTime": 830,
+    "timestamp": "2026-06-09T05:15:36.343Z"
+  },
+  {
+    "id": "6d7b4f43-248d-4294-8e61-a337f163d1f9",
+    "companyId": "airbus",
+    "companyName": "Airbus",
+    "status": "failed",
+    "errors": "Request failed with status code 400",
+    "executionTime": 642,
+    "timestamp": "2026-06-09T05:15:36.089Z"
+  },
+  {
+    "id": "b0b3629e-dec8-4af9-bbba-abe1711558c3",
+    "companyId": "3m",
+    "companyName": "3M",
+    "status": "failed",
+    "errors": "Request failed with status code 400",
+    "executionTime": 917,
+    "timestamp": "2026-06-09T05:15:35.751Z"
+  },
+  {
+    "id": "2f7c3aba-348b-4ee8-912c-c12193fd3aa2",
+    "companyId": "aveva",
+    "companyName": "AVEVA",
+    "status": "failed",
+    "errors": "Request failed with status code 400",
+    "executionTime": 664,
+    "timestamp": "2026-06-09T05:15:35.513Z"
+  },
+  {
+    "id": "c7d8d70c-c76b-46d4-97bb-a1f651f47a03",
+    "companyId": "adidas",
+    "companyName": "Adidas",
+    "status": "failed",
+    "errors": "page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://careers.adidas-group.com/jobs?location=%5B%7B%22country%22%3A%22India%22%7D%5D&offset=0&keywords=&location_manual=India\nCall log:\n\u001b[2m  - navigating to \"https://careers.adidas-group.com/jobs?location=%5B%7B%22country%22%3A%22India%22%7D%5D&offset=0&keywords=&location_manual=India\", waiting until \"domcontentloaded\"\u001b[22m\n",
+    "executionTime": 597,
+    "timestamp": "2026-06-09T05:15:35.447Z"
+  },
+  {
     "id": "862e24ef-6d46-4ea5-8bed-1fcfc799451f",
     "companyId": "aptiv",
     "companyName": "Aptiv",

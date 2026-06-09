@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { MapPin, Briefcase, Calendar, ChevronRight, Share2, Layers } from 'lucide-react';
+import { MapPin, Briefcase, Calendar, ChevronRight, Share2, Layers, Tag } from 'lucide-react';
 
 interface JobCardProps {
   job: {
@@ -20,13 +20,13 @@ interface JobCardProps {
     postedDate?: string;
     remoteStatus?: 'Remote' | 'Hybrid' | 'Onsite' | 'Unknown';
     createdAt: string;
+    industry?: string;
   };
   isActive?: boolean;
   onClick?: () => void;
 }
 
 export default function JobCard({ job, isActive = false, onClick }: JobCardProps) {
-  // Format posted date relative
   const getRelativeTime = (dateStr: string) => {
     try {
       const date = new Date(dateStr);
@@ -42,7 +42,6 @@ export default function JobCard({ job, isActive = false, onClick }: JobCardProps
     }
   };
 
-  // Generate a robust deterministic color theme for company logos
   const getCompanyColor = (name: string) => {
     const colors = [
       'from-pink-500 to-rose-500',
@@ -75,7 +74,6 @@ export default function JobCard({ job, isActive = false, onClick }: JobCardProps
         {/* Card Header (Logo + Company + Tags) */}
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
-            {/* Dynamic Company Logo Placeholder */}
             <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr ${companyLogoColor} text-white font-bold text-lg shadow-inner shadow-white/10`}>
               {job.companyName.charAt(0).toUpperCase()}
             </div>
@@ -116,16 +114,22 @@ export default function JobCard({ job, isActive = false, onClick }: JobCardProps
           {job.title}
         </h3>
 
-        {/* Experience details */}
-        <div className="mt-3 flex items-center gap-4 text-xs text-gray-400">
-          <span className="flex items-center gap-1">
+        {/* Experience & Industry details */}
+        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-gray-400">
+          <span className="flex items-center gap-1 shrink-0">
             <Briefcase className="h-3.5 w-3.5" />
             {job.experienceLevel || 'Not Specified'}
           </span>
           {job.yearsExperience !== undefined && job.yearsExperience > 0 && (
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1 shrink-0">
               <Layers className="h-3.5 w-3.5" />
               {job.yearsExperience}+ Yrs Exp
+            </span>
+          )}
+          {job.industry && (
+            <span className="flex items-center gap-1 shrink-0 text-cyan-400 font-medium text-[11px]">
+              <Tag className="h-3 w-3 shrink-0" />
+              {job.industry}
             </span>
           )}
         </div>

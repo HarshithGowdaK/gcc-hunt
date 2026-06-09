@@ -7,13 +7,6 @@
     "lastScraped": null
   },
   {
-    "id": "adm",
-    "name": "ADM",
-    "careersUrl": "https://sjobs.brassring.com/TGnewUI/Search/home/HomeWithPreLoad?partnerid=25416&siteid=5429&PageType=searchResults&SearchType=linkquery&LinkID=4393910#keyWordSearch=&Location%20Country=India",
-    "status": "success",
-    "lastScraped": "2026-06-08T12:18:17.655Z"
-  },
-  {
     "id": "aveva",
     "name": "AVEVA",
     "careersUrl": "https://aveva.wd3.myworkdayjobs.com/AVEVA_careers?locationCountry=c4f78be1a8f14da0ab49ce1162348a5e",
@@ -42,53 +35,11 @@
     "lastScraped": null
   },
   {
-    "id": "altimetrik",
-    "name": "Altimetrik",
-    "careersUrl": "https://altimetrik.ripplehire.com/candidate/?token=SWCslMw2ct8eSm7LyqVb&source=CAREERSITE#list/location=Bangalore%2BBengaluru%2BChennai%2BHyderabad%2BMumbai%2BPune",
-    "status": "success",
-    "lastScraped": "2026-06-08T12:18:13.431Z"
-  },
-  {
-    "id": "altran",
-    "name": "Altran",
-    "careersUrl": "https://www.capgemini.com/careers/join-capgemini/job-search/?page=1&size=11&country_code=en-in",
-    "status": "success",
-    "lastScraped": "2026-06-08T12:18:22.443Z"
-  },
-  {
-    "id": "alvarez-marsal",
-    "name": "Alvarez & Marsal",
-    "careersUrl": "https://careers.alvarezandmarsal.com/search/jobs/in/country/india",
-    "status": "success",
-    "lastScraped": "2026-06-08T12:18:15.708Z"
-  },
-  {
     "id": "amadeus",
     "name": "Amadeus",
     "careersUrl": "https://amadeus.wd502.myworkdayjobs.com/jobs?locationCountry=c4f78be1a8f14da0ab49ce1162348a5e",
     "status": "failed",
     "lastScraped": null
-  },
-  {
-    "id": "amazon",
-    "name": "Amazon",
-    "careersUrl": "https://www.amazon.jobs/en/search?offset=0&result_limit=10&sort=relevant&country%5B%5D=IND&distanceType=Mi&radius=24km&latitude=&longitude=&loc_group_id=&loc_query=India&base_query=&city=&country=IND®ion=&county=&query_options=&",
-    "status": "success",
-    "lastScraped": "2026-06-08T12:18:24.960Z"
-  },
-  {
-    "id": "american-express",
-    "name": "American Express",
-    "careersUrl": "https://careers.americanexpress.com/en/sites/CX_1/jobs?intlink=us-amex-career-en-us-search&location=India",
-    "status": "success",
-    "lastScraped": "2026-06-08T12:18:37.956Z"
-  },
-  {
-    "id": "amgen",
-    "name": "Amgen",
-    "careersUrl": "https://careers.amgen.com/en/search-jobs/India/87/2/1269750/22/79/50/2",
-    "status": "success",
-    "lastScraped": "2026-06-08T12:18:34.904Z"
   },
   {
     "id": "analog-devices",
@@ -98,74 +49,11 @@
     "lastScraped": null
   },
   {
-    "id": "anthropic",
-    "name": "Anthropic",
-    "careersUrl": "https://www.anthropic.com/careers/jobs?office=4051957008",
-    "status": "success",
-    "lastScraped": "2026-06-08T12:18:37.801Z"
-  },
-  {
-    "id": "aon",
-    "name": "Aon",
-    "careersUrl": "https://jobs.aon.com/jobs?location=India&woe=12®ionCode=IN&stretchUnit=MILES&stretch=0&page=1",
-    "status": "success",
-    "lastScraped": "2026-06-08T12:18:37.786Z"
-  },
-  {
     "id": "apollo-global-management",
     "name": "Apollo Global Management",
     "careersUrl": "https://athene.wd5.myworkdayjobs.com/Apollo_Careers?locations=033362e37aa31001a2dd20852cd80000",
     "status": "failed",
     "lastScraped": null
-  },
-  {
-    "id": "appdynamics",
-    "name": "AppDynamics",
-    "careersUrl": "https://careers.cisco.com/global/en/search-results?keywords=India",
-    "status": "success",
-    "lastScraped": "2026-06-08T12:18:43.950Z"
-  },
-  {
-    "id": "appian",
-    "name": "Appian",
-    "careersUrl": "https://careers.appian.com/jobs?jobs-location=jobs-location:chennai--india&text=",
-    "status": "success",
-    "lastScraped": "2026-06-08T12:18:42.843Z"
-  },
-  {
-    "id": "applied-materials",
-    "name": "Applied Materials",
-    "careersUrl": "https://careers.appliedmaterials.com/careers?start=0&location=India&pid=790316006231&sort_by=distance&filter_include_remote=1",
-    "status": "success",
-    "lastScraped": "2026-06-08T12:18:48.296Z"
-  },
-  {
-    "id": "aptiv",
-    "name": "Aptiv",
-    "careersUrl": "https://www.aptiv.com/en/jobs/search?country=India",
-    "status": "success",
-    "lastScraped": "2026-06-08T12:19:04.082Z"
-  },
-  {
-    "id": "aqua-security",
-    "name": "Aqua Security",
-    "careersUrl": "https://www.aquasec.com/about-us/careers/",
-    "status": "success",
-    "lastScraped": "2026-06-08T12:18:47.730Z"
-  },
-  {
-    "id": "arcadis",
-    "name": "Arcadis",
-    "careersUrl": "https://jobs.arcadis.com/careers?domain=arcadis.com&start=0&location=India&pid=563671530037214&sort_by=distance&filter_include_remote=1",
-    "status": "success",
-    "lastScraped": "2026-06-08T12:18:59.725Z"
-  },
-  {
-    "id": "arcesium",
-    "name": "Arcesium",
-    "careersUrl": "https://www.arcesium.com/careers#open-positions",
-    "status": "success",
-    "lastScraped": "2026-06-08T12:18:55.513Z"
   },
   {
     "id": "arctic-wolf",
@@ -178,287 +66,287 @@
     "id": "arista-networks",
     "name": "Arista Networks",
     "careersUrl": "https://www.arista.com/en/careers",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:15:39.339Z"
   },
   {
     "id": "arm",
     "name": "Arm",
     "careersUrl": "https://careers.arm.com/search-jobs/India?orgIds=33099&alp=1269750&alt=2",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:15:55.154Z"
   },
   {
     "id": "armis",
     "name": "Armis",
     "careersUrl": "https://job-boards.greenhouse.io/armissecurity?keyword=&departments=&offices%5B%5D=4026238004",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:15:37.610Z"
   },
   {
     "id": "ascendion",
     "name": "Ascendion",
     "careersUrl": "https://jobs.ascendion.com/careers?start=0&pid=1970324837278383&sort_by=hot",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:15:53.055Z"
   },
   {
     "id": "aspentech",
     "name": "AspenTech",
     "careersUrl": "https://aspentech.wd5.myworkdayjobs.com/aspentech?locations=ca085437cd681001640a8d943b500000&locations=f55045b8eeb101ee121f9dd48f3d4e90&locations=6cfc80bc9b0301019c2a225bad250000&locations=f55045b8eeb101f8f6acfcd48f3dab91&locations=e15888bd58031000ffdf467c8c250000",
-    "status": "idle",
+    "status": "failed",
     "lastScraped": null
   },
   {
     "id": "astrazeneca",
     "name": "AstraZeneca",
     "careersUrl": "https://careers.astrazeneca.com/search-jobs/India/7684/2",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:16:01.678Z"
   },
   {
     "id": "atkins-ralis",
     "name": "Atkins Réalis",
     "careersUrl": "https://careers.atkinsrealis.com/en/jobs?location=India",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:15:55.350Z"
   },
   {
     "id": "atlassian",
     "name": "Atlassian",
     "careersUrl": "https://www.atlassian.com/company/careers/all-jobs?team=&location=&search=India",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:16:02.259Z"
   },
   {
     "id": "auth0",
     "name": "Auth0",
     "careersUrl": "https://www.okta.com/company/careers/job-listing/?department=All&location=5997",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:16:39.200Z"
   },
   {
     "id": "autodesk",
     "name": "Autodesk",
     "careersUrl": "https://autodesk.wd1.myworkdayjobs.com/Ext?_gl=1*12qeibm*_gcl_au*MTk1Njk3MjU1OC4xNzc5NTQ0MzQw*_ga*NTI5MDQyODc0LjE3Nzk1NDQzNDA.*_ga_NZSJ72N6RX*czE3Nzk1NDQzMzkkbzEkZzEkdDE3Nzk1NDQzMzkkajYwJGwwJGgw&locationCountry=c4f78be1a8f14da0ab49ce1162348a5e",
-    "status": "idle",
+    "status": "failed",
     "lastScraped": null
   },
   {
     "id": "automation-anywhere",
     "name": "Automation Anywhere",
     "careersUrl": "https://www.automationanywhere.com/company/careers/all",
-    "status": "idle",
+    "status": "failed",
     "lastScraped": null
   },
   {
     "id": "avaloq",
     "name": "Avaloq",
     "careersUrl": "https://www.avaloq.com/careers/job-openings",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:16:17.520Z"
   },
   {
     "id": "basf",
     "name": "BASF",
     "careersUrl": "https://basf.jobs/?locale=en_US&utm_source=careersite&utm_medium=global_en&utm_campaign=homepage_careers¤tPage=1&pageSize=10&addresses%2Fcountry=India",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:16:23.869Z"
   },
   {
     "id": "bcg",
     "name": "BCG",
     "careersUrl": "https://careers.bcg.com/global/en/search-results?rk=page-targeted-jobs-page1305-prod-7TrB23bK&sortBy=Most%20relevant",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:16:44.496Z"
   },
   {
     "id": "bmc-software",
     "name": "BMC Software",
     "careersUrl": "https://jobs.bmc.com/Careers/SearchJobs/?16484=%5B9406%5D&16484_format=5516&listFilterMode=1&jobRecordsPerPage=6&",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:16:41.633Z"
   },
   {
     "id": "bny-mellon",
     "name": "BNY Mellon",
     "careersUrl": "https://eofe.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/BNY-Careers/jobs?location=India&locationId=300000000378365&locationLevel=country&mode=location",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:16:53.783Z"
   },
   {
     "id": "bp",
     "name": "BP",
     "careersUrl": "https://careers.bp.com/listing?production_bp_jobs%5Bquery%5D=India&production_bp_jobs%5BrefinementList%5D%5Blocation_list%5D%5B0%5D=India",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:16:46.507Z"
   },
   {
     "id": "bt-group",
     "name": "BT Group",
     "careersUrl": "https://jobs.bt.com/search/?q=&locationsearch=India&searchResultView=LIST&markerViewed=&carouselIndex=&facetFilters=%7B%22jobLocationCountry%22%3A%5B%22India%22%5D%7D&pageNumber=0",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:16:49.751Z"
   },
   {
     "id": "bain-capability-network",
     "name": "Bain Capability Network",
     "careersUrl": "https://www.bain.com/careers/find-a-role/?filters=offices(274,276,275)|",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:16:48.818Z"
   },
   {
     "id": "baker-hughes",
     "name": "Baker Hughes",
     "careersUrl": "https://careers.bakerhughes.com/global/en/search-results",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:17:06.393Z"
   },
   {
     "id": "barclays",
     "name": "Barclays",
     "careersUrl": "https://search.jobs.barclays/search-jobs?glat=30.7019&glon=76.7722",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:17:12.674Z"
   },
   {
     "id": "barracuda-networks",
     "name": "Barracuda Networks",
     "careersUrl": "https://www.barracuda.com/company/careers?location=Bangalore%252C%2520India",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:16:56.436Z"
   },
   {
     "id": "baxter",
     "name": "Baxter",
     "careersUrl": "https://jobs.baxter.com/en/search-jobs/India/152/2/1269750/22/79/50/2",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:17:18.570Z"
   },
   {
     "id": "bechtel",
     "name": "Bechtel",
     "careersUrl": "https://jobs.baxter.com/en/search-jobs/India/152/2/1269750/22/79/50/2",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:17:19.346Z"
   },
   {
     "id": "bharat-pe",
     "name": "Bharat Pe",
     "careersUrl": "https://bharatpe.darwinbox.in/ms/candidatev2/main/careers/allJobs",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:17:15.035Z"
   },
   {
     "id": "bio-rad-laboratories",
     "name": "Bio-Rad Laboratories",
     "careersUrl": "https://careers.bio-rad.com/jobs/search?page=1&country_codes%5B%5D=IN&query=",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:17:28.319Z"
   },
   {
     "id": "birlasoft",
     "name": "Birlasoft",
     "careersUrl": "https://jobs.birlasoft.com/search/?q=India&q2=&alertId=&title=&department=&location=India&date=&facility=#searchresults",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:17:23.874Z"
   },
   {
     "id": "black-veatch",
     "name": "Black & Veatch",
     "careersUrl": "https://careers.bv.com/search/?q=&locationsearch=India",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:17:45.833Z"
   },
   {
     "id": "blackberry-qnx",
     "name": "BlackBerry QNX",
     "careersUrl": "https://bb.wd3.myworkdayjobs.com/BlackBerry/jobs?locations=b15feefdaa031001b5e1e32ca4710000",
-    "status": "idle",
+    "status": "failed",
     "lastScraped": null
   },
   {
     "id": "blackline",
     "name": "BlackLine",
     "careersUrl": "https://careers.blackline.com/careers-home/jobs?country=India&page=1",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:17:28.453Z"
   },
   {
     "id": "blackrock",
     "name": "BlackRock",
     "careersUrl": "https://careers.blackrock.com/search-jobs/India/45831/2/1269750/22/79/0/2",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:17:42.653Z"
   },
   {
     "id": "bloomberg",
     "name": "Bloomberg",
     "careersUrl": "https://bloomberg.avature.net/careers/SearchJobs/?1845=%5B162477%2C162478%2C162575%5D&1845_format=3996&listFilterMode=1&jobRecordsPerPage=12&#",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:17:45.170Z"
   },
   {
     "id": "blue-prism",
     "name": "Blue Prism",
     "careersUrl": "https://wd1.myworkdaysite.com/recruiting/ssctech/SSCTechnologies?locationCountry=c4f78be1a8f14da0ab49ce1162348a5e",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:17:45.828Z"
   },
   {
     "id": "blue-yonder",
     "name": "Blue Yonder",
     "careersUrl": "https://careers.blueyonder.com/us/en/search-results",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:17:56.023Z"
   },
   {
     "id": "boeing",
     "name": "Boeing",
     "careersUrl": "https://jobs.boeing.com/search-jobs/India/185/2/1269750/22/79/50/2",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:17:55.150Z"
   },
   {
     "id": "boomi",
     "name": "Boomi",
     "careersUrl": "https://boomi.com/company/careers/#greenhouseapp",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:18:18.126Z"
   },
   {
     "id": "bosch",
     "name": "Bosch",
     "careersUrl": "https://jobs.bosch.com/en/?pages=1&country=in",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:18:06.579Z"
   },
   {
     "id": "bounteous-x-accolite",
     "name": "Bounteous x Accolite",
     "careersUrl": "https://www.bounteous.com/careers/search-results/?location=India",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:18:01.439Z"
   },
   {
     "id": "brillio",
     "name": "Brillio",
     "careersUrl": "https://careers.brillio.com/job-listing/?job_title=&country=India&workplace=",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:18:13.480Z"
   },
   {
     "id": "bristol-myers-squibb",
     "name": "Bristol Myers Squibb",
     "careersUrl": "https://jobs.bms.com/careers?domain=bms.com&start=0&location=india&pid=137480083642&sort_by=distance&filter_include_remote=1",
-    "status": "idle",
-    "lastScraped": null
+    "status": "success",
+    "lastScraped": "2026-06-09T05:18:22.213Z"
   },
   {
     "id": "broadcom",
     "name": "Broadcom",
     "careersUrl": "https://broadcom.wd1.myworkdayjobs.com/External_Career?locations=6d1be12dc134103be580f2ed396f3bdf&locations=877d747df7191002136421863fac0000&locations=2d466ab4e6e0013cf503069082349dd2&locations=0dd627624e2e0176f301cad8dcd9ab0b&locations=877d747df71910021363ea290d900000&locations=2a204116f85f01189cd964af936b70fb",
-    "status": "idle",
+    "status": "failed",
     "lastScraped": null
   },
   {
@@ -2170,13 +2058,6 @@
     "lastScraped": null
   },
   {
-    "id": "company",
-    "name": "Company",
-    "careersUrl": "Actual Job Listing",
-    "status": "idle",
-    "lastScraped": null
-  },
-  {
     "id": "adp",
     "name": "ADP",
     "careersUrl": "https://jobs.adp.com/en/jobs/?search=&mylocation=India&origin=global&lat=20.593684&lng=78.96288&origin=global",
@@ -2315,5 +2196,117 @@
     "careersUrl": "https://jobs.sw.siemens.com/locations/ind/jobs/",
     "status": "success",
     "lastScraped": "2026-06-08T11:56:09.978Z"
+  },
+  {
+    "id": "altimetrik",
+    "name": "Altimetrik",
+    "careersUrl": "https://altimetrik.ripplehire.com/candidate/?token=SWCslMw2ct8eSm7LyqVb&source=CAREERSITE#list/location=Bangalore%2BBengaluru%2BChennai%2BHyderabad%2BMumbai%2BPune",
+    "status": "success",
+    "lastScraped": "2026-06-08T12:18:13.431Z"
+  },
+  {
+    "id": "alvarez-marsal",
+    "name": "Alvarez & Marsal",
+    "careersUrl": "https://careers.alvarezandmarsal.com/search/jobs/in/country/india",
+    "status": "success",
+    "lastScraped": "2026-06-08T12:18:15.708Z"
+  },
+  {
+    "id": "adm",
+    "name": "ADM",
+    "careersUrl": "https://sjobs.brassring.com/TGnewUI/Search/home/HomeWithPreLoad?partnerid=25416&siteid=5429&PageType=searchResults&SearchType=linkquery&LinkID=4393910#keyWordSearch=&Location%20Country=India",
+    "status": "success",
+    "lastScraped": "2026-06-08T12:18:17.655Z"
+  },
+  {
+    "id": "altran",
+    "name": "Altran",
+    "careersUrl": "https://www.capgemini.com/careers/join-capgemini/job-search/?page=1&size=11&country_code=en-in",
+    "status": "success",
+    "lastScraped": "2026-06-08T12:18:22.443Z"
+  },
+  {
+    "id": "amazon",
+    "name": "Amazon",
+    "careersUrl": "https://www.amazon.jobs/en/search?offset=0&result_limit=10&sort=relevant&country%5B%5D=IND&distanceType=Mi&radius=24km&latitude=&longitude=&loc_group_id=&loc_query=India&base_query=&city=&country=IND®ion=&county=&query_options=&",
+    "status": "success",
+    "lastScraped": "2026-06-08T12:18:24.960Z"
+  },
+  {
+    "id": "amgen",
+    "name": "Amgen",
+    "careersUrl": "https://careers.amgen.com/en/search-jobs/India/87/2/1269750/22/79/50/2",
+    "status": "success",
+    "lastScraped": "2026-06-08T12:18:34.904Z"
+  },
+  {
+    "id": "aon",
+    "name": "Aon",
+    "careersUrl": "https://jobs.aon.com/jobs?location=India&woe=12®ionCode=IN&stretchUnit=MILES&stretch=0&page=1",
+    "status": "success",
+    "lastScraped": "2026-06-08T12:18:37.786Z"
+  },
+  {
+    "id": "anthropic",
+    "name": "Anthropic",
+    "careersUrl": "https://www.anthropic.com/careers/jobs?office=4051957008",
+    "status": "success",
+    "lastScraped": "2026-06-08T12:18:37.801Z"
+  },
+  {
+    "id": "american-express",
+    "name": "American Express",
+    "careersUrl": "https://careers.americanexpress.com/en/sites/CX_1/jobs?intlink=us-amex-career-en-us-search&location=India",
+    "status": "success",
+    "lastScraped": "2026-06-08T12:18:37.956Z"
+  },
+  {
+    "id": "appian",
+    "name": "Appian",
+    "careersUrl": "https://careers.appian.com/jobs?jobs-location=jobs-location:chennai--india&text=",
+    "status": "success",
+    "lastScraped": "2026-06-08T12:18:42.843Z"
+  },
+  {
+    "id": "appdynamics",
+    "name": "AppDynamics",
+    "careersUrl": "https://careers.cisco.com/global/en/search-results?keywords=India",
+    "status": "success",
+    "lastScraped": "2026-06-08T12:18:43.950Z"
+  },
+  {
+    "id": "aqua-security",
+    "name": "Aqua Security",
+    "careersUrl": "https://www.aquasec.com/about-us/careers/",
+    "status": "success",
+    "lastScraped": "2026-06-08T12:18:47.730Z"
+  },
+  {
+    "id": "applied-materials",
+    "name": "Applied Materials",
+    "careersUrl": "https://careers.appliedmaterials.com/careers?start=0&location=India&pid=790316006231&sort_by=distance&filter_include_remote=1",
+    "status": "success",
+    "lastScraped": "2026-06-08T12:18:48.296Z"
+  },
+  {
+    "id": "arcesium",
+    "name": "Arcesium",
+    "careersUrl": "https://www.arcesium.com/careers#open-positions",
+    "status": "success",
+    "lastScraped": "2026-06-08T12:18:55.513Z"
+  },
+  {
+    "id": "arcadis",
+    "name": "Arcadis",
+    "careersUrl": "https://jobs.arcadis.com/careers?domain=arcadis.com&start=0&location=India&pid=563671530037214&sort_by=distance&filter_include_remote=1",
+    "status": "success",
+    "lastScraped": "2026-06-08T12:18:59.725Z"
+  },
+  {
+    "id": "aptiv",
+    "name": "Aptiv",
+    "careersUrl": "https://www.aptiv.com/en/jobs/search?country=India",
+    "status": "success",
+    "lastScraped": "2026-06-08T12:19:04.082Z"
   }
 ]

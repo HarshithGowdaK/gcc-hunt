@@ -21,6 +21,7 @@ function JobsContent() {
   const [selectedExp, setSelectedExp] = useState(searchParams.get('experienceLevel') || '');
   const [selectedType, setSelectedType] = useState(searchParams.get('employmentType') || '');
   const [selectedRemote, setSelectedRemote] = useState(searchParams.get('remoteStatus') || '');
+  const [selectedIndustry, setSelectedIndustry] = useState(searchParams.get('industry') || '');
   const [sortBy, setSortBy] = useState(searchParams.get('sortBy') || 'recent');
   const [page, setPage] = useState(parseInt(searchParams.get('page') || '1'));
 
@@ -32,12 +33,14 @@ function JobsContent() {
     employmentTypes: string[];
     experienceLevels: string[];
     remoteStatuses: string[];
+    industries: string[];
   }>({
     cities: [],
     departments: [],
     employmentTypes: [],
     experienceLevels: [],
-    remoteStatuses: []
+    remoteStatuses: [],
+    industries: []
   });
 
   // Jobs listing states
@@ -82,6 +85,7 @@ function JobsContent() {
           experienceLevel: selectedExp,
           employmentType: selectedType,
           remoteStatus: selectedRemote,
+          industry: selectedIndustry,
           search,
           sortBy
         });
@@ -101,7 +105,7 @@ function JobsContent() {
     }
 
     loadJobs();
-  }, [page, selectedCompany, selectedCity, selectedExp, selectedType, selectedRemote, sortBy, search]);
+  }, [page, selectedCompany, selectedCity, selectedExp, selectedType, selectedRemote, selectedIndustry, sortBy, search]);
 
   // Fetch individual job details when activeJobId changes
   useEffect(() => {
@@ -145,6 +149,7 @@ function JobsContent() {
     setSelectedExp('');
     setSelectedType('');
     setSelectedRemote('');
+    setSelectedIndustry('');
     setSortBy('recent');
     setPage(1);
     updateUrl({
@@ -154,6 +159,7 @@ function JobsContent() {
       experienceLevel: '',
       employmentType: '',
       remoteStatus: '',
+      industry: '',
       sortBy: 'recent',
       page: 1
     });
@@ -261,7 +267,7 @@ function JobsContent() {
               </select>
             </div>
 
-            {/* Remote Status Select */}
+            {/* Workplace Type Select */}
             <div>
               <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1.5">Workplace Type</label>
               <select
@@ -276,6 +282,25 @@ function JobsContent() {
                 <option value="">All Types</option>
                 {filterOptions.remoteStatuses.map((rem) => (
                   <option key={rem} value={rem}>{rem}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Industry Select */}
+            <div>
+              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1.5">Industry Category</label>
+              <select
+                className="w-full glass-card bg-[#0a071c] text-white px-3 py-2 text-xs outline-none border-white/5 border"
+                value={selectedIndustry}
+                onChange={(e) => {
+                  setSelectedIndustry(e.target.value);
+                  setPage(1);
+                  updateUrl({ industry: e.target.value, page: 1 });
+                }}
+              >
+                <option value="">All Industries</option>
+                {filterOptions.industries && filterOptions.industries.map((ind) => (
+                  <option key={ind} value={ind}>{ind}</option>
                 ))}
               </select>
             </div>
@@ -392,7 +417,6 @@ function JobsContent() {
               
               {Array.from({ length: pagination.totalPages }).map((_, idx) => {
                 const pNum = idx + 1;
-                // Render truncated pagination if there are too many pages
                 if (pagination.totalPages > 6 && Math.abs(pNum - page) > 2 && pNum !== 1 && pNum !== pagination.totalPages) {
                   if (pNum === 2 || pNum === pagination.totalPages - 1) {
                     return <span key={idx} className="text-gray-600 px-1 text-xs">...</span>;
@@ -474,6 +498,12 @@ function JobsContent() {
                   <span className="text-gray-500 font-medium">Experience Level</span>
                   <span className="text-gray-300 font-semibold">{activeJobDetails.experienceLevel || 'Mid level'}</span>
                 </div>
+                {activeJobDetails.industry && (
+                  <div className="flex justify-between text-xs">
+                    <span className="text-gray-500 font-medium">Industry</span>
+                    <span className="text-gray-300 font-semibold">{activeJobDetails.industry}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-xs">
                   <span className="text-gray-500 font-medium">Employment Type</span>
                   <span className="text-gray-300 font-semibold">{activeJobDetails.employmentType || 'Full-time'}</span>
@@ -499,7 +529,7 @@ function JobsContent() {
                 </div>
               </div>
 
-              {/* Job Description (Summarized) */}
+              {/* Job Description (Verbatim) */}
               <div className="border-t border-white/5 pt-4">
                 <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Job Description</h3>
                 <div className="text-xs text-gray-400 leading-relaxed whitespace-pre-line line-clamp-[10]">
@@ -631,6 +661,25 @@ function JobsContent() {
                     <option value="">All Types</option>
                     {filterOptions.remoteStatuses.map((rem) => (
                       <option key={rem} value={rem}>{rem}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Industry Category select (Mobile) */}
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1.5">Industry Category</label>
+                  <select
+                    className="w-full glass-card bg-[#0a071c] text-white px-3 py-2 text-xs outline-none border-white/5 border"
+                    value={selectedIndustry}
+                    onChange={(e) => {
+                      setSelectedIndustry(e.target.value);
+                      setPage(1);
+                      updateUrl({ industry: e.target.value, page: 1 });
+                    }}
+                  >
+                    <option value="">All Industries</option>
+                    {filterOptions.industries && filterOptions.industries.map((ind) => (
+                      <option key={ind} value={ind}>{ind}</option>
                     ))}
                   </select>
                 </div>

@@ -24,6 +24,7 @@ interface Job {
   department?: string;
   description: string;
   dateScraped?: string;
+  industry?: string;
 }
 
 // Convert untyped static data imports to typed arrays
@@ -41,6 +42,7 @@ export async function fetchJobs(filters: {
   remoteStatus?: string;
   search?: string;
   sortBy?: string;
+  industry?: string;
 } = {}) {
   await new Promise(resolve => setTimeout(resolve, 50));
 
@@ -66,6 +68,9 @@ export async function fetchJobs(filters: {
   if (filters.remoteStatus) {
     list = list.filter(j => j.remoteStatus === filters.remoteStatus);
   }
+  if (filters.industry) {
+    list = list.filter(j => j.industry === filters.industry);
+  }
 
   // Keywords filter
   if (filters.search) {
@@ -79,7 +84,8 @@ export async function fetchJobs(filters: {
         j.companyName.toLowerCase().includes(searchWord) ||
         j.city.toLowerCase().includes(searchWord) ||
         j.skills.some(s => s.toLowerCase().includes(searchWord)) ||
-        (j.department && j.department.toLowerCase().includes(searchWord))
+        (j.department && j.department.toLowerCase().includes(searchWord)) ||
+        (j.industry && j.industry.toLowerCase().includes(searchWord))
       );
     });
   }
@@ -149,6 +155,7 @@ export async function fetchFilters() {
   const employmentTypes = new Set<string>();
   const experienceLevels = new Set<string>();
   const remoteStatuses = new Set<string>();
+  const industries = new Set<string>();
 
   typedJobs.forEach(job => {
     if (job.city) cities.add(job.city);
@@ -156,6 +163,7 @@ export async function fetchFilters() {
     if (job.employmentType) employmentTypes.add(job.employmentType);
     if (job.experienceLevel) experienceLevels.add(job.experienceLevel);
     if (job.remoteStatus) remoteStatuses.add(job.remoteStatus);
+    if (job.industry) industries.add(job.industry);
   });
 
   return {
@@ -163,7 +171,8 @@ export async function fetchFilters() {
     departments: Array.from(departments).sort(),
     employmentTypes: Array.from(employmentTypes).sort(),
     experienceLevels: Array.from(experienceLevels).sort(),
-    remoteStatuses: Array.from(remoteStatuses).sort()
+    remoteStatuses: Array.from(remoteStatuses).sort(),
+    industries: Array.from(industries).sort()
   };
 }
 
