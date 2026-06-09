@@ -612,7 +612,7 @@ async function scrapeGeneric(companyId, companyName, careersUrl) {
         
         rawText = await detailPage.evaluate(() => {
           const mainNode = document.querySelector('main, article, [class*="job-details" i], [class*="description" i], [id*="description" i]');
-          if (mainNode) return (mainNode as HTMLElement).innerText;
+          if (mainNode) return mainNode.innerText;
           return document.body.innerText;
         });
         rawText = rawText.replace(/\s+/g, ' ').trim();
