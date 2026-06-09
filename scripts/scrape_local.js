@@ -273,73 +273,93 @@ function classifyIndustry(title, department) {
 async function parseJobPostingWithAI(text, jobTitle, jobLocation) {
   if (!GEMINI_API_KEY) return null;
   
-  const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
-  const cleanText = text.substring(0, 15000); // Gemini handles large contexts easily
+  const models = ['gemini-2.5-flash', 'gemini-2.0-flash'];
+  const cleanText = text.substring(0, 15000); 
 
   for (const model of models) {
-    try {
-      console.log(`[Gemini API] Parsing job details for: "${jobTitle}" using model ${model}...`);
-      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
-      
-      const response = await axios.post(apiUrl, {
-        contents: [{
-          parts: [{
-            text: `Analyze this job posting text and extract the exact details requested.
+    let retries = 0;
+    const maxRetries = 4;
+    let baseDelay = 5000; 
+
+    while (retries < maxRetries) {
+      try {
+        console.log(`[Gemini API] Parsing job details for: "${jobTitle}" using model ${model} (attempt ${retries + 1}/${maxRetries})...`);
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+        
+        const response = await axios.post(apiUrl, {
+          contents: [{
+            parts: [{
+              text: `Analyze this job posting text and extract the exact details requested.
 Title: ${jobTitle}
 Location: ${jobLocation}
 
 Job Description Text:
 ${cleanText}`
-          }]
-        }],
-        generationConfig: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: "OBJECT",
-            properties: {
-              description: { 
-                type: "STRING", 
-                description: "Extract the EXACT, COMPLETE job description details (responsibilities, requirements, technical criteria) VERBATIM from the page. Do NOT summarize, rewrite, or truncate the text. Simply exclude unrelated website cookies banners, headers, and footer menu navigation items. Preserve the exact vocabulary."
+            }]
+          }],
+          generationConfig: {
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: "OBJECT",
+              properties: {
+                description: { 
+                  type: "STRING", 
+                  description: "Extract the EXACT, COMPLETE job description details (responsibilities, requirements, technical criteria) VERBATIM from the page. Do NOT summarize, rewrite, or truncate the text. Simply exclude unrelated website cookies banners, headers, and footer menu navigation items. Preserve the exact vocabulary."
+                },
+                skills: { 
+                  type: "ARRAY", 
+                  items: { type: "STRING" },
+                  description: "Key technical/non-technical tools or skills mentioned in the job description."
+                },
+                yearsExperience: { 
+                  type: "INTEGER",
+                  description: "Minimum years of experience requested as a number. For freshers, graduates, or trainees, specify 0."
+                },
+                experienceLevel: { 
+                  type: "STRING", 
+                  enum: ["Entry Level", "Mid-Senior Level", "Director / Lead"],
+                  description: "Select Entry Level (0-2 years), Mid-Senior Level (3-7 years), or Director / Lead (8+ years)."
+                },
+                remoteStatus: { 
+                  type: "STRING", 
+                  enum: ["Remote", "Hybrid", "Onsite", "Unknown"] 
+                },
+                employmentType: { 
+                  type: "STRING", 
+                  enum: ["Full-time", "Part-time", "Contract", "Internship", "Apprenticeship"],
+                  description: "Select Full-time, Part-time, Contract, Internship (if title or text specifies intern/trainee), or Apprenticeship (if specifies apprentice)."
+                }
               },
-              skills: { 
-                type: "ARRAY", 
-                items: { type: "STRING" },
-                description: "Key technical/non-technical tools or skills mentioned in the job description."
-              },
-              yearsExperience: { 
-                type: "INTEGER",
-                description: "Minimum years of experience requested as a number. For freshers, graduates, or trainees, specify 0."
-              },
-              experienceLevel: { 
-                type: "STRING", 
-                enum: ["Entry Level", "Mid-Senior Level", "Director / Lead"],
-                description: "Select Entry Level (0-2 years), Mid-Senior Level (3-7 years), or Director / Lead (8+ years)."
-              },
-              remoteStatus: { 
-                type: "STRING", 
-                enum: ["Remote", "Hybrid", "Onsite", "Unknown"] 
-              },
-              employmentType: { 
-                type: "STRING", 
-                enum: ["Full-time", "Part-time", "Contract", "Internship", "Apprenticeship"],
-                description: "Select Full-time, Part-time, Contract, Internship (if title or text specifies intern/trainee), or Apprenticeship (if specifies apprentice)."
-              }
-            },
-            required: ["description", "skills", "yearsExperience", "experienceLevel", "remoteStatus", "employmentType"]
+              required: ["description", "skills", "yearsExperience", "experienceLevel", "remoteStatus", "employmentType"]
+            }
           }
-        }
-      }, {
-        headers: { 'Content-Type': 'application/json' },
-        timeout: 20000
-      });
+        }, {
+          headers: { 'Content-Type': 'application/json' },
+          timeout: 20000
+        });
 
-      const candidate = response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (candidate) {
-        return JSON.parse(candidate);
+        const candidate = response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (candidate) {
+          return JSON.parse(candidate);
+        }
+        break; 
+      } catch (error) {
+        const errMsg = error.response?.data?.error?.message || error.message || '';
+        const status = error.response?.status;
+        
+        const isRateLimit = status === 429 || errMsg.toLowerCase().includes('quota') || errMsg.toLowerCase().includes('rate limit');
+        const isHighDemand = status === 503 || errMsg.toLowerCase().includes('high demand') || errMsg.toLowerCase().includes('spikes in demand') || errMsg.toLowerCase().includes('temporary');
+        
+        if ((isRateLimit || isHighDemand) && retries < maxRetries - 1) {
+          retries++;
+          const sleepMs = baseDelay * Math.pow(2, retries - 1) + Math.random() * 2000;
+          console.warn(`[Gemini API - ${model}] Rate limited/high demand (status ${status || 'unknown'}): ${errMsg.substring(0, 150)}. Retrying in ${(sleepMs/1000).toFixed(1)}s...`);
+          await new Promise(resolve => setTimeout(resolve, sleepMs));
+        } else {
+          console.warn(`[Gemini API - ${model}] Request failed: ${errMsg.substring(0, 200)}`);
+          break; 
+        }
       }
-    } catch (error) {
-      console.warn(`[Gemini API - ${model}] Failed: ${error.response?.data?.error?.message || error.message}`);
-      // Fall through to next model
     }
   }
 
@@ -386,6 +406,9 @@ async function scrapeWorkday(companyId, companyName, careersUrl) {
       for (const posting of postings) {
         const normLoc = normalizeLocation(posting.locationsText);
         if (!normLoc) continue;
+
+        // Introduce a small pacing delay to distribute queries and prevent Gemini rate spikes
+        await new Promise(resolve => setTimeout(resolve, 1500));
 
         const jobUrl = `https://${host}/${site.toLowerCase()}${posting.externalPath}`;
         const detailApiUrl = `https://${host}/wday/cxs/${tenant}/${site}${posting.externalPath}`;
@@ -803,6 +826,9 @@ async function scrapeGeneric(companyId, companyName, careersUrl) {
     for (const item of allRawJobs.slice(0, 15)) {
       const normLoc = normalizeLocation(item.location) || normalizeLocation(item.title);
       if (!normLoc) continue;
+
+      // Introduce a small pacing delay to distribute queries and prevent Gemini rate spikes
+      await new Promise(resolve => setTimeout(resolve, 1500));
 
       let rawText = `Job listing available at ${item.url}`;
       let description = '';
