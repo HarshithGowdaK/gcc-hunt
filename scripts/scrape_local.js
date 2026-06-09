@@ -270,8 +270,10 @@ function classifyIndustry(title, department) {
 // GEMINI PARSING ENGINE
 // -------------------------------------------------------------
 
+let geminiQuotaExceeded = false;
+
 async function parseJobPostingWithAI(text, jobTitle, jobLocation) {
-  if (!GEMINI_API_KEY) return null;
+  if (!GEMINI_API_KEY || geminiQuotaExceeded) return null;
   
   const models = ['gemini-2.5-flash', 'gemini-2.0-flash'];
   const cleanText = text.substring(0, 15000); 
@@ -347,7 +349,14 @@ ${cleanText}`
         const errMsg = error.response?.data?.error?.message || error.message || '';
         const status = error.response?.status;
         
-        const isRateLimit = status === 429 || errMsg.toLowerCase().includes('quota') || errMsg.toLowerCase().includes('rate limit');
+        const isQuotaExceeded = errMsg.toLowerCase().includes('quota') || errMsg.toLowerCase().includes('plan and billing') || errMsg.toLowerCase().includes('billing details');
+        if (isQuotaExceeded) {
+          console.warn(`[Gemini API] Quota/Billing limit hit: "${errMsg}". Disabling AI parser for the rest of this run.`);
+          geminiQuotaExceeded = true;
+          return null;
+        }
+
+        const isRateLimit = status === 429 || errMsg.toLowerCase().includes('rate limit');
         const isHighDemand = status === 503 || errMsg.toLowerCase().includes('high demand') || errMsg.toLowerCase().includes('spikes in demand') || errMsg.toLowerCase().includes('temporary');
         
         if ((isRateLimit || isHighDemand) && retries < maxRetries - 1) {
