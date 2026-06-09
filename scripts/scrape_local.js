@@ -103,12 +103,13 @@ function extractExperience(description, title) {
     titleText.includes('trainee') || 
     titleText.includes('fresher') || 
     titleText.includes('graduate') ||
-    titleText.includes('entry level')
+    titleText.includes('entry level') ||
+    titleText.includes('apprentice')
   ) {
     return { years: 0, level: 'Entry Level' };
   }
 
-  // 2. Scan description for years of experience numbers (e.g. 5+ years, 3-5 years)
+  // 2. Scan description for years of experience numbers
   const regexes = [
     /(\d+)\s*(?:to|-)\s*(\d+)\s*years?/g,
     /(\d+)\+?\s*years?\s*(?:of\s*)?experience/g,
@@ -132,9 +133,9 @@ function extractExperience(description, title) {
     return { years, level };
   }
 
-  // 4. Fallback: If no years parsed, check for fresher keywords using word boundary regexes
+  // 4. Fallback: Check for fresher keywords using word boundary regexes
   const hasEntryKeywords = 
-    /\b(fresher|trainee|intern|graduate)\b/i.test(descText) ||
+    /\b(fresher|trainee|intern|graduate|apprentice)\b/i.test(descText) ||
     descText.includes('no experience required') ||
     descText.includes('entry-level role') ||
     descText.includes('entry level role');
@@ -143,8 +144,39 @@ function extractExperience(description, title) {
     return { years: 0, level: 'Entry Level' };
   }
 
-  // Default fallback if we cannot find details
   return { years: 3, level: 'Mid-Senior Level' };
+}
+
+/**
+ * Heuristically parses employment type from title and description.
+ */
+function detectEmploymentType(title, description, defaultVal) {
+  const text = `${title} ${description || ''}`.toLowerCase();
+  
+  if (text.includes('internship') || text.includes('intern') || text.includes('trainee')) {
+    return 'Internship';
+  }
+  if (text.includes('apprenticeship') || text.includes('apprentice')) {
+    return 'Apprenticeship';
+  }
+  if (text.includes('contract') || text.includes('temporary') || text.includes('freelance') || text.includes('consultant')) {
+    return 'Contract';
+  }
+  if (text.includes('part-time') || text.includes('part time')) {
+    return 'Part-time';
+  }
+  
+  // Clean default values like Workday's timeTypes
+  if (defaultVal) {
+    const cleanDefault = defaultVal.toLowerCase();
+    if (cleanDefault.includes('full')) return 'Full-time';
+    if (cleanDefault.includes('part')) return 'Part-time';
+    if (cleanDefault.includes('contract')) return 'Contract';
+    if (cleanDefault.includes('intern')) return 'Internship';
+    if (cleanDefault.includes('apprentice')) return 'Apprenticeship';
+  }
+
+  return 'Full-time';
 }
 
 function extractSkills(title, description) {
@@ -176,7 +208,7 @@ function detectATS(url) {
 }
 
 /**
- * Classifies jobs into high-level industries based on title and department.
+ * Classifies jobs into industries.
  */
 function classifyIndustry(title, department) {
   const text = `${title} ${department || ''}`.toLowerCase();
@@ -254,7 +286,7 @@ async function parseJobPostingWithAI(text, jobTitle, jobLocation) {
 3. "yearsExperience": Minimum years of experience requested as a number. If it is for freshers, graduates, or trainees, specify 0.
 4. "experienceLevel": Specify either "Entry Level", "Mid-Senior Level", or "Director / Lead".
 5. "remoteStatus": Specify either "Remote", "Hybrid", "Onsite", or "Unknown".
-6. "employmentType": "Full-time", "Part-time", "Contract", or "Internship".
+6. "employmentType": Specify "Full-time", "Part-time", "Contract", "Internship", or "Apprenticeship". If the title or text describes an intern/trainee, use "Internship". If it describes an apprentice, use "Apprenticeship".
 
 Format output as valid JSON:
 {
@@ -331,7 +363,6 @@ async function scrapeWorkday(companyId, companyName, careersUrl) {
         const info = detailRes.data.jobPostingInfo;
         const rawText = (info.jobDescription || '').replace(/<[^>]*>/g, '\n').replace(/\s+/g, ' ').trim();
         
-        // Attempt AI parse
         const aiParsed = await parseJobPostingWithAI(rawText, posting.title, posting.locationsText);
         if (aiParsed) {
           description = aiParsed.description;
@@ -344,7 +375,7 @@ async function scrapeWorkday(companyId, companyName, careersUrl) {
           exp = extractExperience(description, posting.title);
           skills = extractSkills(posting.title, description);
           remoteStatus = parseRemoteStatus(posting.title, posting.locationsText || '', description);
-          empType = info.timeType || 'Full-time';
+          empType = detectEmploymentType(posting.title, description, info.timeType);
         }
 
         if (info.applyUrl) applyUrl = info.applyUrl;
@@ -415,6 +446,7 @@ async function scrapeGreenhouse(companyId, companyName, careersUrl) {
       exp = extractExperience(description, posting.title);
       skills = extractSkills(posting.title, description);
       remoteStatus = parseRemoteStatus(posting.title, locationName, description);
+      empType = detectEmploymentType(posting.title, description, 'Full-time');
     }
 
     jobs.push({
@@ -468,7 +500,7 @@ async function scrapeLever(companyId, companyName, careersUrl) {
     let skills = [];
     let exp = { level: 'Mid-Senior Level', years: 3 };
     let remoteStatus = 'Unknown';
-    let empType = posting.categories?.commitment || 'Full-time';
+    let empType = 'Full-time';
     const deptName = posting.categories?.department || posting.categories?.team || '';
 
     const aiParsed = await parseJobPostingWithAI(rawText, posting.title, loc);
@@ -483,6 +515,7 @@ async function scrapeLever(companyId, companyName, careersUrl) {
       exp = extractExperience(description, posting.title);
       skills = extractSkills(posting.title, description);
       remoteStatus = parseRemoteStatus(posting.title, loc, description);
+      empType = detectEmploymentType(posting.title, description, posting.categories?.commitment);
     }
 
     jobs.push({
@@ -629,6 +662,7 @@ async function scrapeGeneric(companyId, companyName, careersUrl) {
           exp = extractExperience(description, item.title);
           skills = extractSkills(item.title, description);
           remoteStatus = parseRemoteStatus(item.title, item.location, description);
+          empType = detectEmploymentType(item.title, description, 'Full-time');
         }
 
         await detailPage.close();
@@ -636,6 +670,7 @@ async function scrapeGeneric(companyId, companyName, careersUrl) {
         description = rawText;
         exp = extractExperience(description, item.title);
         skills = extractSkills(item.title, description);
+        empType = detectEmploymentType(item.title, description, 'Full-time');
       }
 
       jobs.push({

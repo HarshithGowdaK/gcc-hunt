@@ -152,9 +152,9 @@ export async function fetchFilters() {
 
   const cities = new Set<string>();
   const departments = new Set<string>();
-  const employmentTypes = new Set<string>();
-  const experienceLevels = new Set<string>();
-  const remoteStatuses = new Set<string>();
+  const employmentTypes = new Set<string>(['Full-time', 'Part-time', 'Contract', 'Internship', 'Apprenticeship']);
+  const experienceLevels = new Set<string>(['Entry Level', 'Mid-Senior Level', 'Director / Lead']);
+  const remoteStatuses = new Set<string>(['Onsite', 'Hybrid', 'Remote']);
   const industries = new Set<string>();
 
   typedJobs.forEach(job => {
@@ -169,9 +169,9 @@ export async function fetchFilters() {
   return {
     cities: Array.from(cities).sort(),
     departments: Array.from(departments).sort(),
-    employmentTypes: Array.from(employmentTypes).sort(),
-    experienceLevels: Array.from(experienceLevels).sort(),
-    remoteStatuses: Array.from(remoteStatuses).sort(),
+    employmentTypes: Array.from(employmentTypes),
+    experienceLevels: Array.from(experienceLevels),
+    remoteStatuses: Array.from(remoteStatuses),
     industries: Array.from(industries).sort()
   };
 }
