@@ -1,5 +1,59 @@
 [
   {
+    "id": "0e44573d-8f4a-489e-9781-8ff2dd1abebd",
+    "companyId": "adidas",
+    "companyName": "Adidas",
+    "status": "failed",
+    "errors": "page.goto: Timeout 15000ms exceeded.\nCall log:\n  - navigating to \"https://careers.adidas-group.com/jobs?location=%5B%7B%22country%22%3A%22India%22%7D%5D&offset=0&keywords=&location_manual=India\", waiting until \"commit\"\n",
+    "executionTime": 30135,
+    "timestamp": "2026-06-09T07:11:06.887Z"
+  },
+  {
+    "id": "a2de3b1a-42f0-4a4b-ab66-98219a3621a1",
+    "companyId": "adidas",
+    "companyName": "Adidas",
+    "status": "failed",
+    "errors": "page.goto: Timeout 15000ms exceeded.\nCall log:\n  - navigating to \"https://careers.adidas-group.com/jobs?location=%5B%7B%22country%22%3A%22India%22%7D%5D&offset=0&keywords=&location_manual=India\", waiting until \"commit\"\n",
+    "executionTime": 30336,
+    "timestamp": "2026-06-09T07:10:00.152Z"
+  },
+  {
+    "id": "23a43a75-5eb5-40bd-bbfc-cde3e85cb4af",
+    "companyId": "adidas",
+    "companyName": "Adidas",
+    "status": "failed",
+    "errors": "page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://careers.adidas-group.com/jobs?location=%5B%7B%22country%22%3A%22India%22%7D%5D&offset=0&keywords=&location_manual=India\nCall log:\n  - navigating to \"https://careers.adidas-group.com/jobs?location=%5B%7B%22country%22%3A%22India%22%7D%5D&offset=0&keywords=&location_manual=India\", waiting until \"domcontentloaded\"\n",
+    "executionTime": 443,
+    "timestamp": "2026-06-09T07:03:56.359Z"
+  },
+  {
+    "id": "87de08d1-2615-45a1-a118-6575af1d40ae",
+    "companyId": "adidas",
+    "companyName": "Adidas",
+    "status": "failed",
+    "errors": "page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://careers.adidas-group.com/jobs?location=%5B%7B%22country%22%3A%22India%22%7D%5D&offset=0&keywords=&location_manual=India\nCall log:\n  - navigating to \"https://careers.adidas-group.com/jobs?location=%5B%7B%22country%22%3A%22India%22%7D%5D&offset=0&keywords=&location_manual=India\", waiting until \"domcontentloaded\"\n",
+    "executionTime": 682,
+    "timestamp": "2026-06-09T06:57:54.996Z"
+  },
+  {
+    "id": "3567ed14-426e-4bd8-bce4-17100df8c51e",
+    "companyId": "aveva",
+    "companyName": "AVEVA",
+    "status": "success",
+    "jobsFound": 0,
+    "executionTime": 730,
+    "timestamp": "2026-06-09T06:53:42.673Z"
+  },
+  {
+    "id": "b9c587b9-7de1-4565-9d39-888f655cc826",
+    "companyId": "3m",
+    "companyName": "3M",
+    "status": "success",
+    "jobsFound": 0,
+    "executionTime": 996,
+    "timestamp": "2026-06-09T06:53:06.753Z"
+  },
+  {
     "id": "d2789087-7374-447a-ab25-630134113279",
     "companyId": "boomi",
     "companyName": "Boomi",
@@ -844,59 +898,5 @@
     "jobsFound": 8,
     "executionTime": 10162,
     "timestamp": "2026-06-09T06:00:42.753Z"
-  },
-  {
-    "id": "79d70c98-9bc8-4c03-9918-2228e15211f7",
-    "companyId": "kpit-automotive",
-    "companyName": "KPIT Automotive",
-    "status": "success",
-    "jobsFound": 0,
-    "executionTime": 4359,
-    "timestamp": "2026-06-09T06:00:39.361Z"
-  },
-  {
-    "id": "419152c6-bc2f-4ffb-b13a-b2ead4f9ead3",
-    "companyId": "johnson-controls",
-    "companyName": "Johnson Controls",
-    "status": "success",
-    "jobsFound": 8,
-    "executionTime": 15170,
-    "timestamp": "2026-06-09T06:00:39.218Z"
-  },
-  {
-    "id": "9f3ed278-cbce-4a0b-a45b-6793afeba9be",
-    "companyId": "kla",
-    "companyName": "KLA",
-    "status": "failed",
-    "errors": "Request failed with status code 400",
-    "executionTime": 1016,
-    "timestamp": "2026-06-09T06:00:35.002Z"
-  },
-  {
-    "id": "063ca104-4e6b-4f7d-bc7b-a7e98e5568d0",
-    "companyId": "jamf",
-    "companyName": "Jamf",
-    "status": "success",
-    "jobsFound": 8,
-    "executionTime": 11623,
-    "timestamp": "2026-06-09T06:00:33.986Z"
-  },
-  {
-    "id": "0d36bc29-bb8c-4c58-9728-6d06dae28258",
-    "companyId": "jupiter",
-    "companyName": "Jupiter",
-    "status": "success",
-    "jobsFound": 8,
-    "executionTime": 3843,
-    "timestamp": "2026-06-09T06:00:32.591Z"
-  },
-  {
-    "id": "254300e7-059c-4102-a613-c8cd64cd6330",
-    "companyId": "jump-trading",
-    "companyName": "Jump Trading",
-    "status": "success",
-    "jobsFound": 0,
-    "executionTime": 3129,
-    "timestamp": "2026-06-09T06:00:28.748Z"
   }
 ]
