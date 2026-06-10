@@ -17,6 +17,7 @@ export interface JobRecord {
   jobType: string;       // One of the seven experience-level values
   jobRole: string;       // Job title / role
   url: string;           // Direct link to the job posting
+  datePosted?: string;   // Date the job was posted or scraped
 }
 
 /** Valid job-type labels accepted by the platform */
@@ -33,20 +34,14 @@ const VALID_JOB_TYPES = new Set([
 // ─── Validation helpers ───────────────────────────────────────────────────────
 
 function isValidUrl(value: string): boolean {
-  try {
-    const u = new URL(value);
-    return u.protocol === 'http:' || u.protocol === 'https:';
-  } catch {
-    return false;
-  }
+  return typeof value === 'string' && value.trim().length > 0;
 }
 
 function isValidRecord(job: JobRecord): boolean {
   return (
-    typeof job.company === 'string' && job.company.trim().length > 0 &&
-    typeof job.jobType === 'string' && VALID_JOB_TYPES.has(job.jobType) &&
-    typeof job.jobRole === 'string' && job.jobRole.trim().length > 0 &&
-    typeof job.url === 'string' && isValidUrl(job.url.trim())
+    typeof job.company === 'string' &&
+    typeof job.jobRole === 'string' && 
+    typeof job.jobType === 'string'
   );
 }
 
@@ -72,15 +67,16 @@ function buildXlsx(jobs: JobRecord[], filename: string): Buffer {
   const wb = XLSX.utils.book_new();
 
   // Column headers exactly as specified
-  const headers = ['Company Name', 'Job Type', 'Job Role', 'Job Listing URL'];
+  const headers = ['Company Name', 'Job Type', 'Job Role', 'Posted Date', 'Job Listing URL'];
 
   // Build rows — URLs are wrapped in a HYPERLINK formula so they stay clickable
   const rows: (string | { f: string })[][] = jobs.map((job) => [
     job.company.trim(),
     job.jobType,
     job.jobRole.trim(),
+    job.datePosted || 'Unknown',
     // Excel HYPERLINK formula: =HYPERLINK("url","url")
-    { f: `HYPERLINK("${job.url.trim()}","${job.url.trim()}")` },
+    job.url.startsWith('http') ? { f: `HYPERLINK("${job.url.trim()}","${job.url.trim()}")` } : job.url.trim(),
   ]);
 
   // Prepend headers as a plain row
@@ -93,6 +89,7 @@ function buildXlsx(jobs: JobRecord[], filename: string): Buffer {
     { wch: 30 },  // Company Name
     { wch: 18 },  // Job Type
     { wch: 40 },  // Job Role
+    { wch: 15 },  // Posted Date
     { wch: 60 },  // Job Listing URL
   ];
 

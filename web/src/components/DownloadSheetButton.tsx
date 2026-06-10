@@ -55,13 +55,12 @@ export function DownloadSheetButton({ jobs, className = '' }: DownloadSheetButto
         aria-label="Download filtered jobs as Excel spreadsheet"
         className={[
           // Base
-          'inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm',
-          'transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2',
+          'inline-flex justify-center items-center gap-1.5 px-4 py-2.5 w-full',
+          'text-[9px] font-black uppercase tracking-widest transition-all',
           // Colours
           isLoading
-            ? 'bg-gray-400 text-white cursor-not-allowed'
-            : 'bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white',
-          'focus:ring-emerald-500',
+            ? 'border border-[#E5E1D8] bg-[#E5E1D8] text-[#7A8471] cursor-not-allowed'
+            : 'bg-[#161616] text-[#F7F4EE] hover:bg-[#D16A4A]',
         ].join(' ')}
       >
         {isLoading ? (
@@ -108,9 +107,9 @@ export function DownloadSheetButton({ jobs, className = '' }: DownloadSheetButto
           role="status"
           aria-live="polite"
           className={[
-            'flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium',
-            isSuccess ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : '',
-            isError   ? 'bg-red-50 text-red-700 border border-red-200'             : '',
+            'flex items-center gap-2 px-3 py-2 text-[9px] uppercase tracking-widest font-bold mt-2',
+            isSuccess ? 'bg-[#FCFAF7] text-[#7A8471] border border-[#E5E1D8]' : '',
+            isError   ? 'bg-[#FCFAF7] text-[#D16A4A] border border-[#D16A4A]' : '',
           ].join(' ')}
         >
           {/* Icon */}

@@ -434,7 +434,8 @@ function JobsContent() {
                 company: j.companyName || j.companyId || 'Unknown', 
                 jobType: j.experienceLevel || j.employmentType || 'Unknown', 
                 jobRole: j.title || 'Unknown', 
-                url: j.applyUrl || j.url || '#' 
+                url: j.applyUrl || j.url || '#',
+                datePosted: j.dateScraped ? new Date(j.dateScraped).toLocaleDateString() : 'Unknown'
               }))} />
             </div>
           </div>

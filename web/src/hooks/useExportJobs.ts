@@ -18,6 +18,7 @@ export interface ExportJob {
   jobType: string;
   jobRole: string;
   url: string;
+  datePosted?: string;
 }
 
 export type ExportStatus = 'idle' | 'loading' | 'success' | 'error';
