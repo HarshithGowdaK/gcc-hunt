@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { fetchJobs, fetchJob, fetchCompanies, fetchFilters } from '@/lib/api';
 import JobCard from '@/components/JobCard';
+import ExportButton from '@/components/ExportButton';
 
 function JobsContent() {
   const router = useRouter();
@@ -427,7 +428,10 @@ function JobsContent() {
         <div className="col-span-1 md:col-span-5 space-y-4">
           <div className="flex items-center justify-between text-[9px] uppercase tracking-widest text-[#7A8471] mb-1 font-bold">
             <span>Indexed <b>{jobs.length}</b> nodes (Total: {pagination.totalJobs})</span>
-            <span>Page {pagination.page} of {pagination.totalPages}</span>
+            <div className="flex items-center gap-4">
+              <span>Page {pagination.page} of {pagination.totalPages}</span>
+              <ExportButton filters={{ experienceLevel: selectedExp, division: selectedIndustry }} />
+            </div>
           </div>
 
           {loading ? (
