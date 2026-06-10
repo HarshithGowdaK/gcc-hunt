@@ -100,57 +100,74 @@ function parseRemoteStatus(title, location, description) {
 }
 
 function extractExperience(description, title) {
-  const descText = description.toLowerCase();
+  const descText = (description || '').toLowerCase();
   const titleText = (title || '').toLowerCase();
+  const fullText = `${titleText} ${descText}`;
 
-  // 1. Check title first (extremely specific and reliable indicators)
-  if (
-    titleText.includes('intern') || 
-    titleText.includes('trainee') || 
-    titleText.includes('fresher') || 
-    titleText.includes('graduate') ||
-    titleText.includes('entry level') ||
-    titleText.includes('apprentice')
-  ) {
-    return { years: 0, level: 'Entry Level' };
+  // Step 2: Internship / Apprenticeship Detection
+  const internshipKeywords = [
+    'internship', 'summer intern', 'winter intern', 'graduate intern', 
+    'student intern', 'research intern', 'campus internship', 'trainee intern',
+    'apprenticeship', 'graduate apprentice', 'trade apprentice',
+    'engineering apprentice', 'technician apprentice', 'apprenticeship program',
+    'co-op', 'coop', 'student program', 'industrial trainee'
+  ];
+  const internRegex = /\b(intern|apprentice)\b/i;
+  
+  if (internRegex.test(fullText) || internshipKeywords.some(kw => fullText.includes(kw))) {
+    return { years: 0, level: 'Internship / Apprenticeship' };
   }
 
-  // 2. Scan description for years of experience numbers
+  // Step 1: Extract Experience Requirement
   const regexes = [
-    /(\d+)\s*(?:to|-)\s*(\d+)\s*years?/g,
-    /(\d+)\+?\s*years?\s*(?:of\s*)?experience/g,
+    /(\d+)\s*(?:-|to)\s*(\d+)\s*years?/g,
+    /(\d+)\+\s*years?/g,
+    /minimum\s*(\d+)\s*years?/g,
+    /at\s*least\s*(\d+)\s*years?/g,
+    /(\d+)\s*years?\s*(?:of\s*)?experience/g,
     /experience\s*(?:of\s*)?(\d+)\+?\s*years?/g,
     /(\d+)\s*yrs?\b/g
   ];
-  let years;
+
+  let minYears = null;
   for (const regex of regexes) {
-    const match = regex.exec(descText);
-    if (match) {
-      years = parseInt(match[1], 10);
+    const matches = Array.from(descText.matchAll(regex));
+    if (matches && matches.length > 0) {
+      minYears = parseInt(matches[0][1], 10);
       break;
     }
   }
 
-  // 3. If years are found, categorize strictly based on years
-  if (years !== undefined) {
-    let level = 'Mid-Senior Level';
-    if (years <= 2) level = 'Entry Level';
-    else if (years >= 8) level = 'Director / Lead';
-    return { years, level };
+  // Step 3: Experience-Based Classification
+  if (minYears !== null && !isNaN(minYears)) {
+    if (minYears <= 2) return { years: minYears, level: 'Entry Level' };
+    if (minYears >= 3 && minYears <= 7) return { years: minYears, level: 'Mid Level' };
+    if (minYears >= 8 && minYears <= 11) return { years: minYears, level: 'Senior Level' };
+    if (minYears >= 12 && minYears <= 14) return { years: minYears, level: 'Lead / Manager' };
+    if (minYears >= 15) return { years: minYears, level: 'Director / Executive' };
   }
 
-  // 4. Fallback: Check for fresher keywords using word boundary regexes
-  const hasEntryKeywords = 
-    /\b(fresher|trainee|intern|graduate|apprentice)\b/i.test(descText) ||
-    descText.includes('no experience required') ||
-    descText.includes('entry-level role') ||
-    descText.includes('entry level role');
+  // Step 4 & 5: Title-Based Fallback
+  const entryKeywords = /\b(junior|graduate|fresher|entry level|associate engineer|associate developer|associate consultant|trainee|early career)\b/;
+  const leadKeywords = /\b(lead|manager|architect|program manager|project manager|engineering manager|delivery manager|solution architect|enterprise architect|head of|director)\b/;
+  const seniorKeywords = /\b(senior|staff engineer|staff developer|principal engineer|technical lead|senior consultant|senior analyst|principal)\b/;
+  const midKeywords = /\b(engineer|developer|consultant|analyst|specialist|administrator|designer|programmer)\b/;
 
-  if (hasEntryKeywords) {
+  if (entryKeywords.test(titleText) || /\b(entry level|fresher|recent graduate|fresh graduate)\b/.test(descText)) {
     return { years: 0, level: 'Entry Level' };
   }
+  if (leadKeywords.test(titleText)) {
+    return { years: 12, level: 'Lead / Manager' };
+  }
+  if (seniorKeywords.test(titleText)) {
+    return { years: 8, level: 'Senior Level' };
+  }
+  if (midKeywords.test(titleText)) {
+    return { years: 3, level: 'Mid Level' };
+  }
 
-  return { years: 3, level: 'Mid-Senior Level' };
+  // Default Fallback
+  return { years: 3, level: 'Mid Level' };
 }
 
 /**
