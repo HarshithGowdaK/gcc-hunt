@@ -9,7 +9,7 @@ try {
   playwright = require('playwright');
   axios = require('axios');
 } catch (e) {
-  console.error("Missing local dependencies. Make sure to run 'npm install' inside the 'functions' directory first.");
+  console.error("Missing local dependencies. Make sure to run 'npm install' in the root directory first.");
   process.exit(1);
 }
 
