@@ -30,12 +30,12 @@ export default function AdminLoginPage() {
     setLoginLoading(true);
 
     const emailInput = email.trim();
+    const passwordInput = password.trim();
 
     // Secure fallback for explicit admin credentials if Firebase identity toolkit is unavailable
-    if (emailInput === 'harshithgowdakbtech24@rvu.edu.in' && password === 'Rvu@123') {
+    if (emailInput === 'harshithgowdakbtech24@rvu.edu.in' && passwordInput === 'Rvu@123') {
       if (typeof window !== 'undefined') {
         localStorage.setItem('mockAdmin', 'true');
-        // Reload to let AuthContext pick up the localStorage token and redirect
         window.location.href = '/admin/dashboard';
         return;
       }
@@ -45,7 +45,11 @@ export default function AdminLoginPage() {
       // Sign in the user via Firebase Auth
       await signInWithEmailAndPassword(auth, emailInput, password);
     } catch (err: any) {
-      setError(err.message || 'Authentication failed. Please check your credentials.');
+      if (err.code === 'auth/api-key-not-valid') {
+        setError('Firebase Auth is not configured. Please use the hardcoded admin credentials.');
+      } else {
+        setError(err.message || 'Authentication failed. Please check your credentials.');
+      }
       setLoginLoading(false);
     }
   };
