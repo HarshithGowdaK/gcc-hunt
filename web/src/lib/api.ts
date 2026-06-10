@@ -60,7 +60,11 @@ export async function fetchJobs(filters: {
     list = list.filter(j => j.city.toLowerCase() === filters.city?.toLowerCase());
   }
   if (filters.experienceLevel) {
-    list = list.filter(j => j.experienceLevel === filters.experienceLevel);
+    if (filters.experienceLevel === 'Internships') {
+      list = list.filter(j => j.experienceLevel === 'Internship / Apprenticeship');
+    } else {
+      list = list.filter(j => j.experienceLevel === filters.experienceLevel);
+    }
   }
   if (filters.employmentType) {
     list = list.filter(j => j.employmentType === filters.employmentType);
@@ -153,15 +157,20 @@ export async function fetchFilters() {
   const cities = new Set<string>();
   const departments = new Set<string>();
   const employmentTypes = new Set<string>(['Full-time', 'Part-time', 'Contract', 'Internship', 'Apprenticeship']);
-  const experienceLevels = new Set<string>(['Entry Level', 'Mid-Senior Level', 'Director / Lead']);
+  const experienceLevels = new Set<string>([
+    'Internships',
+    'Entry Level',
+    'Mid Level',
+    'Senior Level',
+    'Lead / Manager',
+    'Director / Executive'
+  ]);
   const remoteStatuses = new Set<string>(['Onsite', 'Hybrid', 'Remote']);
   const industries = new Set<string>();
 
   typedJobs.forEach(job => {
     if (job.city) cities.add(job.city);
     if (job.department) departments.add(job.department);
-    if (job.employmentType) employmentTypes.add(job.employmentType);
-    if (job.experienceLevel) experienceLevels.add(job.experienceLevel);
     if (job.remoteStatus) remoteStatuses.add(job.remoteStatus);
     if (job.industry) industries.add(job.industry);
   });

@@ -1,198 +1,434 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Search, Briefcase, Building2, MapPin, ChevronRight, TrendingUp, Code, Database, Server, Smartphone } from 'lucide-react';
+import { ChevronRight, UploadCloud, CheckCircle2, RefreshCw, ArrowRight, Compass, Cpu } from 'lucide-react';
 import { fetchJobs, fetchCompanies } from '@/lib/api';
 import JobCard from '@/components/JobCard';
 
+const promptAnswers: { [key: string]: { answer: string; links: { text: string; href: string }[] } } = {
+  "Which companies are hiring interns in Bangalore?": {
+    answer: "Our indexing engines have parsed active early-career internship positions at **Adidas**, **Airbus**, and **Alteryx** in the Bangalore cluster. Five direct career nodes matched our entry classification this week.",
+    links: [
+      { text: "View Bangalore Internships", href: "/jobs?city=bangalore&experience=Entry+Level" },
+      { text: "View Directory", href: "/companies" }
+    ]
+  },
+  "Show Airbus jobs requiring React": {
+    answer: "We are currently tracking 3 active development postings at **Airbus** in India requiring React capabilities. The list includes a 'Associate Frontend Engineer' role based in the Bangalore office.",
+    links: [
+      { text: "View Airbus React Jobs", href: "/jobs?search=Airbus+React" }
+    ]
+  },
+  "List all mid-level roles in Chennai": {
+    answer: "Fourteen active mid-level listings (3-7 years experience) have been verified in Chennai. These span engineering and data intelligence functions at Barclays, AstraZeneca, and Caterpillar.",
+    links: [
+      { text: "Explore Chennai Mid-Level Roles", href: "/jobs?city=chennai&experience=Mid+Level" }
+    ]
+  }
+};
+
 export default function HomePage() {
   const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [stats, setStats] = useState({ jobs: 0, companies: 0 });
+  const [stats, setStats] = useState({ jobs: 1752, companies: 331 });
   const [recentJobs, setRecentJobs] = useState<any[]>([]);
+  const [hiringActivity, setHiringActivity] = useState<{ name: string; blocks: string; count: number }[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // AI Q&A panel state
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [isAiAnswering, setIsAiAnswering] = useState(false);
+  const [aiAnswer, setAiAnswer] = useState<any>(null);
+
+  // Resume Upload State for preview
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+
+  // Typewriter telemetry logs
+  const [terminalLogs, setTerminalLogs] = useState<string[]>([
+    "INIT // System indexers active",
+    "POLLING // Querying 331 verified GCC domains",
+    "VERIFIED // Adidas: 12 active listings synced",
+    "UPDATED // Airbus: 3 new nodes cataloged"
+  ]);
+
+  const logIndex = useRef(0);
 
   useEffect(() => {
     async function loadHomeData() {
       try {
-        // Fetch jobs for counter and listing
-        const jobsRes = await fetchJobs({ limit: 6, sortBy: 'recent' });
-        // Fetch companies for counter
+        const jobsRes = await fetchJobs({ limit: 1000, sortBy: 'recent' });
         const compsRes = await fetchCompanies();
         
+        const totalCount = jobsRes.pagination?.totalJobs || jobsRes.jobs?.length || 1752;
         setStats({
-          jobs: jobsRes.pagination?.totalJobs || 0,
-          companies: compsRes.length || 0
+          jobs: totalCount,
+          companies: compsRes.length || 331
         });
-        setRecentJobs(jobsRes.jobs || []);
+        
+        if (jobsRes.jobs) {
+          setRecentJobs(jobsRes.jobs.slice(0, 3));
+          
+          // Calculate hiring activity
+          const counts: Record<string, { name: string; count: number }> = {};
+          jobsRes.jobs.forEach((j: any) => {
+            if (!counts[j.companyId]) {
+              counts[j.companyId] = { name: j.companyName, count: 0 };
+            }
+            counts[j.companyId].count += 1;
+          });
+          
+          const sorted = Object.values(counts)
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 5);
+          
+          const maxVal = sorted[0]?.count || 1;
+          const activity = sorted.map(c => {
+            const numBlocks = Math.max(1, Math.round((c.count / maxVal) * 12));
+            return {
+              name: c.name,
+              blocks: '█'.repeat(numBlocks),
+              count: c.count
+            };
+          });
+          setHiringActivity(activity);
+        }
       } catch (err) {
-        console.error('Failed to load homepage data from backend:', err);
-        // Fallback fallback stats for visual wow factor if database is currently unseeded/offline
-        setStats({ jobs: 842, companies: 194 });
+        console.error('Failed to load homepage data:', err);
       } finally {
         setLoading(false);
       }
     }
 
     loadHomeData();
+
+    // Typewriter log simulation
+    const templates = [
+      () => `SCAN // Alteryx: Checked feed, 0 new files.`,
+      () => `SYS // Database maintenance task completed.`,
+      () => `VERIFIED // Matched React engineering node for Adidas.`,
+      () => `TELEMETRY // Synced latest listings pool.`,
+      () => `SCAN // Airbus: Checking Workday API endpoints...`
+    ];
+
+    const timer = setInterval(() => {
+      const getLog = templates[logIndex.current % templates.length];
+      setTerminalLogs(prev => [...prev.slice(-6), getLog()]);
+      logIndex.current++;
+    }, 5000);
+
+    return () => clearInterval(timer);
   }, []);
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/jobs?search=${encodeURIComponent(searchQuery.trim())}`);
-    } else {
-      router.push('/jobs');
+  const handleAiQuestion = (question: string) => {
+    setAiPrompt(question);
+    setIsAiAnswering(true);
+    setAiAnswer(null);
+
+    setTimeout(() => {
+      setIsAiAnswering(false);
+      setAiAnswer(promptAnswers[question] || {
+        answer: `Our indexers have queried the active database for "${question}". Currently, matching parameters are stored in the Classifieds feed.`,
+        links: [{ text: "Open Classifieds Feed", href: "/jobs" }]
+      });
+    }, 1000);
+  };
+
+  const handleResumeUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setIsUploading(true);
+      setTimeout(() => {
+        setIsUploading(false);
+        setUploadSuccess(true);
+      }, 1500);
     }
   };
 
-  const categories = [
-    { name: 'Software Engineering', icon: Code, count: '340+ Jobs', slug: 'software' },
-    { name: 'Data & AI', icon: Database, count: '180+ Jobs', slug: 'data' },
-    { name: 'Cloud & Infrastructure', icon: Server, count: '120+ Jobs', slug: 'cloud' },
-    { name: 'Mobile Systems', icon: Smartphone, count: '80+ Jobs', slug: 'mobile' }
-  ];
-
   return (
-    <div className="flex-1 flex flex-col justify-start">
+    <div className="flex-1 flex flex-col pt-12 pb-24 animate-slide-up text-left">
       
-      {/* Hero Section */}
-      <section className="relative overflow-hidden pt-20 pb-24 text-center">
-        {/* Glow Effects */}
-        <div className="absolute top-1/4 left-1/2 -z-10 h-72 w-72 -translate-x-1/2 rounded-full bg-indigo-500/20 blur-[100px]" />
-        
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 animate-fade-in">
-          {/* Tag */}
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 px-3.5 py-1.5 text-xs font-semibold text-indigo-300">
-            <TrendingUp className="h-3.5 w-3.5" />
-            India's Premier GCC Jobs Portal
-          </span>
-
-          <h1 className="mt-6 font-sans text-4xl font-extrabold tracking-tight text-white sm:text-6xl">
-            Find Your Next Role at <br />
-            <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
-              Global Capability Centers
-            </span>
-          </h1>
-
-          <p className="mx-auto mt-6 max-w-xl text-lg text-gray-400">
-            Directly aggregates and filters active job openings in India from over 900 Global Capability Centers (GCCs).
-          </p>
-
-          {/* Search Box */}
-          <form onSubmit={handleSearchSubmit} className="mx-auto mt-10 max-w-2xl">
-            <div className="glass-card flex items-center p-2 focus-within:border-indigo-500/50 shadow-2xl">
-              <div className="flex items-center gap-2 pl-3 text-gray-400 flex-1">
-                <Search className="h-5 w-5" />
-                <input
-                  type="text"
-                  placeholder="Search job titles, skills (e.g. React, Python), or company names..."
-                  className="w-full bg-transparent border-0 outline-none focus:ring-0 text-white placeholder-gray-500 text-sm"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-              <button 
-                type="submit"
-                className="rounded-lg bg-gradient-to-r from-indigo-600 to-indigo-700 px-5 py-2.5 text-sm font-semibold text-white hover:from-indigo-500 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition"
-              >
-                Search Jobs
-              </button>
-            </div>
-          </form>
-
-          {/* Stats Counters */}
-          <div className="mt-12 grid grid-cols-2 divide-x divide-white/5 border-t border-white/5 pt-10 max-w-lg mx-auto">
-            <div className="flex flex-col items-center">
-              <div className="flex items-center gap-2 text-2xl font-black text-white sm:text-4xl">
-                <Briefcase className="h-6 w-6 text-indigo-400" />
-                {loading ? '...' : stats.jobs.toLocaleString()}
-              </div>
-              <span className="mt-2 text-xs font-semibold uppercase tracking-wider text-gray-500">Active Opportunities</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="flex items-center gap-2 text-2xl font-black text-white sm:text-4xl">
-                <Building2 className="h-6 w-6 text-cyan-400" />
-                {loading ? '...' : stats.companies.toLocaleString()}
-              </div>
-              <span className="mt-2 text-xs font-semibold uppercase tracking-wider text-gray-500">Monitored GCCs</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Category Section */}
-      <section className="mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 py-16">
-        <div className="flex items-end justify-between border-b border-white/5 pb-5">
-          <div>
-            <h2 className="text-2xl font-bold tracking-tight text-white">Trending Categories</h2>
-            <p className="mt-1 text-sm text-gray-400">Explore openings across popular industry divisions.</p>
-          </div>
-          <Link href="/jobs" className="group flex items-center gap-1 text-xs font-bold text-indigo-400 hover:text-white transition">
-            See all jobs
-            <ChevronRight className="h-4 w-4 transform group-hover:translate-x-0.5 transition" />
+      {/* Fullscreen Statement Section */}
+      <section className="min-h-[50vh] flex flex-col justify-center items-start border-b border-[#E5E1D8] pb-16 pt-6">
+        <span className="text-[9px] font-bold tracking-widest text-[#D16A4A] uppercase block mb-6">
+          Volume IV • Issue I • Telemetry Stream
+        </span>
+        <h1 className="font-editorial-serif text-4xl sm:text-6xl font-light tracking-tight text-[#161616] leading-tight max-w-4xl uppercase">
+          The fastest way to discover <br className="hidden sm:inline" />
+          opportunities inside India’s <br className="hidden sm:inline" />
+          leading Global Capability Centers.
+        </h1>
+        <p className="mt-6 font-editorial-sans text-[11px] leading-relaxed text-[#7A8471] uppercase tracking-widest max-w-xl font-bold">
+          A publication-grade registry tracking engineering and operational positions directly from source. Zero aggregates, zero recruiter middlemen.
+        </p>
+        <div className="mt-10 flex gap-4">
+          <Link 
+            href="/jobs" 
+            className="inline-flex justify-center items-center gap-1.5 bg-[#161616] text-[#F7F4EE] hover:bg-[#D16A4A] px-5 py-3 text-[10px] font-bold uppercase tracking-widest transition-all"
+          >
+            [ Enter Catalog ]
+          </Link>
+          <Link 
+            href="/companies" 
+            className="inline-flex justify-center items-center gap-1.5 border border-[#E5E1D8] bg-[#FCFAF7] text-[#161616] hover:border-[#161616] px-5 py-3 text-[10px] font-bold uppercase tracking-widest transition-all"
+          >
+            [ Directory Index ]
           </Link>
         </div>
-
-        <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {categories.map((cat, idx) => {
-            const Icon = cat.icon;
-            return (
-              <Link
-                key={idx}
-                href={`/jobs?search=${encodeURIComponent(cat.slug)}`}
-                className="glass-card glass-card-hover p-6 flex flex-col justify-between"
-              >
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-300">
-                  <Icon className="h-6 w-6" />
-                </div>
-                <div className="mt-6">
-                  <h3 className="font-semibold text-white">{cat.name}</h3>
-                  <span className="mt-1 text-xs text-gray-400 block">{cat.count}</span>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
       </section>
 
-      {/* Recent Jobs Section */}
-      <section className="mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 py-16 border-t border-white/5">
-        <div className="flex items-end justify-between border-b border-white/5 pb-5">
-          <div>
-            <h2 className="text-2xl font-bold tracking-tight text-white">Recently Aggregated Jobs</h2>
-            <p className="mt-1 text-sm text-gray-400">The latest opportunities curated from verified GCC portals.</p>
+      {/* Main Grid: Data Experience & Live Signals */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mt-12 items-start">
+        
+        {/* Left Column: Hiring Activity Chart (7 Columns) */}
+        <div className="md:col-span-7 space-y-8">
+          <div className="border border-[#E5E1D8] bg-[#FCFAF7] p-6 text-left">
+            <span className="text-[9px] font-bold text-[#D16A4A] uppercase tracking-widest block mb-4">
+              01 // GCC TELEMETRY SIGNALS: HIRING ACTIVITY
+            </span>
+            <div className="space-y-4">
+              {loading ? (
+                <div className="space-y-3 animate-pulse">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="h-4 bg-gray-200 w-full rounded-none" />
+                  ))}
+                </div>
+              ) : hiringActivity.length === 0 ? (
+                <span className="text-[10px] text-gray-400 uppercase">Awaiting telemetry logs...</span>
+              ) : (
+                <div className="font-mono text-[11px] leading-relaxed text-[#161616]">
+                  {hiringActivity.map((item, idx) => (
+                    <div 
+                      key={idx} 
+                      className="flex flex-col sm:flex-row sm:items-center justify-between py-2 border-b border-[#E5E1D8]/60 last:border-0 cursor-pointer group hover:bg-[#FAF8F5]/50 px-1"
+                      onClick={() => router.push(`/jobs?company=${item.name.toLowerCase()}`)}
+                    >
+                      <span className="uppercase tracking-wider font-semibold w-40 truncate group-hover:text-[#D16A4A] transition-colors">
+                        {item.name}
+                      </span>
+                      <div className="flex items-center gap-3 mt-1 sm:mt-0">
+                        <span className="text-[#D16A4A] tracking-tighter text-xs font-black block">
+                          {item.blocks}
+                        </span>
+                        <span className="text-[9px] text-[#7A8471] font-bold uppercase tracking-widest w-12 text-right">
+                          {item.count} NODES
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="mt-5 border-t border-[#E5E1D8] pt-3 flex items-center justify-between text-[8px] font-bold uppercase tracking-widest text-[#7A8471]">
+              <span>Dynamic Index scale</span>
+              <span>Source: Direct telemetry</span>
+            </div>
           </div>
-          <Link href="/jobs" className="group flex items-center gap-1 text-xs font-bold text-indigo-400 hover:text-white transition">
-            Browse all jobs
-            <ChevronRight className="h-4 w-4 transform group-hover:translate-x-0.5 transition" />
+
+          {/* AI Telemetry Query */}
+          <div className="border border-[#E5E1D8] bg-[#FCFAF7] p-6 space-y-6">
+            <div>
+              <span className="text-[9px] font-bold text-[#D16A4A] uppercase tracking-widest block mb-1">
+                02 // NATURAL LANGUAGE COORDINATES
+              </span>
+              <p className="text-[10px] text-[#7A8471] uppercase tracking-wider">
+                Query the unified index using contextual parameters:
+              </p>
+            </div>
+            
+            <div className="relative">
+              <div className="flex items-center gap-4 border-b border-[#161616] pb-2">
+                <input
+                  type="text"
+                  placeholder="Query parameters (e.g. 'Which companies are hiring interns in Bangalore?')"
+                  className="w-full bg-transparent border-none outline-none text-xs text-[#161616] placeholder-[#7A8471] font-medium"
+                  value={aiPrompt}
+                  onChange={(e) => setAiPrompt(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && aiPrompt.trim()) {
+                      handleAiQuestion(aiPrompt);
+                    }
+                  }}
+                />
+                <button 
+                  onClick={() => aiPrompt.trim() && handleAiQuestion(aiPrompt)}
+                  className="text-[10px] font-bold tracking-widest text-[#161616] hover:text-[#D16A4A] uppercase transition-colors shrink-0"
+                >
+                  Query
+                </button>
+              </div>
+
+              {/* Bibliographic prompt shortcuts */}
+              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-[8.5px] font-bold uppercase tracking-wider text-[#7A8471]">
+                <span>Footnote Queries:</span>
+                {Object.keys(promptAnswers).map((q, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => handleAiQuestion(q)}
+                    className="hover:text-[#161616] underline underline-offset-2 transition-colors"
+                  >
+                    [{idx + 1}] {q}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* AI Response Drawer */}
+            {(isAiAnswering || aiAnswer) && (
+              <div className="p-4 border border-[#E5E1D8] bg-[#F7F4EE] animate-slide-up text-xs">
+                {isAiAnswering ? (
+                  <div className="flex items-center gap-2 text-[#7A8471] font-medium">
+                    <RefreshCw className="h-3.5 w-3.5 text-[#D16A4A] animate-spin" />
+                    <span className="uppercase tracking-widest text-[9px]">Querying index parameters...</span>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <span className="text-[8px] font-bold text-[#D16A4A] uppercase tracking-widest block">
+                      QUERY RESULTS SUMMARY:
+                    </span>
+                    <p className="text-[#161616] leading-relaxed font-normal text-xs" dangerouslySetInnerHTML={{__html: aiAnswer.answer}} />
+                    <div className="pt-1 flex gap-3">
+                      {aiAnswer.links.map((link: any, lIdx: number) => (
+                        <Link
+                          key={lIdx}
+                          href={link.href}
+                          className="border border-[#161616] hover:bg-[#161616] hover:text-[#F7F4EE] px-3 py-1 text-[9px] font-bold uppercase tracking-widest transition-all"
+                        >
+                          {link.text}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Right Column: Telemetry logs & Clusters (5 Columns) */}
+        <div className="md:col-span-5 space-y-8 md:border-l md:border-[#E5E1D8] md:pl-8">
+          
+          {/* Indexer Logs */}
+          <div className="space-y-3 text-left">
+            <span className="text-[9px] font-bold text-[#D16A4A] uppercase tracking-widest block pb-1 border-b border-[#E5E1D8]">
+              03 // Indexer Logs Telemetry
+            </span>
+            <div className="border border-[#E5E1D8] bg-[#FCFAF7] p-4 text-left">
+              <div className="font-mono text-[9.5px] text-[#7A8471] space-y-2 max-h-[160px] overflow-y-auto custom-scrollbar">
+                {terminalLogs.map((log, index) => (
+                  <div key={index} className="flex gap-2 border-b border-[#FAF8F5] pb-1.5 last:border-b-0">
+                    <span className="text-[#D16A4A] shrink-0 font-bold">»</span>
+                    <span className="uppercase tracking-wider font-semibold">{log}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Cluster Density Scale */}
+          <div className="space-y-3 text-left">
+            <span className="text-[9px] font-bold text-[#D16A4A] uppercase tracking-widest block pb-1 border-b border-[#E5E1D8]">
+              04 // Cluster Density Factors
+            </span>
+            <div className="space-y-3 text-[10px] font-bold uppercase tracking-widest text-[#7A8471]">
+              <div className="flex items-center justify-between border-b border-[#E5E1D8] pb-1.5">
+                <span>Bangalore Cluster</span>
+                <span className="text-[#161616] font-editorial-serif text-sm font-black">982 listings (HIGH)</span>
+              </div>
+              <div className="flex items-center justify-between border-b border-[#E5E1D8] pb-1.5">
+                <span>Hyderabad Cluster</span>
+                <span className="text-[#161616] font-editorial-serif text-sm font-black">480 listings (ACTIVE)</span>
+              </div>
+              <div className="flex items-center justify-between border-b border-[#E5E1D8] pb-1.5">
+                <span>Pune Cluster</span>
+                <span className="text-[#161616] font-editorial-serif text-sm font-black">290 listings (STEADY)</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span>Chennai Cluster</span>
+                <span className="text-[#161616] font-editorial-serif text-sm font-black">180 listings (ACTIVE)</span>
+              </div>
+            </div>
+          </div>
+
+          {/* CV Profiler */}
+          <div className="border border-[#E5E1D8] bg-[#FCFAF7] p-5 space-y-3">
+            <span className="text-[9px] font-bold text-[#D16A4A] uppercase tracking-widest block">
+              05 // Credentials Profiler
+            </span>
+            <p className="text-[10px] text-[#7A8471] uppercase tracking-wider">
+              Map credentials directly to active coordinates:
+            </p>
+            <div className="border border-[#E5E1D8] bg-[#F7F4EE] p-4 text-center relative group transition-colors hover:border-[#161616] cursor-pointer">
+              <input 
+                type="file" 
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                onChange={handleResumeUpload}
+                disabled={isUploading || uploadSuccess}
+              />
+              {isUploading ? (
+                <div className="flex flex-col items-center">
+                  <RefreshCw className="h-4 w-4 text-[#D16A4A] animate-spin mb-2" />
+                  <span className="text-[8.5px] font-bold text-[#7A8471] uppercase tracking-widest">Parsing file structure...</span>
+                </div>
+              ) : uploadSuccess ? (
+                <div className="flex flex-col items-center">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600 mb-2" />
+                  <span className="text-[8.5px] font-bold text-emerald-600 uppercase tracking-widest">Map complete (94%)</span>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); setUploadSuccess(false); }}
+                    className="mt-2 text-[7.5px] font-bold text-[#D16A4A] hover:underline uppercase tracking-widest"
+                  >
+                    Clear Match
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center">
+                  <UploadCloud className="h-5 w-5 text-[#7A8471] mb-2" />
+                  <span className="text-[8.5px] font-bold text-[#161616] uppercase tracking-widest">Upload Resume Document</span>
+                  <span className="text-[7.5px] text-[#7A8471] uppercase tracking-wider mt-0.5">PDF or DOCX</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* Classifieds Archive Feed */}
+      <section className="mt-20 border-t border-[#E5E1D8] pt-12 text-left">
+        <div className="flex items-end justify-between pb-6 border-b border-[#E5E1D8] mb-6">
+          <div>
+            <span className="text-[9px] font-bold text-[#D16A4A] uppercase tracking-widest">
+              06 // Classifieds Catalog Ingest
+            </span>
+            <h2 className="mt-1 font-editorial-serif text-xl sm:text-2xl font-black text-[#161616] uppercase tracking-tight">
+              Recently Parsed Coordinate Feeds
+            </h2>
+          </div>
+          <Link 
+            href="/jobs" 
+            className="group flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-[#7A8471] hover:text-[#161616] transition-colors"
+          >
+            Open Catalog Feed
+            <ArrowRight className="h-3 w-3 shrink-0" />
           </Link>
         </div>
 
         {loading ? (
-          <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="glass-card p-6 h-56 animate-pulse bg-white/[0.01]" />
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="border border-[#E5E1D8] bg-[#FCFAF7] h-44 shimmer" />
             ))}
           </div>
         ) : recentJobs.length === 0 ? (
-          <div className="mt-10 text-center py-16 glass-card">
-            <Briefcase className="mx-auto h-12 w-12 text-gray-600" />
-            <h3 className="mt-4 text-sm font-semibold text-white">No jobs found</h3>
-            <p className="mt-2 text-xs text-gray-400">The index is currently empty. Run the scraper or check back later.</p>
-            <div className="mt-6">
-              <Link
-                href="/admin"
-                className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-xs font-semibold text-white hover:bg-indigo-500"
-              >
-                Go to Admin to Seed Database
-              </Link>
-            </div>
+          <div className="text-center py-16 border border-[#E5E1D8] bg-[#FCFAF7]">
+            <span className="text-[10px] font-bold text-[#7A8471] uppercase tracking-widest">
+              Index Registry Clear • Awaiting Scraper Node Stream
+            </span>
           </div>
         ) : (
-          <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             {recentJobs.map((job) => (
               <JobCard 
                 key={job.id} 

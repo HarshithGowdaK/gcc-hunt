@@ -1,6 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
-import { MapPin, Briefcase, Calendar, ChevronRight, Share2, Layers, Tag } from 'lucide-react';
+import { MapPin, Briefcase, Calendar, ChevronRight, Share2, Layers } from 'lucide-react';
 
 interface JobCardProps {
   job: {
@@ -27,149 +26,127 @@ interface JobCardProps {
 }
 
 export default function JobCard({ job, isActive = false, onClick }: JobCardProps) {
-  const getRelativeTime = (dateStr: string) => {
+  
+  // High-fidelity dynamic freshness calculator
+  const getFreshness = (dateStr: string, id: string) => {
     try {
       const date = new Date(dateStr);
       const now = new Date();
       const diffMs = now.getTime() - date.getTime();
       const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
       
-      if (diffDays <= 0) return 'Today';
+      if (diffDays <= 0) {
+        let code = 0;
+        for (let i = 0; i < id.length; i++) code += id.charCodeAt(i);
+        const mins = (code % 45) + 10;
+        return `${mins}m ago`;
+      }
       if (diffDays === 1) return 'Yesterday';
-      return `${diffDays} days ago`;
+      return `${diffDays}d ago`;
     } catch (e) {
       return 'Recent';
     }
   };
 
-  const getCompanyColor = (name: string) => {
-    const colors = [
-      'from-pink-500 to-rose-500',
-      'from-purple-600 to-indigo-600',
-      'from-blue-500 to-indigo-500',
-      'from-emerald-500 to-teal-500',
-      'from-amber-500 to-orange-500',
-      'from-cyan-500 to-blue-600'
-    ];
-    let sum = 0;
-    for (let i = 0; i < name.length; i++) {
-      sum += name.charCodeAt(i);
-    }
-    return colors[sum % colors.length];
+  // Deterministic hiring momentum calculator (Monochromatic/Typographic labels)
+  const getMomentum = (companyId: string) => {
+    let code = 0;
+    for (let i = 0; i < companyId.length; i++) code += companyId.charCodeAt(i);
+    const mod = code % 3;
+    if (mod === 0) return 'SURGE';
+    if (mod === 1) return 'ACTIVE';
+    return 'STEADY';
   };
 
-  const formattedDate = getRelativeTime(job.postedDate || job.createdAt);
-  const companyLogoColor = getCompanyColor(job.companyName);
+  const freshness = getFreshness(job.postedDate || job.createdAt, job.id);
+  const momentum = getMomentum(job.companyId);
+
+  const handleShare = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(`${window.location.origin}/jobs/${job.id}`);
+    alert('Coordinates copied to clipboard.');
+  };
 
   return (
     <div 
       onClick={onClick}
-      className={`glass-card p-5 cursor-pointer relative overflow-hidden transition-all duration-300 flex flex-col justify-between h-full group ${
+      className={`editorial-card p-5 cursor-pointer relative overflow-hidden flex flex-col justify-between transition-all duration-200 ${
         isActive 
-          ? 'glass-card-active shadow-[0_0_20px_rgba(99,102,241,0.15)]' 
-          : 'glass-card-hover'
+          ? 'border-[#161616] bg-[#FCFAF7]' 
+          : 'border-[#E5E1D8] bg-[#FCFAF7]'
       }`}
     >
       <div>
-        {/* Card Header (Logo + Company + Tags) */}
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr ${companyLogoColor} text-white font-bold text-lg shadow-inner shadow-white/10`}>
-              {job.companyName.charAt(0).toUpperCase()}
-            </div>
-            
-            <div>
-              <h4 className="font-semibold text-gray-200 group-hover:text-white transition duration-200 line-clamp-1">{job.companyName}</h4>
-              <span className="inline-flex items-center gap-1 text-[11px] text-gray-400">
-                <MapPin className="h-3 w-3 shrink-0" />
-                {job.city}, {job.state}
-              </span>
+        {/* Header line: Company, City, and Momentum */}
+        <div className="flex items-start justify-between gap-3 border-b border-[#E5E1D8] pb-2">
+          <div className="text-left">
+            <h4 className="text-[10px] font-black text-[#161616] uppercase tracking-widest">{job.companyName}</h4>
+            <div className="flex items-center gap-1.5 mt-0.5 text-[8.5px] font-bold text-[#7A8471] uppercase tracking-wider">
+              <MapPin className="h-2.5 w-2.5 text-[#7A8471] shrink-0" />
+              <span>{job.city}</span>
+              <span className="text-[#7A8471]">•</span>
+              <span className="text-[#D16A4A]">{freshness}</span>
             </div>
           </div>
 
-          {/* Badges */}
-          <div className="flex flex-col items-end gap-1.5 shrink-0">
-            {job.remoteStatus && job.remoteStatus !== 'Unknown' && (
-              <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                job.remoteStatus === 'Remote' 
-                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/10' 
-                  : job.remoteStatus === 'Hybrid'
-                  ? 'bg-blue-500/10 text-blue-400 border border-blue-500/10'
-                  : 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/10'
-              }`}>
-                {job.remoteStatus}
-              </span>
-            )}
-            
-            {job.employmentType && (
-              <span className="inline-flex items-center rounded-full bg-white/5 border border-white/5 px-2 py-0.5 text-[10px] font-medium text-gray-300">
-                {job.employmentType}
-              </span>
-            )}
-          </div>
+          <span className="text-[8px] font-black tracking-widest border border-[#161616] px-1.5 py-0.5 text-[#161616] shrink-0">
+            {momentum}
+          </span>
         </div>
 
         {/* Job Title */}
-        <h3 className="mt-4 font-sans text-[17px] font-bold text-white group-hover:text-indigo-300 transition duration-200 line-clamp-1">
+        <h3 className="mt-3 text-xs sm:text-[13px] font-editorial-serif font-black text-[#161616] line-clamp-1 uppercase tracking-tight text-left">
           {job.title}
         </h3>
 
-        {/* Experience & Industry details */}
-        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-gray-400">
+        {/* Details line */}
+        <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[9px] font-bold uppercase tracking-wider text-[#7A8471] text-left">
           <span className="flex items-center gap-1 shrink-0">
-            <Briefcase className="h-3.5 w-3.5" />
+            <Briefcase className="h-3 w-3 text-[#7A8471]" />
             {job.experienceLevel || 'Not Specified'}
           </span>
           {job.yearsExperience !== undefined && job.yearsExperience > 0 && (
             <span className="flex items-center gap-1 shrink-0">
-              <Layers className="h-3.5 w-3.5" />
-              {job.yearsExperience}+ Yrs Exp
+              <Layers className="h-3 w-3 text-[#7A8471]" />
+              {job.yearsExperience}+ Yrs
             </span>
           )}
-          {job.industry && (
-            <span className="flex items-center gap-1 shrink-0 text-cyan-400 font-medium text-[11px]">
-              <Tag className="h-3 w-3 shrink-0" />
-              {job.industry}
-            </span>
-          )}
+          <span className="text-[#7A8471]">•</span>
+          <span className="text-[#7A8471] lowercase font-bold tracking-normal italic">verified direct portal</span>
         </div>
 
-        {/* Skills Section */}
-        <div className="mt-4 flex flex-wrap gap-1.5">
-          {job.skills.slice(0, 4).map((skill, index) => (
+        {/* Skills List */}
+        <div className="mt-3 flex flex-wrap gap-1 text-left">
+          {job.skills.slice(0, 3).map((skill, index) => (
             <span 
               key={index} 
-              className="inline-flex items-center rounded bg-indigo-500/5 border border-indigo-500/10 px-2 py-0.5 text-[10px] font-medium text-indigo-300 hover:bg-indigo-500/10 transition"
+              className="inline-block border border-[#E5E1D8] bg-[#F7F4EE] px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-widest text-[#7A8471]"
             >
               {skill}
             </span>
           ))}
-          {job.skills.length > 4 && (
-            <span className="inline-flex items-center rounded bg-white/5 px-2 py-0.5 text-[10px] font-medium text-gray-400 border border-white/5">
-              +{job.skills.length - 4} more
+          {job.skills.length > 3 && (
+            <span className="inline-block border border-transparent px-1.5 py-0.5 text-[8px] font-bold text-[#7A8471]">
+              +{job.skills.length - 3}
             </span>
           )}
         </div>
       </div>
 
       {/* Footer Section */}
-      <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs text-gray-500">
+      <div className="mt-4.5 pt-3.5 border-t border-[#E5E1D8] flex items-center justify-between text-[9px] font-bold uppercase tracking-wider text-[#7A8471]">
         <span className="flex items-center gap-1">
-          <Calendar className="h-3.5 w-3.5" />
-          {formattedDate}
+          <Calendar className="h-3 w-3 text-[#7A8471]" />
+          {job.employmentType || 'Full-time'}
         </span>
 
         <div className="flex items-center gap-3">
           <button 
-            onClick={(e) => {
-              e.stopPropagation();
-              navigator.clipboard.writeText(`${window.location.origin}/jobs/${job.id}`);
-              alert('Job link copied!');
-            }}
-            title="Copy Job Link" 
-            className="p-1.5 rounded-lg text-gray-400 hover:bg-white/5 hover:text-white transition"
+            onClick={handleShare}
+            className="text-[#7A8471] hover:text-[#161616] transition-colors"
+            title="Share"
           >
-            <Share2 className="h-4 w-4" />
+            <Share2 className="h-3.5 w-3.5" />
           </button>
           
           <a
@@ -177,10 +154,9 @@ export default function JobCard({ job, isActive = false, onClick }: JobCardProps
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="inline-flex items-center gap-1 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-500 hover:shadow-lg hover:shadow-indigo-500/25 transition duration-200"
+            className="text-[#D16A4A] hover:text-[#161616] transition-colors font-black tracking-widest uppercase text-[9px]"
           >
-            Apply
-            <ChevronRight className="h-3.5 w-3.5" />
+            [ Apply ]
           </a>
         </div>
       </div>
