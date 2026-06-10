@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { fetchJobs, fetchJob, fetchCompanies, fetchFilters } from '@/lib/api';
 import JobCard from '@/components/JobCard';
-import ExportButton from '@/components/ExportButton';
+import { DownloadSheetButton } from '@/components/DownloadSheetButton';
 
 function JobsContent() {
   const router = useRouter();
@@ -430,7 +430,12 @@ function JobsContent() {
             <span>Indexed <b>{jobs.length}</b> nodes (Total: {pagination.totalJobs})</span>
             <div className="flex items-center gap-4">
               <span>Page {pagination.page} of {pagination.totalPages}</span>
-              <ExportButton filters={{ experienceLevel: selectedExp, division: selectedIndustry }} />
+              <DownloadSheetButton jobs={jobs.map(j => ({ 
+                company: j.companyName || j.companyId || 'Unknown', 
+                jobType: j.experienceLevel || j.employmentType || 'Unknown', 
+                jobRole: j.title || 'Unknown', 
+                url: j.applyUrl || j.url || '#' 
+              }))} />
             </div>
           </div>
 
