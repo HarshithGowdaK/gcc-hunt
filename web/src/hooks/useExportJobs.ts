@@ -26,7 +26,7 @@ export type ExportStatus = 'idle' | 'loading' | 'success' | 'error';
 export interface UseExportJobsReturn {
   exportStatus: ExportStatus;
   exportMessage: string;
-  triggerExport: (jobs: ExportJob[]) => Promise<void>;
+  triggerExport: (filters: any) => Promise<void>;
   resetExportStatus: () => void;
 }
 
@@ -41,11 +41,11 @@ export function useExportJobs(): UseExportJobsReturn {
     setExportMessage('');
   }, []);
 
-  const triggerExport = useCallback(async (jobs: ExportJob[]) => {
-    // ── Guard: nothing to export ──────────────────────────────────────────
-    if (!jobs || jobs.length === 0) {
+  const triggerExport = useCallback(async (filters: any) => {
+    // ── Guard ──────────────────────────────────────────
+    if (!filters) {
       setExportStatus('error');
-      setExportMessage('No jobs available to export.');
+      setExportMessage('Filters undefined.');
       return;
     }
 
@@ -61,7 +61,7 @@ export function useExportJobs(): UseExportJobsReturn {
       const response = await fetch('/api/export-jobs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jobs, filename }),
+        body: JSON.stringify({ filters, filename }),
       });
 
       if (!response.ok) {

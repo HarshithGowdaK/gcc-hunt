@@ -430,13 +430,16 @@ function JobsContent() {
             <span>Indexed <b>{jobs.length}</b> nodes (Total: {pagination.totalJobs})</span>
             <div className="flex items-center gap-4">
               <span>Page {pagination.page} of {pagination.totalPages}</span>
-              <DownloadSheetButton jobs={jobs.map(j => ({ 
-                company: j.companyName || j.companyId || 'Unknown', 
-                jobType: j.experienceLevel || j.employmentType || 'Unknown', 
-                jobRole: j.title || 'Unknown', 
-                url: j.applyUrl || j.url || '#',
-                datePosted: j.dateScraped ? new Date(j.dateScraped).toLocaleDateString() : 'Unknown'
-              }))} />
+              <DownloadSheetButton filters={{ 
+                company: selectedCompany, 
+                city: selectedCity, 
+                experienceLevel: selectedExp, 
+                employmentType: selectedType, 
+                remoteStatus: selectedRemote, 
+                industry: selectedIndustry, 
+                search, 
+                sortBy 
+              }} />
             </div>
           </div>
 

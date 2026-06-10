@@ -16,15 +16,15 @@ import { useExportJobs, ExportJob } from '@/hooks/useExportJobs';
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface DownloadSheetButtonProps {
-  /** The filtered jobs currently displayed in the results list */
-  jobs: ExportJob[];
+  /** The current filter state to pass to the backend */
+  filters: any;
   /** Optional extra CSS classes for the button wrapper */
   className?: string;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function DownloadSheetButton({ jobs, className = '' }: DownloadSheetButtonProps) {
+export function DownloadSheetButton({ filters, className = '' }: DownloadSheetButtonProps) {
   const { exportStatus, exportMessage, triggerExport, resetExportStatus } = useExportJobs();
 
   const isLoading = exportStatus === 'loading';
@@ -40,7 +40,7 @@ export function DownloadSheetButton({ jobs, className = '' }: DownloadSheetButto
 
   const handleClick = () => {
     if (isLoading) return;
-    triggerExport(jobs);
+    triggerExport(filters);
   };
 
   return (

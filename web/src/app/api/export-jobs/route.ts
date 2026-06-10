@@ -9,6 +9,7 @@
 
 import { NextResponse } from 'next/server';
 import * as XLSX from 'xlsx';
+import { fetchJobs } from '@/lib/api';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -110,14 +111,25 @@ export async function POST(request: Request) {
     const body = await request.json();
 
     // ── 1. Parse input ──────────────────────────────────────────────────────
-    const { jobs, filename } = body as { jobs: JobRecord[]; filename?: string };
+    const { filters, filename } = body as { filters: any; filename?: string };
 
-    if (!Array.isArray(jobs)) {
+    if (!filters) {
       return NextResponse.json(
-        { error: 'Request body must include a "jobs" array.' },
+        { error: 'Request body must include a "filters" object.' },
         { status: 400 }
       );
     }
+
+    filters.limit = 100000;
+    const { jobs: rawJobs } = await fetchJobs(filters);
+
+    const jobs: JobRecord[] = rawJobs.map((j: any) => ({
+      company: j.companyName || j.companyId || 'Unknown',
+      jobType: j.experienceLevel || j.employmentType || 'Unknown',
+      jobRole: j.title || 'Unknown',
+      url: j.applyUrl || j.url || '#',
+      datePosted: j.dateScraped ? new Date(j.dateScraped).toLocaleDateString() : 'Unknown'
+    }));
 
     // ── 2. Validate each record ─────────────────────────────────────────────
     const validJobs = jobs.filter(isValidRecord);
