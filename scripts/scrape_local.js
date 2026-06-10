@@ -775,8 +775,24 @@ async function scrapeGeneric(companyId, companyName, careersUrl) {
           if (!isJob) continue;
 
           let title = a.innerText.trim();
-          if (!title && a.parentElement) title = a.parentElement.innerText.trim().split('\n')[0];
-          if (!title || title.length < 5) continue;
+          if (!title && a.parentElement) title = a.parentElement.innerText.trim();
+          if (!title) continue;
+          title = title.split('\n')[0].trim();
+          if (title.length < 5) continue;
+
+          const boilerplate = [
+            'cookie policy', 'privacy policy', 'terms of service', 'terms of use', 'ai usage', 'using ai',
+            'our story', 'our teams', 'dashboard', 'profile', 'sign in', 'sign-in', 'login', 'log in', 'log-in',
+            'logout', 'log out', 'search & apply', 'homepage', 'deutsch', 'english', 'español', 'français',
+            'italiano', 'português', 'japanese', 'german', 'french', 'italian', 'spanish', 'korean', 'chinese',
+            'portuguese', 'careers', 'our platform', 'culture', 'benefits', 'awards', 'search', 'apply now',
+            'apply', 'you can still apply', 'click here', 'read more', 'learn more', 'go back', 'back to search',
+            'view profile', 'talent community', 'talent network', 'join us', 'close', 'cancel', 'accept',
+            'decline', 'agree', 'cookies', 'all jobs', 'job search', 'open positions', 'view jobs', 'view openings',
+            'job openings', 'careers portal', 'careers home', 'about us', 'contact us', 'home', 'faq', 'help',
+            'support', 'sitemap', 'skip to main content', 'main content', 'skip to navigation', 'navigation'
+          ];
+          if (boilerplate.includes(title.toLowerCase())) continue;
 
           let loc = 'India';
           let p = a.parentElement;
@@ -1091,10 +1107,21 @@ async function runLocalScraper() {
       newJob.dateScraped = new Date().toISOString();
 
       finalJobsList.push(newJob);
+      crawledJobIds.delete(newJob.id);
     }
   }
 
-  fs.writeFileSync(JOBS_PATH, JSON.stringify(finalJobsList, null, 2));
+  // Final database deduplication safety pass
+  const uniqueFinalJobsList = [];
+  const seenFinalIds = new Set();
+  for (const job of finalJobsList) {
+    if (!seenFinalIds.has(job.id)) {
+      seenFinalIds.add(job.id);
+      uniqueFinalJobsList.push(job);
+    }
+  }
+
+  fs.writeFileSync(JOBS_PATH, JSON.stringify(uniqueFinalJobsList, null, 2));
   fs.writeFileSync(COMPANIES_PATH, JSON.stringify(finalCompaniesList, null, 2));
   fs.writeFileSync(LOGS_PATH, JSON.stringify(existingLogs.slice(0, 100), null, 2));
 
