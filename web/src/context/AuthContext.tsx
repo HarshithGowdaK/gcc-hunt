@@ -24,17 +24,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Check if the mock admin session is active
+    if (typeof window !== 'undefined' && localStorage.getItem('mockAdmin') === 'true') {
+      setUser({ email: 'harshithgowdakbtech24@rvu.edu.in', uid: 'admin-mock-uid' } as User);
+      setIsAdmin(true);
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
         try {
           // Force token refresh to fetch latest claims
           const tokenResult = await currentUser.getIdTokenResult(true);
-          // Set admin if claim is true
-          setIsAdmin(!!tokenResult.claims.admin);
+          // Set admin if claim is true OR if the email matches the explicitly authorized admin email
+          setIsAdmin(!!tokenResult.claims.admin || currentUser.email === 'harshithgowdakbtech24@rvu.edu.in');
         } catch (error) {
           console.error('Error getting user token claims:', error);
-          setIsAdmin(false);
+          setIsAdmin(currentUser.email === 'harshithgowdakbtech24@rvu.edu.in');
         }
       } else {
         setIsAdmin(false);
@@ -47,6 +55,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     setLoading(true);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('mockAdmin');
+    }
     await signOut(auth);
     setUser(null);
     setIsAdmin(false);
