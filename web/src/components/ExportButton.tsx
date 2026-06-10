@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Download, Loader2, ExternalLink, AlertCircle } from 'lucide-react';
+import { Download, Loader2, AlertCircle } from 'lucide-react';
 
 interface ExportButtonProps {
   filters: {
@@ -39,9 +39,9 @@ export default function ExportButton({ filters }: ExportButtonProps) {
       } else {
         throw new Error('No URL returned from server');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Export Error:', err);
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Unknown error occurred.');
     } finally {
       setLoading(false);
     }

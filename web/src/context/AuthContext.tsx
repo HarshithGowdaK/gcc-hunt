@@ -26,6 +26,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     // Check if the mock admin session is active
     if (typeof window !== 'undefined' && localStorage.getItem('mockAdmin') === 'true') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setUser({ email: 'harshithgowdakbtech24@rvu.edu.in', uid: 'admin-mock-uid' } as User);
       setIsAdmin(true);
       setLoading(false);
