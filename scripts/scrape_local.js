@@ -14,7 +14,7 @@ try {
 }
 
 // Environment variables
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
+const NUM_WORKERS = process.env.WORKERS ? parseInt(process.env.WORKERS) : 3;
 const CRAWL_LIMIT = process.env.LIMIT || 'all'; // Default to 'all' to scrape all companies in the sheet
 
 const AXIOS_HEADERS = {
@@ -284,112 +284,93 @@ function classifyIndustry(title, department) {
 }
 
 // -------------------------------------------------------------
-// GEMINI PARSING ENGINE
+// -------------------------------------------------------------
+// NVIDIA MOONSHOT AI PARSING ENGINE
 // -------------------------------------------------------------
 
-let geminiQuotaExceeded = false;
+let aiQuotaExceeded = false;
 
 async function parseJobPostingWithAI(text, jobTitle, jobLocation) {
-  if (!GEMINI_API_KEY || geminiQuotaExceeded) return null;
+  if (aiQuotaExceeded) return null;
   
-  const models = ['gemini-2.5-flash', 'gemini-2.0-flash'];
   const cleanText = text.substring(0, 15000); 
 
-  for (const model of models) {
-    let retries = 0;
-    const maxRetries = 4;
-    let baseDelay = 5000; 
+  let retries = 0;
+  const maxRetries = 4;
+  let baseDelay = 5000; 
 
-    while (retries < maxRetries) {
-      try {
-        console.log(`[Gemini API] Parsing job details for: "${jobTitle}" using model ${model} (attempt ${retries + 1}/${maxRetries})...`);
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
-        
-        const response = await axios.post(apiUrl, {
-          contents: [{
-            parts: [{
-              text: `Analyze this job posting text and extract the exact details requested.
+  const promptContent = `Analyze this job posting text and extract the exact details requested.
 Title: ${jobTitle}
 Location: ${jobLocation}
 
 Job Description Text:
-${cleanText}`
-            }]
-          }],
-          generationConfig: {
-            responseMimeType: "application/json",
-            responseSchema: {
-              type: "OBJECT",
-              properties: {
-                description: { 
-                  type: "STRING", 
-                  description: "Extract the EXACT, COMPLETE job description details (responsibilities, requirements, technical criteria) VERBATIM from the page. Do NOT summarize, rewrite, or truncate the text. Simply exclude unrelated website cookies banners, headers, and footer menu navigation items. Preserve the exact vocabulary."
-                },
-                skills: { 
-                  type: "ARRAY", 
-                  items: { type: "STRING" },
-                  description: "Key technical/non-technical tools or skills mentioned in the job description."
-                },
-                yearsExperience: { 
-                  type: "INTEGER",
-                  description: "Minimum years of experience requested as a number. For freshers, graduates, or trainees, specify 0."
-                },
-                experienceLevel: { 
-                  type: "STRING", 
-                  enum: ["Entry Level", "Mid-Senior Level", "Director / Lead"],
-                  description: "Select Entry Level (0-2 years), Mid-Senior Level (3-7 years), or Director / Lead (8+ years)."
-                },
-                remoteStatus: { 
-                  type: "STRING", 
-                  enum: ["Remote", "Hybrid", "Onsite", "Unknown"] 
-                },
-                employmentType: { 
-                  type: "STRING", 
-                  enum: ["Full-time", "Part-time", "Contract", "Internship", "Apprenticeship"],
-                  description: "Select Full-time, Part-time, Contract, Internship (if title or text specifies intern/trainee), or Apprenticeship (if specifies apprentice)."
-                }
-              },
-              required: ["description", "skills", "yearsExperience", "experienceLevel", "remoteStatus", "employmentType"]
-            }
-          }
-        }, {
-          headers: { 'Content-Type': 'application/json' },
-          timeout: 20000
-        });
+${cleanText}
 
-        const candidate = response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (candidate) {
-          return JSON.parse(candidate);
-        }
+Output the result strictly as a JSON object with EXACTLY the following format, and nothing else (do not wrap in markdown \`\`\`json):
+{
+  "description": "Extract the EXACT, COMPLETE job description details (responsibilities, requirements, technical criteria) VERBATIM from the page. Do NOT summarize, rewrite, or truncate the text. Simply exclude unrelated website cookies banners, headers, and footer menu navigation items. Preserve the exact vocabulary.",
+  "skills": ["skill1", "skill2"],
+  "yearsExperience": 3,
+  "experienceLevel": "Mid Level", // Select from: "Internship / Apprenticeship", "Entry Level", "Mid Level", "Senior Level", "Lead / Manager", "Director / Executive"
+  "remoteStatus": "Unknown", // Select from: "Remote", "Hybrid", "Onsite", "Unknown"
+  "employmentType": "Full-time" // Select from: "Full-time", "Part-time", "Contract", "Internship", "Apprenticeship"
+}`;
+
+  while (retries < maxRetries) {
+    try {
+      console.log(`[NVIDIA AI] Parsing job details for: "${jobTitle}" using moonshotai/kimi-k2.6 (attempt ${retries + 1}/${maxRetries})...`);
+      const apiUrl = 'https://integrate.api.nvidia.com/v1/chat/completions';
+      
+      const response = await axios.post(apiUrl, {
+        model: 'moonshotai/kimi-k2.6',
+        messages: [{ role: 'user', content: promptContent }],
+        max_tokens: 16384,
+        temperature: 0.1,
+        top_p: 1.00,
+        stream: false
+      }, {
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer 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',
+          'Accept': 'application/json'
+        },
+        timeout: 40000
+      });
+
+      const candidate = response.data?.choices?.[0]?.message?.content;
+      if (candidate) {
+        // Strip markdown backticks if the model ignores the prompt instruction
+        const jsonStr = candidate.replace(/^```json\s*/i, '').replace(/```$/i, '').trim();
+        return JSON.parse(jsonStr);
+      }
+      break; 
+    } catch (error) {
+      const errMsg = error.response?.data?.error?.message || error.message || '';
+      const status = error.response?.status;
+      
+      const isQuotaExceeded = errMsg.toLowerCase().includes('quota') || errMsg.toLowerCase().includes('billing') || status === 402 || status === 401;
+      if (isQuotaExceeded) {
+        console.warn(`[NVIDIA AI] Quota/Auth error: "${errMsg}". Disabling AI parser for the rest of this run.`);
+        aiQuotaExceeded = true;
+        return null;
+      }
+
+      const isRateLimit = status === 429 || errMsg.toLowerCase().includes('rate limit');
+      const isHighDemand = status === 503 || errMsg.toLowerCase().includes('high demand') || errMsg.toLowerCase().includes('spikes in demand') || errMsg.toLowerCase().includes('temporary');
+      
+      if ((isRateLimit || isHighDemand) && retries < maxRetries - 1) {
+        retries++;
+        const sleepMs = baseDelay * Math.pow(2, retries - 1) + Math.random() * 2000;
+        console.warn(`[NVIDIA AI] Rate limited/high demand (status ${status || 'unknown'}): ${errMsg.substring(0, 150)}. Retrying in ${(sleepMs/1000).toFixed(1)}s...`);
+        await new Promise(resolve => setTimeout(resolve, sleepMs));
+      } else {
+        console.warn(`[NVIDIA AI] Request failed: ${errMsg.substring(0, 200)}`);
         break; 
-      } catch (error) {
-        const errMsg = error.response?.data?.error?.message || error.message || '';
-        const status = error.response?.status;
-        
-        const isQuotaExceeded = errMsg.toLowerCase().includes('quota') || errMsg.toLowerCase().includes('plan and billing') || errMsg.toLowerCase().includes('billing details');
-        if (isQuotaExceeded) {
-          console.warn(`[Gemini API] Quota/Billing limit hit: "${errMsg}". Disabling AI parser for the rest of this run.`);
-          geminiQuotaExceeded = true;
-          return null;
-        }
-
-        const isRateLimit = status === 429 || errMsg.toLowerCase().includes('rate limit');
-        const isHighDemand = status === 503 || errMsg.toLowerCase().includes('high demand') || errMsg.toLowerCase().includes('spikes in demand') || errMsg.toLowerCase().includes('temporary');
-        
-        if ((isRateLimit || isHighDemand) && retries < maxRetries - 1) {
-          retries++;
-          const sleepMs = baseDelay * Math.pow(2, retries - 1) + Math.random() * 2000;
-          console.warn(`[Gemini API - ${model}] Rate limited/high demand (status ${status || 'unknown'}): ${errMsg.substring(0, 150)}. Retrying in ${(sleepMs/1000).toFixed(1)}s...`);
-          await new Promise(resolve => setTimeout(resolve, sleepMs));
-        } else {
-          console.warn(`[Gemini API - ${model}] Request failed: ${errMsg.substring(0, 200)}`);
-          break; 
-        }
       }
     }
   }
 
-  console.warn(`[Gemini API] All model attempts failed. Falling back to rule-based heuristics.`);
+  console.warn(`[NVIDIA AI] All attempts failed. Falling back to rule-based heuristics.`);
   return null;
 }
 
@@ -948,12 +929,7 @@ async function runLocalScraper() {
   const startTime = Date.now();
   console.log('=== GCC Hunt Local Scraper ===');
   console.log(`Starting crawl at: ${new Date().toLocaleString()}`);
-  if (GEMINI_API_KEY) {
-    console.log('[AI Integration] Gemini flash parser is ACTIVE.');
-  } else {
-    console.log('[AI Integration] Gemini is INACTIVE. (Set GEMINI_API_KEY environment variable to activate)');
-  }
-
+  console.log('[AI Integration] NVIDIA Moonshot AI (kimi-k2.6) parser is ACTIVE.');
   const excelPath = path.join(__dirname, '..', 'companies.xlsx');
   if (!fs.existsSync(excelPath)) {
     console.error(`Error: Excel file not found at: ${excelPath}`);

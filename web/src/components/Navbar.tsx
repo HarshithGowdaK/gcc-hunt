@@ -4,11 +4,9 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Search } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { user, isAdmin, logout } = useAuth();
 
   const isActive = (path: string) => pathname === path;
 
@@ -74,34 +72,6 @@ export default function Navbar() {
           <Search className="h-3 w-3" />
           <span>Search (⌘K)</span>
         </button>
-
-        {isAdmin && (
-          <Link 
-            href="/admin/dashboard" 
-            className="text-[#D16A4A] hover:text-[#161616] transition-colors"
-          >
-            Admin
-          </Link>
-        )}
-
-        {user ? (
-          <div className="flex items-center gap-3 border-l border-[#E5E1D8] pl-3">
-            <span className="text-[#7A8471] normal-case font-medium">{user.email?.split('@')[0]}</span>
-            <button
-              onClick={() => logout()}
-              className="text-[#D16A4A] hover:underline transition-colors"
-            >
-              Sign out
-            </button>
-          </div>
-        ) : (
-          <Link
-            href="/admin"
-            className="text-[#7A8471] hover:text-[#161616] transition-colors"
-          >
-            Sign in
-          </Link>
-        )}
       </div>
     </header>
   );

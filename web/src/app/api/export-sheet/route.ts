@@ -48,11 +48,11 @@ export async function POST(request: Request) {
     // 3. Filter the jobs based on user criteria
     let filteredJobs = jobs;
     if (experienceLevel && experienceLevel !== 'All') {
-      filteredJobs = filteredJobs.filter(job => job.experienceLevel === experienceLevel);
+      filteredJobs = filteredJobs.filter((job: any) => job.experienceLevel === experienceLevel);
     }
     if (division && division !== 'All') {
       // In this setup, division acts as industry/department
-      filteredJobs = filteredJobs.filter(job => job.industry === division || job.division === division);
+      filteredJobs = filteredJobs.filter((job: any) => job.department === division || job.industry === division);
     }
 
     // 4. Remove duplicate jobs (company + title + location)
@@ -75,7 +75,7 @@ export async function POST(request: Request) {
     const deduplicatedJobs = Array.from(uniqueJobsMap.values());
 
     // 5. Sort by fetched_timestamp descending
-    deduplicatedJobs.sort((a, b) => {
+    deduplicatedJobs.sort((a: any, b: any) => {
       const timeA = new Date(a.dateScraped || 0).getTime();
       const timeB = new Date(b.dateScraped || 0).getTime();
       return timeB - timeA;
@@ -94,7 +94,7 @@ export async function POST(request: Request) {
 
     // 7. Populate columns: Company, Job Title, Location, Experience Level, Division, Apply URL, Fetched Timestamp
     const headers = ['Company', 'Job Title', 'Location', 'Experience Level', 'Division/Industry', 'Apply URL', 'Fetched Timestamp'];
-    const rows = deduplicatedJobs.map(job => [
+    const rows = deduplicatedJobs.map((job: any) => [
       job.company || job.companyId || 'Unknown',
       job.title || 'N/A',
       job.location || 'N/A',
