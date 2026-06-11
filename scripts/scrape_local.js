@@ -987,7 +987,8 @@ async function scrapeLever(companyId, companyName, careersUrl) {
     let rawText = posting.descriptionPlain || '';
     if (posting.lists) {
       posting.lists.forEach(l => {
-        rawText += `\n${l.text || ''}\n` + (l.content ? l.content.join('\n') : '');
+        const contentStr = Array.isArray(l.content) ? l.content.join('\n') : (l.content || '');
+        rawText += `\n${l.text || ''}\n` + contentStr;
       });
     }
 
@@ -1218,8 +1219,12 @@ async function scrapeGeneric(companyId, companyName, careersUrl) {
             'decline','agree','cookies','all jobs','job search','open positions','view jobs','view openings',
             'job openings','careers portal','careers home','about us','contact us','home','faq','help',
             'support','sitemap','skip to main content','main content','skip to navigation','navigation',
+            'skip to content','português - brasil','português - pt','română','slovenčina, slovenský jazyk',
+            '中文 - 简体','中文 - 繁體','polski','nederlands','magyar','suomi','svenska','dansk','česky',
+            'türkçe','tiếng việt','русский','ภาษาไทย','日本語','한국어','עברית','العربية'
           ];
           if (boilerplate.includes(title.toLowerCase())) continue;
+          if (/^(skip to|language|select language|accessibility)/i.test(title)) continue;
 
           // [FIX-15] Do NOT default to 'India'. If no Indian city/country keyword
           // is found near this link, loc stays null. The detail-fetch phase below
