@@ -823,7 +823,7 @@ async function scrapeWorkday(companyId, companyName, careersUrl) {
         const response = await axios.post(
           apiUrl,
           { appliedFacets: {}, limit, offset, searchText: '' },
-          { headers: { ...AXIOS_HEADERS, 'Content-Type': 'application/json' }, timeout: 15000 }
+          { headers: { ...AXIOS_HEADERS, 'Content-Type': 'application/json' }, timeout: 60000 }
         );
 
         const postings = response.data.jobPostings || [];
@@ -924,7 +924,7 @@ async function scrapeGreenhouse(companyId, companyName, careersUrl) {
   const apiUrl   = `https://boards-api.greenhouse.io/v1/boards/${token}/jobs?content=true`;
   // [FIX-13] Retry the index fetch too
   const response = await withRetry(() =>
-    axios.get(apiUrl, { headers: AXIOS_HEADERS, timeout: 15000 })
+    axios.get(apiUrl, { headers: AXIOS_HEADERS, timeout: 60000 })
   );
   const postings = response.data.jobs || [];
 
@@ -1045,19 +1045,42 @@ async function scrapeGeneric(companyId, companyName, careersUrl) {
   try {
     console.log(`[Generic Scraper] ${companyName} — Opening: ${careersUrl}`);
     try {
-      await page.goto(careersUrl, { waitUntil: 'domcontentloaded', timeout: 15000 });
+      await page.goto(careersUrl, { waitUntil: 'domcontentloaded', timeout: 60000 });
     } catch (gotoErr) {
       console.warn(`[Generic Scraper] Initial nav failed, retrying with commit: ${gotoErr.message}`);
-      await page.goto(careersUrl, { waitUntil: 'commit', timeout: 15000 });
+      try {
+        await page.goto(careersUrl, { waitUntil: 'commit', timeout: 60000 });
+      } catch (commitErr) {
+        console.warn(`[Generic Scraper] Commit nav also timed out. Proceeding anyway, DOM might be ready: ${commitErr.message}`);
+      }
     }
     await sleep(2000);
 
+    // ── Helper to handle "Execution context was destroyed" errors safely ─────
+    async function safeEvaluate(fn) {
+      try {
+        return await page.evaluate(fn);
+      } catch (err) {
+        if (err.message.includes('Execution context was destroyed')) {
+          console.warn(`[Generic Scraper] Evaluation context destroyed (likely navigating). Waiting 4s and retrying...`);
+          await sleep(4000);
+          return await page.evaluate(fn);
+        }
+        throw err;
+      }
+    }
+
     // ── Redirect to search page if landing page has no direct job links ──────
-    let jobLinksCount = await page.evaluate(() =>
-      document.querySelectorAll(
-        'a[href*="/job/"],a[href*="/jobs/"],a[href*="/posting/"],a[href*="/careers/"],a[href*="/vacancy/"],a[href*="/detail/"],a[href*="/position/"]'
-      ).length
-    );
+    let jobLinksCount = 0;
+    try {
+      jobLinksCount = await safeEvaluate(() =>
+        document.querySelectorAll(
+          'a[href*="/job/"],a[href*="/jobs/"],a[href*="/posting/"],a[href*="/careers/"],a[href*="/vacancy/"],a[href*="/detail/"],a[href*="/position/"]'
+        ).length
+      );
+    } catch (e) {
+      console.warn(`[Generic Scraper] Error checking initial job links: ${e.message}`);
+    }
 
     if (jobLinksCount < 2) {
       const searchRedirectLink = await page.$(
@@ -1067,8 +1090,12 @@ async function scrapeGeneric(companyId, companyName, careersUrl) {
         const href = await searchRedirectLink.getAttribute('href');
         if (href) {
           const targetUrl = href.startsWith('http') ? href : new URL(href, careersUrl).toString();
-          await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 20000 });
-          await sleep(2000);
+          try {
+            await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
+          } catch (e) {
+            console.warn(`[Generic Scraper] Search redirect nav failed/timed out. Continuing. ${e.message}`);
+          }
+          await sleep(3000);
         } else {
           await searchRedirectLink.click();
           await sleep(4000);
@@ -1139,25 +1166,32 @@ async function scrapeGeneric(companyId, companyName, careersUrl) {
       let scrollRounds = 0;
       const MAX_SCROLL_ROUNDS = 15;
       while (scrollRounds < MAX_SCROLL_ROUNDS) {
-        prevCount = await page.evaluate(() =>
-          document.querySelectorAll(
-            'a[href*="/job/"],a[href*="/jobs/"],a[href*="/posting/"],a[href*="/careers/"],a[href*="/detail/"],a[href*="/position/"]'
-          ).length
-        );
-        await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-        await sleep(1200);
-        const newCount = await page.evaluate(() =>
-          document.querySelectorAll(
-            'a[href*="/job/"],a[href*="/jobs/"],a[href*="/posting/"],a[href*="/careers/"],a[href*="/detail/"],a[href*="/position/"]'
-          ).length
-        );
-        // Stop scrolling once no new links appear in two consecutive rounds
-        if (newCount === prevCount) break;
+        try {
+          prevCount = await safeEvaluate(() =>
+            document.querySelectorAll(
+              'a[href*="/job/"],a[href*="/jobs/"],a[href*="/posting/"],a[href*="/careers/"],a[href*="/detail/"],a[href*="/position/"]'
+            ).length
+          );
+          await safeEvaluate(() => window.scrollTo(0, document.body.scrollHeight));
+          await sleep(1200);
+          const newCount = await safeEvaluate(() =>
+            document.querySelectorAll(
+              'a[href*="/job/"],a[href*="/jobs/"],a[href*="/posting/"],a[href*="/careers/"],a[href*="/detail/"],a[href*="/position/"]'
+            ).length
+          );
+          // Stop scrolling once no new links appear in two consecutive rounds
+          if (newCount === prevCount) break;
+        } catch (e) {
+          console.warn(`[Generic Scraper] Scroll/evaluate error: ${e.message}`);
+          break;
+        }
         scrollRounds++;
       }
 
       // Collect all job links on the current page
-      const rawJobs = await page.evaluate(() => {
+      let rawJobs = [];
+      try {
+        rawJobs = await safeEvaluate(() => {
         const results = [];
         for (const a of Array.from(document.querySelectorAll('a'))) {
           const href = a.href;
@@ -1205,6 +1239,9 @@ async function scrapeGeneric(companyId, companyName, careersUrl) {
         }
         return results;
       });
+      } catch (e) {
+        console.warn(`[Generic Scraper] Failed to extract links from page ${pageNum}: ${e.message}`);
+      }
 
       let newThisPage = 0;
       for (const item of rawJobs) {
