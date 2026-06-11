@@ -1,5 +1,185 @@
 [
   {
+    "id": "aff95261-4b1b-4724-a4d7-6d245fa02aeb",
+    "companyId": "encora",
+    "companyName": "Encora",
+    "status": "success",
+    "jobsFound": 0,
+    "executionTime": 696531,
+    "timestamp": "2026-06-11T14:05:43.859Z"
+  },
+  {
+    "id": "49bee445-5bc2-4ddf-b4a4-cbc446aceaea",
+    "companyId": "jacobs",
+    "companyName": "Jacobs",
+    "status": "success",
+    "jobsFound": 16,
+    "executionTime": 74594,
+    "timestamp": "2026-06-11T14:00:10.754Z"
+  },
+  {
+    "id": "947a803b-2ff8-4483-9c6a-691dc5d4c0a3",
+    "companyId": "circana",
+    "companyName": "Circana",
+    "status": "success",
+    "jobsFound": 19,
+    "executionTime": 64118,
+    "timestamp": "2026-06-11T14:00:03.236Z"
+  },
+  {
+    "id": "3fd96f17-f976-4c14-8b40-5b024e61a329",
+    "companyId": "extreme-networks",
+    "companyName": "Extreme Networks",
+    "status": "failed",
+    "errors": "l.content.join is not a function",
+    "executionTime": 2985,
+    "timestamp": "2026-06-11T13:58:59.118Z"
+  },
+  {
+    "id": "934a63f2-3a7b-4ac9-9071-e9434ba5588b",
+    "companyId": "coforge",
+    "companyName": "Coforge",
+    "status": "success",
+    "jobsFound": 0,
+    "executionTime": 696484,
+    "timestamp": "2026-06-11T13:58:56.160Z"
+  },
+  {
+    "id": "0c5a6fc1-9da8-4339-a4db-1fba10bf7dd9",
+    "companyId": "cyient",
+    "companyName": "Cyient",
+    "status": "success",
+    "jobsFound": 0,
+    "executionTime": 696456,
+    "timestamp": "2026-06-11T13:58:56.132Z"
+  },
+  {
+    "id": "cbf9b059-01f2-40d8-a747-a0d19074b357",
+    "companyId": "crisil",
+    "companyName": "CRISIL",
+    "status": "success",
+    "jobsFound": 0,
+    "executionTime": 656158,
+    "timestamp": "2026-06-11T13:54:07.328Z"
+  },
+  {
+    "id": "8e0e88c0-09a3-4593-96b6-df3aab2e9fd9",
+    "companyId": "automation-anywhere",
+    "companyName": "Automation Anywhere",
+    "status": "success",
+    "jobsFound": 0,
+    "executionTime": 696807,
+    "timestamp": "2026-06-11T13:47:19.676Z"
+  },
+  {
+    "id": "5d2ed808-7394-4bd6-9d09-c726af85be3b",
+    "companyId": "adidas",
+    "companyName": "Adidas",
+    "status": "success",
+    "jobsFound": 0,
+    "executionTime": 696811,
+    "timestamp": "2026-06-11T13:47:19.676Z"
+  },
+  {
+    "id": "11021e75-c8dd-492f-8483-e9a511f30998",
+    "companyId": "cbre",
+    "companyName": "CBRE",
+    "status": "success",
+    "jobsFound": 50,
+    "executionTime": 448301,
+    "timestamp": "2026-06-11T13:43:11.170Z"
+  },
+  {
+    "id": "c76a93b8-ae57-4e3c-91fc-0853689e6c43",
+    "companyId": "clickup",
+    "companyName": "ClickUp",
+    "status": "success",
+    "jobsFound": 0,
+    "executionTime": 24162,
+    "timestamp": "2026-06-11T13:23:44.349Z"
+  },
+  {
+    "id": "d05fb993-58ba-4f68-af92-6a9167ea1d2a",
+    "companyId": "encora",
+    "companyName": "Encora",
+    "status": "failed",
+    "errors": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://careers.coforge.com/coforge/\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 30044,
+    "timestamp": "2026-06-11T13:23:22.987Z"
+  },
+  {
+    "id": "ef9dd174-ee9b-4bb6-ac9b-9f85cb3e9814",
+    "companyId": "jacobs",
+    "companyName": "Jacobs",
+    "status": "failed",
+    "errors": "page.evaluate: Execution context was destroyed, most likely because of a navigation",
+    "executionTime": 5006,
+    "timestamp": "2026-06-11T13:23:21.245Z"
+  },
+  {
+    "id": "9790a3e2-be8c-41a6-a0a8-a0f6e20853bc",
+    "companyId": "extreme-networks",
+    "companyName": "Extreme Networks",
+    "status": "failed",
+    "errors": "l.content.join is not a function",
+    "executionTime": 3976,
+    "timestamp": "2026-06-11T13:23:20.187Z"
+  },
+  {
+    "id": "7f583914-d455-4795-8b0e-5d492a3275bb",
+    "companyId": "coforge",
+    "companyName": "Coforge",
+    "status": "failed",
+    "errors": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://careers.coforge.com/coforge/\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 30087,
+    "timestamp": "2026-06-11T13:23:16.239Z"
+  },
+  {
+    "id": "36ad7908-8e0f-4918-872d-ecd29f5cd48e",
+    "companyId": "cyient",
+    "companyName": "Cyient",
+    "status": "failed",
+    "errors": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://careers.cyient.com/cyient/\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 30057,
+    "timestamp": "2026-06-11T13:23:16.211Z"
+  },
+  {
+    "id": "a189fff8-a791-4361-896a-11ae7ed316aa",
+    "companyId": "crisil",
+    "companyName": "CRISIL",
+    "status": "failed",
+    "errors": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://career.crisil.com/crisil/\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 30043,
+    "timestamp": "2026-06-11T13:22:52.943Z"
+  },
+  {
+    "id": "ee3b716f-7fa5-4889-9f06-d360099a68a7",
+    "companyId": "adidas",
+    "companyName": "Adidas",
+    "status": "failed",
+    "errors": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://careers.adidas-group.com/jobs?location=%5B%7B%22country%22%3A%22India%22%7D%5D&offset=0&keywords=&location_manual=India\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 30374,
+    "timestamp": "2026-06-11T13:22:46.153Z"
+  },
+  {
+    "id": "ce5b4965-6c09-43a5-a5a0-f8807d8f1ef5",
+    "companyId": "automation-anywhere",
+    "companyName": "Automation Anywhere",
+    "status": "failed",
+    "errors": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://www.automationanywhere.com/company/careers/all\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 30369,
+    "timestamp": "2026-06-11T13:22:46.152Z"
+  },
+  {
+    "id": "2d08d3fd-2fc3-4dab-8d3c-64bfca2faaf3",
+    "companyId": "cbre",
+    "companyName": "CBRE",
+    "status": "failed",
+    "errors": "page.evaluate: Execution context was destroyed, most likely because of a navigation",
+    "executionTime": 7117,
+    "timestamp": "2026-06-11T13:22:22.900Z"
+  },
+  {
     "id": "36ee9f93-7233-42f9-8155-e5df8f5fce3a",
     "companyId": "ceridian-dayforce",
     "companyName": "Ceridian Dayforce",
