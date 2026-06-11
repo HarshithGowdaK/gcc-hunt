@@ -53,6 +53,13 @@
 const fs     = require('fs');
 const path   = require('path');
 const crypto = require('crypto');
+const {
+  classifyWithValidation,
+  extractExperienceDetails,
+  extractExperience,
+  normaliseAILevel,
+  SENIORITY_LEVELS,
+} = require('./classifier');
 
 let xlsx, playwright, axios;
 try {
@@ -222,375 +229,11 @@ function classifyIndustry(title, department) {
 }
 
 // =============================================================================
-// SECTION 2 — CLASSIFICATION ENGINE  [FIX-01 through FIX-06]
+// SECTION 2 — CLASSIFICATION ENGINE (see scripts/classifier.js)
 // =============================================================================
 
-/**
- * All valid seniority levels as per specification.
- * Order matters — more specific checks run first.
- */
-const SENIORITY_LEVELS = {
-  INTERNSHIP  : 'Internship',
-  APPRENTICESHIP: 'Apprenticeship',
-  FRESHER     : 'Fresher',
-  ENTRY       : 'Entry Level',
-  MID         : 'Mid Level',
-  SENIOR      : 'Senior Level',
-  LEAD        : 'Lead Level',
-};
-
-// ─── Keyword dictionaries ─────────────────────────────────────────────────────
-
-const INTERNSHIP_KEYWORDS = [
-  'internship', 'summer intern', 'winter intern', 'graduate intern',
-  'student intern', 'research intern', 'campus internship', 'trainee intern',
-  'co-op', 'coop', 'student program', 'industrial trainee',
-  'university placement', 'undergraduate program', 'intern program',
-];
-const INTERNSHIP_RE = /\b(intern(?:ship)?)\b/i;
-
-const APPRENTICESHIP_KEYWORDS = [
-  'apprenticeship', 'graduate apprentice', 'trade apprentice',
-  'engineering apprentice', 'technician apprentice', 'apprenticeship program',
-  'vocational training', 'learn while working', 'trainee program',
-];
-const APPRENTICESHIP_RE = /\b(apprentice(?:ship)?)\b/i;
-
-const FRESHER_KEYWORDS = [
-  'fresh graduate', 'recent graduate', 'graduate program', 'new graduate',
-  'no experience required', 'no prior experience', 'fresher', 'freshers',
-  'entry level graduate', '0 years', '0-0 years', 'zero experience',
-];
-
-/**
- * Returns true if n is a plausible years-of-experience value.
- * Guards against matching version numbers (e.g. "Python 3.11") or page numbers.
- */
-function isValidYears(n) {
-  return !isNaN(n) && n >= 0 && n <= 40;
-}
-
-/**
- * [FIX-06] Extracts the PRIMARY experience requirement from a job description.
- *
- * Two-step approach:
- *
- * Step A — Sub-role exclusion.
- *   Patterns like "atleast 1 year experience as Team Lead" are SECONDARY
- *   qualifiers stacked on top of the base requirement. They must be blanked
- *   out before scanning so they don't pollute the primary signal.
- *   Exclusion pattern: "X year(s) [of] experience as <role>"
- *   e.g. "atleast 1 year experience as Team Lead" → excluded
- *        "4 years prior relevant experience"       → kept
- *
- * Step B — Maximum selection.
- *   After exclusion, collect all remaining numeric experience values and
- *   return the MAXIMUM. When multiple thresholds appear (e.g. "4 years
- *   general + 2 years with React"), the highest is the real requirement bar.
- *   For range patterns ("3-5 years") the LOWER bound is stored so that
- *   max(range_lower_bounds, explicit_values) still behaves correctly.
- *
- * Returns { minYears, allFound, rawMatches }
- *   — minYears is the primary years value (kept as "minYears" for compat)
- */
-function extractExperienceDetails(description) {
-  const text = (description || '').toLowerCase();
-
-  // ── Step A: blank out sub-role experience qualifiers ─────────────────────
-  // Matches: "X year(s) [of] [experience] as <role phrase>"
-  // Uses .replace so positions shift cleanly; replace chars with spaces to
-  // preserve string length (keeps subsequent regex positions valid).
-  const subRoleRe = /\d+\s*(?:year|yr)s?\s*(?:of\s*)?(?:experience|exp)?\s*as\b[^,.\n;]*/gi;
-  const cleanedText = text.replace(subRoleRe, match => ' '.repeat(match.length));
-
-  const candidates = [];  // { value: number, raw: string }
-  let m;
-
-  // 1. Range: "3 to 5 years" / "3-5 years"  →  store LOWER bound
-  const rangeRe = /(\d+)\s*(?:-|to)\s*(\d+)\s*years?/gi;
-  while ((m = rangeRe.exec(cleanedText)) !== null) {
-    const low = parseInt(m[1], 10);
-    if (isValidYears(low)) candidates.push({ value: low, raw: m[0] });
-  }
-
-  // 2. "8+ years"
-  const plusRe = /(\d+)\+\s*years?/gi;
-  while ((m = plusRe.exec(cleanedText)) !== null) {
-    const v = parseInt(m[1], 10);
-    if (isValidYears(v)) candidates.push({ value: v, raw: m[0] });
-  }
-
-  // 3. "minimum X years" / "minimum of X years" / "at least X years" / "atleast X years"
-  //    Added (?:of\s+)? so "minimum of 4 years" works (the word "of" sits between them).
-  //    \s* between "at" and "least" also handles the no-space form "atleast".
-  const minRe = /(?:minimum|at\s*least|requires?)\s*(?:of\s+)?(\d+)\s*years?/gi;
-  while ((m = minRe.exec(cleanedText)) !== null) {
-    const v = parseInt(m[1], 10);
-    if (isValidYears(v)) candidates.push({ value: v, raw: m[0] });
-  }
-
-  // 4. "X years of experience" / "X years experience" (direct adjacency)
-  const yrsExpRe = /(\d+)\s*years?\s*(?:of\s*)?experience/gi;
-  while ((m = yrsExpRe.exec(cleanedText)) !== null) {
-    const v = parseInt(m[1], 10);
-    if (isValidYears(v)) candidates.push({ value: v, raw: m[0] });
-  }
-
-  // 4b. "X years [up to 4 intervening words] experience"
-  //     Catches phrasing like "4 years prior relevant experience" where adjectives
-  //     sit between "years" and "experience". The negative lookahead ensures the
-  //     intervening words are not themselves "experience" (prevents double-match).
-  const yrsWordsExpRe = /(\d+)\s*years?(?:\s+(?!experience\b)\w+){1,4}\s+experience\b/gi;
-  while ((m = yrsWordsExpRe.exec(cleanedText)) !== null) {
-    const v = parseInt(m[1], 10);
-    if (isValidYears(v)) candidates.push({ value: v, raw: m[0] });
-  }
-
-  // 5. "experience of X years"
-  const expOfRe = /experience\s*(?:of\s*)?(\d+)\+?\s*years?/gi;
-  while ((m = expOfRe.exec(cleanedText)) !== null) {
-    const v = parseInt(m[1], 10);
-    if (isValidYears(v)) candidates.push({ value: v, raw: m[0] });
-  }
-
-  if (candidates.length === 0) return { minYears: null, allFound: [], rawMatches: [] };
-
-  // ── Step B: use MAXIMUM value as the primary requirement ─────────────────
-  const primaryYears = Math.max(...candidates.map(c => c.value));
-  return {
-    minYears  : primaryYears,                              // "minYears" kept for backward compat
-    allFound  : candidates.map(c => c.value),
-    rawMatches: [...new Set(candidates.map(c => c.raw))],
-  };
-}
-
-/**
- * [FIX-01, FIX-02, FIX-03, FIX-04, FIX-05]
- *
- * Primary classification function — returns a rich validation object.
- *
- * Priority:
- *   1. Experience requirements in the description  (highest)
- *   2. Qualification / seniority keywords in description
- *   3. Graduate / fresher indicators in description
- *   4. Job title keywords                           (lowest)
- */
-function classifyWithValidation(description, title) {
-  const descText  = (description || '').toLowerCase();
-  const titleText = (title       || '').toLowerCase();
-
-  const matchedKeywords   = [];
-  let   classification    = SENIORITY_LEVELS.MID;   // safe default
-  let   confidence        = 0.50;
-  let   reason            = 'No strong signal found. Defaulting to Mid Level.';
-  let   experienceFound   = null;
-
-  // ── STEP 1: Check description for Internship keywords ─────────────────────
-  // [FIX-05] Description runs FIRST, title only used as tie-breaker at the end.
-  const descHasInternship = INTERNSHIP_RE.test(descText) ||
-    INTERNSHIP_KEYWORDS.some(kw => descText.includes(kw));
-
-  const descHasApprenticeship = APPRENTICESHIP_RE.test(descText) ||
-    APPRENTICESHIP_KEYWORDS.some(kw => descText.includes(kw));
-
-  // ── STEP 2: Extract numeric experience from description ───────────────────
-  const { minYears, allFound, rawMatches } = extractExperienceDetails(descText);
-  experienceFound = minYears !== null ? `${minYears} year${minYears !== 1 ? 's' : ''}` : null;
-
-  // ── STEP 3: Check description for seniority keywords ─────────────────────
-  const descHasLead   = /\b(lead|principal|staff engineer|team lead|technical lead|architecture ownership|technical leadership)\b/i.test(descText);
-  const descHasSenior = /\b(senior|advanced expertise|mentoring|mentor)\b/i.test(descText);
-  const descHasFresher= FRESHER_KEYWORDS.some(kw => descText.includes(kw));
-  const descHasEntry  = /\b(junior|entry.?level|associate|early.?career)\b/i.test(descText);
-
-  // ── STEP 4: Title keywords (LOWEST priority) ──────────────────────────────
-  const titleHasInternship    = INTERNSHIP_RE.test(titleText) ||
-    INTERNSHIP_KEYWORDS.some(kw => titleText.includes(kw));
-  const titleHasApprenticeship= APPRENTICESHIP_RE.test(titleText) ||
-    APPRENTICESHIP_KEYWORDS.some(kw => titleText.includes(kw));
-  const titleHasLead   = /\b(lead|principal|staff engineer|director|head of)\b/i.test(titleText);
-  const titleHasSenior = /\b(senior|sr\.?)\b/i.test(titleText);
-  const titleHasFresher= /\b(fresher|fresh graduate|recent graduate|trainee|graduate)\b/i.test(titleText);
-  const titleHasEntry  = /\b(junior|jr\.?|associate|entry.?level)\b/i.test(titleText);
-
-  // ════════════════════════════════════════════════════════════════════════════
-  // CLASSIFICATION DECISION TREE
-  // Priority: experience years > desc keywords > title keywords
-  // ════════════════════════════════════════════════════════════════════════════
-
-  // [FIX-04] Apprenticeship is its own category; checked before Internship
-  if (descHasApprenticeship) {
-    classification = SENIORITY_LEVELS.APPRENTICESHIP;
-    matchedKeywords.push(...APPRENTICESHIP_KEYWORDS.filter(kw => descText.includes(kw)));
-    confidence = 0.95;
-    reason = 'Job description contains apprenticeship indicators.';
-
-  } else if (descHasInternship) {
-    // [FIX-05] If description explicitly names it an internship, respect that
-    // regardless of what the title says.
-    classification = SENIORITY_LEVELS.INTERNSHIP;
-    matchedKeywords.push(...INTERNSHIP_KEYWORDS.filter(kw => descText.includes(kw)));
-    if (INTERNSHIP_RE.test(descText)) matchedKeywords.push('intern');
-    confidence = 0.97;
-    reason = 'Job description explicitly identifies this as an internship/intern role.';
-
-  } else if (minYears !== null) {
-    // ── Experience years in description: PRIMARY decision signal ─────────────
-    // [FIX-01] Corrected boundaries per spec:
-    //   0-2   → Entry Level
-    //   3-4   → Mid Level
-    //   5-7   → Senior Level
-    //   8+    → Lead Level
-    //
-    // [FIX-03] But first: if years === 0 AND fresher keywords present → Fresher
-
-    if (minYears === 0 && descHasFresher) {
-      classification = SENIORITY_LEVELS.FRESHER;
-      matchedKeywords.push(...FRESHER_KEYWORDS.filter(kw => descText.includes(kw)));
-      confidence = 0.92;
-      reason = `Job description requires 0 years and uses fresher/graduate language.`;
-
-    } else if (minYears <= 2) {
-      classification = SENIORITY_LEVELS.ENTRY;
-      confidence = minYears === 0 ? 0.80 : 0.90;
-      reason = `Job description requires ${minYears} year(s) of experience → Entry Level (0–2 yrs).`;
-      if (descHasEntry) { matchedKeywords.push('entry-level keyword in description'); confidence = Math.min(confidence + 0.05, 0.99); }
-
-    } else if (minYears <= 4) {
-      // [FIX-01] 3-4 → Mid (was 3-7 in original — too wide)
-      classification = SENIORITY_LEVELS.MID;
-      confidence = 0.88;
-      reason = `Job description requires ${minYears} year(s) of experience → Mid Level (3–4 yrs).`;
-      if (descHasSenior) { matchedKeywords.push('senior keyword despite mid years'); confidence -= 0.10; reason += ' (senior keyword also found — lower confidence).'; }
-
-    } else if (minYears <= 7) {
-      // [FIX-01] 5-7 → Senior (was 3-7 → Mid in original — completely wrong)
-      classification = SENIORITY_LEVELS.SENIOR;
-      confidence = 0.90;
-      reason = `Job description requires ${minYears} year(s) of experience → Senior Level (5–7 yrs).`;
-      if (descHasSenior) { matchedKeywords.push('senior'); confidence = Math.min(confidence + 0.05, 0.99); }
-      if (descHasLead)   { matchedKeywords.push('lead keyword found — possible Lead Level'); confidence -= 0.08; }
-
-    } else {
-      // [FIX-01] 8+ → Lead Level (was "Senior" at 8-11, "Lead/Manager" at 12+)
-      classification = SENIORITY_LEVELS.LEAD;
-      confidence = 0.93;
-      reason = `Job description requires ${minYears} year(s) of experience → Lead Level (8+ yrs).`;
-      if (descHasLead)   { matchedKeywords.push('lead', 'principal', 'staff engineer'); confidence = Math.min(confidence + 0.04, 0.99); }
-    }
-
-  } else {
-    // ── No numeric experience found: use keyword signals ─────────────────────
-    // Still desc-first; title only used if desc has no signal.
-
-    if (descHasLead) {
-      classification = SENIORITY_LEVELS.LEAD;
-      matchedKeywords.push('lead/principal/staff in description');
-      confidence = 0.72;
-      reason = 'No experience years found; description contains lead/principal/staff keywords.';
-
-    } else if (descHasSenior) {
-      classification = SENIORITY_LEVELS.SENIOR;
-      matchedKeywords.push('senior in description');
-      confidence = 0.70;
-      reason = 'No experience years found; description contains "senior" or mentoring keywords.';
-
-    } else if (descHasFresher) {
-      // [FIX-03] Fresher keywords in description
-      classification = SENIORITY_LEVELS.FRESHER;
-      matchedKeywords.push(...FRESHER_KEYWORDS.filter(kw => descText.includes(kw)));
-      confidence = 0.85;
-      reason = 'Job description uses fresh-graduate / fresher language with no experience requirement.';
-
-    } else if (descHasEntry) {
-      classification = SENIORITY_LEVELS.ENTRY;
-      matchedKeywords.push('entry/junior in description');
-      confidence = 0.73;
-      reason = 'No experience years found; description contains junior/entry-level keywords.';
-
-    // ── Title-based fallbacks (lowest priority) ───────────────────────────────
-    } else if (titleHasApprenticeship) {
-      classification = SENIORITY_LEVELS.APPRENTICESHIP;
-      matchedKeywords.push('apprentice in title');
-      confidence = 0.65;
-      reason = 'No description signals; title contains apprenticeship keyword.';
-
-    } else if (titleHasInternship) {
-      classification = SENIORITY_LEVELS.INTERNSHIP;
-      matchedKeywords.push('intern in title');
-      confidence = 0.65;
-      reason = 'No description signals; title contains internship keyword.';
-
-    } else if (titleHasLead) {
-      classification = SENIORITY_LEVELS.LEAD;
-      matchedKeywords.push('lead/principal in title');
-      confidence = 0.60;
-      reason = 'No description signals; title contains lead/principal keyword.';
-
-    } else if (titleHasSenior) {
-      classification = SENIORITY_LEVELS.SENIOR;
-      matchedKeywords.push('senior in title');
-      confidence = 0.60;
-      reason = 'No description signals; title contains "senior" keyword.';
-
-    } else if (titleHasFresher) {
-      classification = SENIORITY_LEVELS.FRESHER;
-      matchedKeywords.push('fresher/graduate in title');
-      confidence = 0.60;
-      reason = 'No description signals; title contains fresher/graduate keyword.';
-
-    } else if (titleHasEntry) {
-      classification = SENIORITY_LEVELS.ENTRY;
-      matchedKeywords.push('junior/associate in title');
-      confidence = 0.60;
-      reason = 'No description signals; title contains junior/associate keyword.';
-
-    } else {
-      // Pure default
-      classification = SENIORITY_LEVELS.MID;
-      confidence = 0.40;
-      reason = 'No experience years and no seniority keywords found anywhere. Defaulting to Mid Level.';
-    }
-  }
-
-  // ── Build raw experience years numeric value ──────────────────────────────
-  const yearsNumeric = minYears !== null ? minYears : levelToDefaultYears(classification);
-
-  const validationResult = {
-    classification,
-    confidence        : Math.round(confidence * 100) / 100,
-    experienceFound,
-    allExperienceFound: rawMatches,
-    matchedKeywords   : [...new Set(matchedKeywords)],
-    reason,
-    years             : yearsNumeric,
-  };
-
-  return validationResult;
-}
-
-/** Returns a sensible default years value for display when no years found in description. */
-function levelToDefaultYears(level) {
-  const map = {
-    [SENIORITY_LEVELS.INTERNSHIP]    : 0,
-    [SENIORITY_LEVELS.APPRENTICESHIP]: 0,
-    [SENIORITY_LEVELS.FRESHER]       : 0,
-    [SENIORITY_LEVELS.ENTRY]         : 1,
-    [SENIORITY_LEVELS.MID]           : 3,
-    [SENIORITY_LEVELS.SENIOR]        : 6,
-    [SENIORITY_LEVELS.LEAD]          : 9,
-  };
-  return map[level] ?? 3;
-}
-
-// Keep a backward-compat shim so existing call-sites still work.
-function extractExperience(description, title) {
-  const v = classifyWithValidation(description, title);
-  return { years: v.years, level: v.classification };
-}
-
 // =============================================================================
-// SECTION 3 — NVIDIA MOONSHOT AI PARSING ENGINE  [FIX-07]
+// SECTION 3 — NVIDIA LLAMA AI PARSING ENGINE
 // =============================================================================
 
 let aiQuotaExceeded = false;
@@ -601,57 +244,59 @@ let aiQuotaExceeded = false;
  * "Internship / Apprenticeship" into two separate options.
  */
 async function parseJobPostingWithAI(text, jobTitle, jobLocation) {
-  return null; // AI disabled per user request, falling back to generic rule-based heuristics
+  if (aiQuotaExceeded || !process.env.NVIDIA_API_KEY) return null;
 
   const cleanText = text.substring(0, 15000);
   let retries = 0;
   const maxRetries = 4;
   let baseDelay = 5000;
 
-  const promptContent = `Analyze this job posting text and extract the exact details requested.
+  const promptContent = `Analyze this GCC job posting and extract structured details from the FULL page text.
 Title: ${jobTitle}
 Location: ${jobLocation}
 
 Job Description Text:
 ${cleanText}
 
-Output the result strictly as a JSON object with EXACTLY the following format, and nothing else (do not wrap in markdown \`\`\`json):
+Output strictly as JSON (no markdown fences):
 {
-  "description": "Extract the EXACT, COMPLETE job description details (responsibilities, requirements, technical criteria) VERBATIM from the page. Do NOT summarize, rewrite, or truncate the text. Simply exclude unrelated website cookies banners, headers, and footer menu navigation items. Preserve the exact vocabulary.",
+  "description": "Complete job description verbatim (responsibilities, requirements, qualifications). Exclude cookie banners and nav menus only.",
   "skills": ["skill1", "skill2"],
-  "yearsExperience": 3,
+  "minYearsExperience": 3,
+  "maxYearsExperience": 5,
   "experienceLevel": "Mid Level",
   "remoteStatus": "Unknown",
   "employmentType": "Full-time"
 }
 
-Rules for experienceLevel — select EXACTLY one of these seven values:
-  "Internship"      — intern / student / university placement / co-op
-  "Apprenticeship"  — apprentice / vocational training / trainee program
-  "Fresher"         — fresh graduate / recent graduate / no experience required / 0 years
-  "Entry Level"     — junior / associate / 0-2 years experience
-  "Mid Level"       — 3-4 years experience / independent contributor
-  "Senior Level"    — 5-7 years experience / senior / advanced expertise / mentoring
-  "Lead Level"      — 8+ years / lead / principal / staff engineer / team leadership
+experienceLevel — pick EXACTLY one:
+  "Internship / Apprenticeship" — intern, apprenticeship, co-op, student program
+  "Entry Level" — 0-2 years, fresher, junior, campus hire
+  "Mid Level" — 3-7 years; associate/senior titles with mid-range experience
+  "Senior Level" — 8-11 years, principal, staff, mentoring ownership
+  "Lead / Management" — 12+ years, lead, manager, director, architect
+  "Executive Leadership" — C-suite, VP, president, managing director
 
-IMPORTANT: The experience years found in the description OVERRIDE any title-based assumption.
-  e.g. Title "Senior Developer" + description "1 year experience" → "Entry Level"
-  e.g. Title "Junior Analyst"  + description "6 years experience" → "Senior Level"
+CRITICAL: Experience years in requirements OVERRIDE misleading titles.
+  "Associate Software Engineer" + 5-8 years → "Mid Level" (NOT Entry Level)
+  "Senior Software Engineer" + 3-6 years → "Mid Level"
+  "Lead Engineer" + 6 years → "Mid Level"
 
-Rules for remoteStatus    — one of: "Remote" | "Hybrid" | "Onsite" | "Unknown"
-Rules for employmentType  — one of: "Full-time" | "Part-time" | "Contract" | "Internship" | "Apprenticeship"`;
+Extract minYearsExperience and maxYearsExperience from ranges like "3-5 years" or "5+ years".
+remoteStatus: "Remote" | "Hybrid" | "Onsite" | "Unknown"
+employmentType: "Full-time" | "Part-time" | "Contract" | "Internship" | "Apprenticeship"`;
 
   while (retries < maxRetries) {
     try {
-      console.log(`[NVIDIA AI] Parsing "${jobTitle}" via moonshotai/kimi-k2.6 (attempt ${retries + 1}/${maxRetries})...`);
+      console.log(`[NVIDIA AI] Parsing "${jobTitle}" via meta/llama-3.3-70b-instruct (attempt ${retries + 1}/${maxRetries})...`);
       const response = await axios.post(
         'https://integrate.api.nvidia.com/v1/chat/completions',
         {
-          model      : 'moonshotai/kimi-k2.6',
+          model      : 'meta/llama-3.3-70b-instruct',
           messages   : [{ role: 'user', content: promptContent }],
-          max_tokens : 16384,
-          temperature: 0.1,
-          top_p      : 1.00,
+          max_tokens : 1024,
+          temperature: 0.2,
+          top_p      : 0.7,
           stream     : false,
         },
         {
@@ -666,11 +311,22 @@ Rules for employmentType  — one of: "Full-time" | "Part-time" | "Contract" | "
 
       const candidate = response.data?.choices?.[0]?.message?.content;
       if (candidate) {
-        const jsonStr = candidate.replace(/^```json\s*/i, '').replace(/```$/i, '').trim();
+        let jsonStr = candidate;
+        const match = candidate.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+        if (match) {
+          jsonStr = match[1];
+        } else {
+          const start = candidate.indexOf('{');
+          const end = candidate.lastIndexOf('}');
+          if (start !== -1 && end !== -1) {
+            jsonStr = candidate.slice(start, end + 1);
+          }
+        }
+        jsonStr = jsonStr.trim();
         const parsed  = JSON.parse(jsonStr);
 
-        // Normalise the classification so it always matches our canonical labels.
         parsed.experienceLevel = normaliseAILevel(parsed.experienceLevel);
+        parsed.yearsExperience = parsed.minYearsExperience ?? parsed.yearsExperience ?? null;
         return parsed;
       }
       break;
@@ -703,22 +359,6 @@ Rules for employmentType  — one of: "Full-time" | "Part-time" | "Contract" | "
 
   console.warn(`[NVIDIA AI] All ${maxRetries} attempts failed. Falling back to rule-based heuristics.`);
   return null;
-}
-
-/**
- * Maps any legacy or alias level strings the AI might return to canonical values.
- */
-function normaliseAILevel(raw) {
-  if (!raw) return SENIORITY_LEVELS.MID;
-  const s = raw.trim().toLowerCase();
-  if (s.includes('internship') || s === 'intern')   return SENIORITY_LEVELS.INTERNSHIP;
-  if (s.includes('apprentice'))                      return SENIORITY_LEVELS.APPRENTICESHIP;
-  if (s.includes('fresher') || s.includes('fresh')) return SENIORITY_LEVELS.FRESHER;
-  if (s.includes('entry'))                           return SENIORITY_LEVELS.ENTRY;
-  if (s.includes('mid'))                             return SENIORITY_LEVELS.MID;
-  if (s.includes('senior'))                          return SENIORITY_LEVELS.SENIOR;
-  if (s.includes('lead') || s.includes('principal') || s.includes('director') || s.includes('staff')) return SENIORITY_LEVELS.LEAD;
-  return SENIORITY_LEVELS.MID;
 }
 
 // =============================================================================
@@ -760,29 +400,40 @@ async function withRetry(fn, n = 3, delayMs = 2000) {
 function resolveClassification(aiParsed, rawText, title) {
   let description, skills, exp, remoteStatus, empType;
 
-  if (aiParsed) {
-    description  = aiParsed.description  || rawText;
-    skills       = aiParsed.skills       || [];
-    remoteStatus = aiParsed.remoteStatus || 'Unknown';
-    empType      = aiParsed.employmentType || 'Full-time';
+  // Weighted evidence classifier scans full description + title together.
+  const validation = classifyWithValidation(rawText, title);
 
-    // [FIX-05, FIX-07] Cross-validate AI's level against description years.
-    // If the description has explicit years, those always win.
-    const validation = classifyWithValidation(description, title);
-    if (validation.experienceFound && validation.confidence > 0.75) {
-      // Description-based classification overrides AI level when confident.
-      exp = { level: validation.classification, years: validation.years, validation };
-    } else {
+  if (aiParsed) {
+    description  = aiParsed.description || rawText;
+    skills       = aiParsed.skills      || extractSkills(title, rawText);
+    remoteStatus = aiParsed.remoteStatus || parseRemoteStatus(title, '', rawText);
+    empType      = aiParsed.employmentType || detectEmploymentType(title, rawText, 'Full-time');
+
+    // Rule-based weighted model is primary; AI supplements when rules lack confidence.
+    if (validation.confidence >= 0.75 || validation.experienceFound) {
       exp = {
-        level     : aiParsed.experienceLevel || validation.classification,
-        years     : aiParsed.yearsExperience ?? validation.years,
+        level    : validation.classification,
+        years    : validation.years,
+        maxYears : validation.maxYears,
         validation,
+      };
+    } else {
+      const aiValidation = classifyWithValidation(description, title);
+      exp = {
+        level    : aiParsed.experienceLevel || aiValidation.classification,
+        years    : aiParsed.minYearsExperience ?? aiParsed.yearsExperience ?? aiValidation.years,
+        maxYears : aiParsed.maxYearsExperience ?? aiValidation.maxYears,
+        validation: aiValidation.confidence > validation.confidence ? aiValidation : validation,
       };
     }
   } else {
     description  = rawText;
-    const validation = classifyWithValidation(rawText, title);
-    exp          = { level: validation.classification, years: validation.years, validation };
+    exp = {
+      level    : validation.classification,
+      years    : validation.years,
+      maxYears : validation.maxYears,
+      validation,
+    };
     skills       = extractSkills(title, rawText);
     remoteStatus = parseRemoteStatus(title, '', rawText);
     empType      = detectEmploymentType(title, rawText, 'Full-time');
@@ -880,7 +531,8 @@ async function scrapeWorkday(companyId, companyName, careersUrl) {
             country        : 'India',
             experienceLevel: exp.level,
             yearsExperience: exp.years,
-            classificationMeta: exp.validation,     // [NEW-01] validation log
+            yearsExperienceMax: exp.maxYears ?? exp.years,
+            classificationMeta: exp.validation,
             employmentType : empTypeFinal,
             skills,
             applyUrl,
@@ -952,6 +604,7 @@ async function scrapeGreenhouse(companyId, companyName, careersUrl) {
       country        : 'India',
       experienceLevel: exp.level,
       yearsExperience: exp.years,
+      yearsExperienceMax: exp.maxYears ?? exp.years,
       classificationMeta: exp.validation,
       employmentType : empType,
       skills,
@@ -1009,6 +662,7 @@ async function scrapeLever(companyId, companyName, careersUrl) {
       country        : 'India',
       experienceLevel: exp.level,
       yearsExperience: exp.years,
+      yearsExperienceMax: exp.maxYears ?? exp.years,
       classificationMeta: exp.validation,
       employmentType : empType,
       skills,
@@ -1354,6 +1008,7 @@ async function scrapeGeneric(companyId, companyName, careersUrl) {
         country        : 'India',
         experienceLevel: exp.level,
         yearsExperience: exp.years,
+        yearsExperienceMax: exp.maxYears ?? exp.years,
         classificationMeta: exp.validation,
         employmentType : empType,
         skills,
@@ -1379,7 +1034,7 @@ async function runLocalScraper() {
   const startTime = Date.now();
   console.log('=== GCC Hunt Local Scraper ===');
   console.log(`Starting crawl at: ${new Date().toLocaleString()}`);
-  console.log('[AI Integration] NVIDIA Moonshot AI (kimi-k2.6) parser is ACTIVE.');
+  console.log('[AI Integration] NVIDIA Llama 3.3 70B parser active when NVIDIA_API_KEY is set.');
 
   const excelPath = path.join(__dirname, '..', 'companies.xlsx');
   if (!fs.existsSync(excelPath)) {
@@ -1512,10 +1167,10 @@ async function runLocalScraper() {
   // Add brand-new jobs.
   for (const newJob of crawledJobsPool) {
     if (crawledJobIds.has(newJob.id)) {
-      const titleWords   = newJob.title.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(Boolean);
-      const companyWords = newJob.companyName.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(Boolean);
+      const titleWords   = (newJob.title || '').toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(Boolean);
+      const companyWords = (newJob.companyName || '').toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(Boolean);
       const cityWords    = (newJob.city || '').toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(Boolean);
-      const skillWords   = (newJob.skills || []).map(s => s.toLowerCase());
+      const skillWords   = (newJob.skills || []).map(s => (s || '').toLowerCase());
 
       newJob.keywords    = Array.from(new Set([...titleWords, ...companyWords, ...cityWords, ...skillWords])).filter(w => w.length > 1);
       newJob.createdAt   = new Date().toISOString();
@@ -1547,7 +1202,7 @@ async function runLocalScraper() {
   console.log('══════════════════════════════════════');
 }
 
-// Export for testing
+// Re-export classifier for tests
 module.exports = {
   classifyWithValidation,
   extractExperienceDetails,
