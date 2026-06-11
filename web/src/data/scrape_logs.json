@@ -1,5 +1,185 @@
 [
   {
+    "id": "36ee9f93-7233-42f9-8155-e5df8f5fce3a",
+    "companyId": "ceridian-dayforce",
+    "companyName": "Ceridian Dayforce",
+    "status": "success",
+    "jobsFound": 4,
+    "executionTime": 132869,
+    "timestamp": "2026-06-11T07:25:06.812Z"
+  },
+  {
+    "id": "9c394bd2-2788-4230-accf-ad9522b5da16",
+    "companyId": "encora",
+    "companyName": "Encora",
+    "status": "failed",
+    "errors": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://careers.coforge.com/coforge/\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 30057,
+    "timestamp": "2026-06-11T07:22:56.870Z"
+  },
+  {
+    "id": "9b095b0f-92b1-44b3-91d0-c7fac3b36b01",
+    "companyId": "jacobs",
+    "companyName": "Jacobs",
+    "status": "failed",
+    "errors": "page.evaluate: Execution context was destroyed, most likely because of a navigation",
+    "executionTime": 3845,
+    "timestamp": "2026-06-11T07:22:54.537Z"
+  },
+  {
+    "id": "75f6be12-1390-4839-b7c6-9d9621e2e2cf",
+    "companyId": "extreme-networks",
+    "companyName": "Extreme Networks",
+    "status": "failed",
+    "errors": "l.content.join is not a function",
+    "executionTime": 3280,
+    "timestamp": "2026-06-11T07:22:53.943Z"
+  },
+  {
+    "id": "c39daae6-1aca-43af-8e6f-2c1f85176b62",
+    "companyId": "cyient",
+    "companyName": "Cyient",
+    "status": "failed",
+    "errors": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://careers.cyient.com/cyient/\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 30099,
+    "timestamp": "2026-06-11T07:22:50.692Z"
+  },
+  {
+    "id": "b21e06e5-2f3a-4bbb-8d1f-55a2c3e82690",
+    "companyId": "coforge",
+    "companyName": "Coforge",
+    "status": "failed",
+    "errors": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://careers.coforge.com/coforge/\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 30071,
+    "timestamp": "2026-06-11T07:22:50.663Z"
+  },
+  {
+    "id": "2b15ece7-0513-4942-9ded-fe24c9497af0",
+    "companyId": "crisil",
+    "companyName": "CRISIL",
+    "status": "failed",
+    "errors": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://career.crisil.com/crisil/\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 30046,
+    "timestamp": "2026-06-11T07:22:26.813Z"
+  },
+  {
+    "id": "165cfef2-2d90-4a90-bb31-4e46d3d9ba33",
+    "companyId": "automation-anywhere",
+    "companyName": "Automation Anywhere",
+    "status": "failed",
+    "errors": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://www.automationanywhere.com/company/careers/all\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 30191,
+    "timestamp": "2026-06-11T07:22:20.593Z"
+  },
+  {
+    "id": "84bfa6da-af4d-4885-8085-a201800f7f1b",
+    "companyId": "adidas",
+    "companyName": "Adidas",
+    "status": "failed",
+    "errors": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://careers.adidas-group.com/jobs?location=%5B%7B%22country%22%3A%22India%22%7D%5D&offset=0&keywords=&location_manual=India\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 30194,
+    "timestamp": "2026-06-11T07:22:20.592Z"
+  },
+  {
+    "id": "f7e94e29-7325-4247-9c31-5b1140df41e0",
+    "companyId": "cbre",
+    "companyName": "CBRE",
+    "status": "failed",
+    "errors": "page.evaluate: Execution context was destroyed, most likely because of a navigation",
+    "executionTime": 6365,
+    "timestamp": "2026-06-11T07:21:56.767Z"
+  },
+  {
+    "id": "42d0ab24-12a7-4440-9d5d-a473ad408f8a",
+    "companyId": "chevron",
+    "companyName": "Chevron",
+    "status": "success",
+    "jobsFound": 15,
+    "executionTime": 60672,
+    "timestamp": "2026-06-11T06:04:57.667Z"
+  },
+  {
+    "id": "91ed16e7-2047-42e3-b235-513d748a34aa",
+    "companyId": "encora",
+    "companyName": "Encora",
+    "status": "failed",
+    "errors": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://careers.coforge.com/coforge/\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 30067,
+    "timestamp": "2026-06-11T06:03:59.177Z"
+  },
+  {
+    "id": "f8cfdf9c-f0e1-4fe4-94ae-f4a31d7282b0",
+    "companyId": "extreme-networks",
+    "companyName": "Extreme Networks",
+    "status": "failed",
+    "errors": "l.content.join is not a function",
+    "executionTime": 3972,
+    "timestamp": "2026-06-11T06:03:57.102Z"
+  },
+  {
+    "id": "fa51c1bf-3c94-4077-ad1c-8d4c1c33f2c0",
+    "companyId": "jacobs",
+    "companyName": "Jacobs",
+    "status": "failed",
+    "errors": "page.evaluate: Execution context was destroyed, most likely because of a navigation",
+    "executionTime": 3835,
+    "timestamp": "2026-06-11T06:03:56.994Z"
+  },
+  {
+    "id": "6264dcf0-2a0f-4b88-b275-289dc28c9103",
+    "companyId": "cyient",
+    "companyName": "Cyient",
+    "status": "failed",
+    "errors": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://careers.cyient.com/cyient/\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 30099,
+    "timestamp": "2026-06-11T06:03:53.159Z"
+  },
+  {
+    "id": "e60c7a56-1ad0-4172-8fa0-6304097438b3",
+    "companyId": "coforge",
+    "companyName": "Coforge",
+    "status": "failed",
+    "errors": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://careers.coforge.com/coforge/\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 30071,
+    "timestamp": "2026-06-11T06:03:53.130Z"
+  },
+  {
+    "id": "54383108-bf89-4a75-ad3f-92ffa350738f",
+    "companyId": "crisil",
+    "companyName": "CRISIL",
+    "status": "failed",
+    "errors": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://career.crisil.com/crisil/\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 30050,
+    "timestamp": "2026-06-11T06:03:29.110Z"
+  },
+  {
+    "id": "ccacf4a1-dcc3-483c-8b00-be75d557a35c",
+    "companyId": "automation-anywhere",
+    "companyName": "Automation Anywhere",
+    "status": "failed",
+    "errors": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://www.automationanywhere.com/company/careers/all\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 30413,
+    "timestamp": "2026-06-11T06:03:23.060Z"
+  },
+  {
+    "id": "33b6f964-40e8-408e-9062-5fb050404ba1",
+    "companyId": "adidas",
+    "companyName": "Adidas",
+    "status": "failed",
+    "errors": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://careers.adidas-group.com/jobs?location=%5B%7B%22country%22%3A%22India%22%7D%5D&offset=0&keywords=&location_manual=India\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 30416,
+    "timestamp": "2026-06-11T06:03:23.059Z"
+  },
+  {
+    "id": "87bbba05-f886-4d63-a3f3-d4f9155d5343",
+    "companyId": "cbre",
+    "companyName": "CBRE",
+    "status": "failed",
+    "errors": "page.evaluate: Execution context was destroyed, most likely because of a navigation",
+    "executionTime": 6413,
+    "timestamp": "2026-06-11T06:02:59.060Z"
+  },
+  {
     "id": "5f031d3d-3484-4a02-a8d2-f055c8b85c7b",
     "companyId": "circana",
     "companyName": "Circana",
