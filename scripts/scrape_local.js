@@ -1464,17 +1464,8 @@ async function runLocalScraper() {
   const crawledJobIds = new Set(crawledJobsPool.map(j => j.id));
   const finalJobsList = [];
 
-  // Keep jobs from companies NOT crawled this run; update jobs that were re-scraped.
-  for (const job of existingJobs) {
-    if (!crawledComps.has(job.companyId)) {
-      finalJobsList.push(job);
-    } else if (crawledJobIds.has(job.id)) {
-      const freshJob = crawledJobsPool.find(j => j.id === job.id);
-      finalJobsList.push({ ...job, ...freshJob, updatedAt: new Date().toISOString(), dateScraped: new Date().toISOString() });
-      crawledJobIds.delete(job.id);
-    }
-    // Jobs from crawled companies that no longer appear are intentionally dropped (they're gone).
-  }
+  // The user requested to overwrite old data and only keep jobs scraped in this run.
+  // We skip retaining old jobs entirely.
 
   // Add brand-new jobs.
   for (const newJob of crawledJobsPool) {

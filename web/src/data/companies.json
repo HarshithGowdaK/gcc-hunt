@@ -63,305 +63,11 @@
     "lastScraped": null
   },
   {
-    "id": "brown-forman",
-    "name": "Brown-Forman",
-    "careersUrl": "https://careers.brown-forman.com/jobs/?location=India",
-    "status": "success",
-    "lastScraped": "2026-06-10T16:18:41.375Z"
-  },
-  {
-    "id": "forrester",
-    "name": "Forrester",
-    "careersUrl": "https://forrester.wd501.myworkdayjobs.com/careers?locations=a149255970d701e7095f6110b301c40f&locations=75e20e1b5013019253e51a45a6015209&locations=a149255970d7014f12155f10b301bf0f",
-    "status": "success",
-    "lastScraped": "2026-06-10T16:17:17.062Z"
-  },
-  {
-    "id": "fluence",
-    "name": "Fluence",
-    "careersUrl": "https://fluenceenergy.wd12.myworkdayjobs.com/en-US/fluenceenergy-jobs?locations=e04e2d75fd280100d94e93becb9b0000",
-    "status": "success",
-    "lastScraped": "2026-06-10T16:37:36.327Z"
-  },
-  {
-    "id": "fnz",
-    "name": "FNZ",
-    "careersUrl": "https://fnz.wd3.myworkdayjobs.com/fnz_careers?locations=166dc176c3e210014834874e00900000",
-    "status": "success",
-    "lastScraped": "2026-06-10T17:01:18.953Z"
-  },
-  {
-    "id": "fractal-analytics",
-    "name": "Fractal Analytics",
-    "careersUrl": "https://fractal.wd1.myworkdayjobs.com/Careers?locations=7edfb62955d310014b6351f083a60000&locations=4fedd31659ec01018833886e5c060000&locations=7edfb62955d310014b634f88574d0000&locations=ce4e62e669131000e2dc7e2e78a50000&locations=4fedd31659ec01018833637cbf900000&locations=3b3fb1d62c071000e2a0f48656560000",
-    "status": "success",
-    "lastScraped": "2026-06-10T16:30:40.424Z"
-  },
-  {
-    "id": "cadence-design-systems",
-    "name": "Cadence Design Systems",
-    "careersUrl": "https://cadence.wd1.myworkdayjobs.com/External_Careers?locations=4a80e4a6e96c1000db1fec5d8aec0000&locations=b98fe865fec0100120cf435c0b040000&locations=6418637d4d5010bf8a99bda155db6142&locations=6418637d4d5010bf8a99b21035266138&locations=d1bbeffd71a2100121c577c184b10000&locations=6418637d4d5010bf8a99b84a103c613d&locations=84b6cfd69db310b0db9d79bf33759a36&locations=6418637d4d5010bf8a99abd03be56133&locations=6418637d4d5010bf8a99a4926e59612e",
-    "status": "success",
-    "lastScraped": "2026-06-10T18:10:15.461Z"
-  },
-  {
-    "id": "finastra",
-    "name": "Finastra",
-    "careersUrl": "https://finastra.wd3.myworkdayjobs.com/FINC?locations=8061b46e841701674a93fa087a40597d&locations=9ab6e37cf0b510c4241704726a7e106e&locations=9883965210a71070f73ea6940e97dffb&locations=8061b46e841701e7db11200a7a40fe7d",
-    "status": "success",
-    "lastScraped": "2026-06-10T17:15:06.211Z"
-  },
-  {
-    "id": "genesys",
-    "name": "Genesys",
-    "careersUrl": "https://genesys.wd1.myworkdayjobs.com/Genesys?locationCountry=c4f78be1a8f14da0ab49ce1162348a5e",
-    "status": "success",
-    "lastScraped": "2026-06-10T17:09:49.576Z"
-  },
-  {
-    "id": "gensler",
-    "name": "Gensler",
-    "careersUrl": "https://gensler.wd1.myworkdayjobs.com/genslercareers?locations=9c7925c3799401b47be540d0792a20c6&locations=3827c2ec7c0c1001f65f89d68b0d0000&locations=d1874f20633601b2e27d7bb3d117870a",
-    "status": "success",
-    "lastScraped": "2026-06-10T17:30:44.677Z"
-  },
-  {
-    "id": "illumina",
-    "name": "Illumina",
-    "careersUrl": "https://illumina.wd1.myworkdayjobs.com/illumina-careers?_gl=1*1lc2oj9*_gcl_aw*R0NMLjE3Nzk3MTk2MzMuQ2p3S0NBanc1c19RQmhBZEVpd0FERF9nQnQyeFAyV2N6OEZWdjNHYVFOUTR3NHlKY0xXLUxzZDRSRnZRWjM5bzJEZWR2UFRKWFh2ZXJSb0NucGNRQXZEX0J3RQ..*_gcl_au*Nzk3NDE3ODUyLjE3Nzk3MTk2MzAuMTM3MDAzNzU5My4xNzc5NzE5NjQxLjE3Nzk3MTk2NDE.*_ga*NDkzNDMxMTQ5LjE3Nzk3MTk2MzM.*_ga_RWQ04G1X8S*czE3Nzk3MTk2MzIkbzEkZzEkdDE3Nzk3MTk2NDIkajUwJGwwJGgw&locationCountry=c4f78be1a8f14da0ab49ce1162348a5e",
-    "status": "success",
-    "lastScraped": "2026-06-10T17:28:19.400Z"
-  },
-  {
-    "id": "huron-consulting",
-    "name": "Huron Consulting",
-    "careersUrl": "https://huron.wd1.myworkdayjobs.com/huroncareers?locationCountry=c4f78be1a8f14da0ab49ce1162348a5e",
-    "status": "success",
-    "lastScraped": "2026-06-10T18:01:40.520Z"
-  },
-  {
-    "id": "hubspot",
-    "name": "HubSpot",
-    "careersUrl": "https://www.hubspot.com/careers/jobs?hubs_signup-cta=careers-nav-cta&page=1#office=bengaluru;",
-    "status": "success",
-    "lastScraped": "2026-06-10T17:32:31.463Z"
-  },
-  {
-    "id": "jade-global",
-    "name": "Jade Global",
-    "careersUrl": "https://jadeglobal.wd5.myworkdayjobs.com/Jade_Careers?locations=8bedb2882e801001b6c62ed679650000&locations=8bedb2882e801001b6c622c7f31e0000&locations=8bedb2882e801001b6c636ad7fef0000&locations=8bedb2882e801001b6c6314124fc0000&locations=8bedb2882e801001b6c64cf853b20000&locations=8bedb2882e801001b6c65e6fcc630000&locations=8bedb2882e801001b6c63b8011300000&locations=8bedb2882e801001b6c66a78b37b0000&locations=87428186d072100013ba3dcef2fa0000",
-    "status": "success",
-    "lastScraped": "2026-06-10T18:35:55.010Z"
-  },
-  {
-    "id": "intel",
-    "name": "Intel",
-    "careersUrl": "https://intel.wd1.myworkdayjobs.com/External?locations=1e4a4eb3adf101f44070f976bf8184cf",
-    "status": "success",
-    "lastScraped": "2026-06-10T19:01:28.667Z"
-  },
-  {
-    "id": "vmware",
-    "name": "VMware",
-    "careersUrl": "https://broadcom.wd1.myworkdayjobs.com/External_Career?locations=6d1be12dc134103be580f2ed396f3bdf&locations=877d747df7191002136421863fac0000&locations=2d466ab4e6e0013cf503069082349dd2&locations=0dd627624e2e0176f301cad8dcd9ab0b&locations=877d747df71910021363ea290d900000&locations=2a204116f85f01189cd964af936b70fb",
-    "status": "success",
-    "lastScraped": "2026-06-10T18:19:24.219Z"
-  },
-  {
-    "id": "agilent-technologies",
-    "name": "Agilent Technologies",
-    "careersUrl": "https://agilent.wd5.myworkdayjobs.com/Agilent_Student_Careers?locationCountry=c4f78be1a8f14da0ab49ce1162348a5e",
-    "status": "success",
-    "lastScraped": "2026-06-10T18:20:07.560Z"
-  },
-  {
-    "id": "kla",
-    "name": "KLA",
-    "careersUrl": "https://kla.wd1.myworkdayjobs.com/Search?_ga=2.114994375.1345301171.1780297045-1621796480.1780297045&_gl=1*90sowa*_gcl_au*NDgyNjIwNjMuMTc4MDI5NzA0NQ..*_ga*MTYyMTc5NjQ4MC4xNzgwMjk3MDQ1*_ga_TZPEFM1MF5*czE3ODAyOTcwNDUkbzEkZzAkdDE3ODAyOTcwNDgkajU3JGwwJGgw&Country=c4f78be1a8f14da0ab49ce1162348a5e",
-    "status": "success",
-    "lastScraped": "2026-06-10T19:24:53.291Z"
-  },
-  {
-    "id": "brother-international",
-    "name": "Brother International",
-    "careersUrl": "https://www.brother.in/en/contents/career",
-    "status": "success",
-    "lastScraped": "2026-06-10T18:36:18.381Z"
-  },
-  {
-    "id": "brookfield",
-    "name": "Brookfield",
-    "careersUrl": "https://www.brookfield.com/careers/career-opportunities?ZmllbGRfY2FyZWVyX2xvY2F0aW9uX3RhcmdldF9pZFtd=239%2C26",
-    "status": "success",
-    "lastScraped": "2026-06-10T18:38:49.397Z"
-  },
-  {
-    "id": "c3-ai",
-    "name": "C3 AI",
-    "careersUrl": "https://c3.ai/careers/",
-    "status": "success",
-    "lastScraped": "2026-06-10T18:39:12.075Z"
-  },
-  {
-    "id": "cred",
-    "name": "CRED",
-    "careersUrl": "https://careers.cred.club/openings",
-    "status": "success",
-    "lastScraped": "2026-06-10T18:39:14.499Z"
-  },
-  {
-    "id": "ch-robinson",
-    "name": "C.H. Robinson",
-    "careersUrl": "https://www.chrobinson.com/en-us/about-us/careers/search/#f-careers_job_region=India",
-    "status": "success",
-    "lastScraped": "2026-06-10T18:39:31.572Z"
-  },
-  {
-    "id": "bunge",
-    "name": "Bunge",
-    "careersUrl": "https://jobs.bunge.com/search/?createNewAlert=false&q=&optionsFacetsDD_country=IN&optionsFacetsDD_dept=",
-    "status": "success",
-    "lastScraped": "2026-06-10T18:46:39.882Z"
-  },
-  {
-    "id": "canon-india",
-    "name": "Canon India",
-    "careersUrl": "https://career.asia.canon:8086/psc/ps/EMPLOYEE/CIPLCAREER/c/HRS_HRAM.HRS_APP_SCHJOB.GBL?Page=HRS_APP_SCHJOB&Action=U&FOCUS=Applicant&SiteId=2226&",
-    "status": "success",
-    "lastScraped": "2026-06-10T18:46:42.527Z"
-  },
-  {
-    "id": "camunda",
-    "name": "Camunda",
-    "careersUrl": "https://camunda.com/careers/all-jobs/",
-    "status": "success",
-    "lastScraped": "2026-06-10T18:46:45.230Z"
-  },
-  {
-    "id": "ceva",
-    "name": "CEVA",
-    "careersUrl": "https://www.ceva-ip.com/career/location/apac/",
-    "status": "success",
-    "lastScraped": "2026-06-10T18:49:15.016Z"
-  },
-  {
-    "id": "carlyle-group",
-    "name": "Carlyle Group",
-    "careersUrl": "https://carlyle.avature.net/externalcareers/SearchJobs/?2449=%5B34721%5D&2449_format=1392&listFilterMode=1&jobRecordsPerPage=10&",
-    "status": "success",
-    "lastScraped": "2026-06-10T18:49:29.150Z"
-  },
-  {
-    "id": "kyndryl",
-    "name": "Kyndryl",
-    "careersUrl": "https://kyndryl.wd5.myworkdayjobs.com/KyndrylEarlyCareers?locationCountry=c4f78be1a8f14da0ab49ce1162348a5e",
-    "status": "success",
-    "lastScraped": "2026-06-10T20:02:52.633Z"
-  },
-  {
-    "id": "cashfree-payments",
-    "name": "Cashfree Payments",
-    "careersUrl": "https://www.cashfree.com/careers/",
-    "status": "success",
-    "lastScraped": "2026-06-10T19:02:52.398Z"
-  },
-  {
-    "id": "catalyst-brands",
-    "name": "Catalyst Brands",
-    "careersUrl": "https://careers-catalystbrand.icims.com/jobs/search?ss=1&searchRelation=keyword_all&searchLocation=13228-13245-Bangalore",
-    "status": "success",
-    "lastScraped": "2026-06-10T19:02:55.617Z"
-  },
-  {
-    "id": "calendly",
-    "name": "Calendly",
-    "careersUrl": "https://calendly.com/careers?location=Remote",
-    "status": "success",
-    "lastScraped": "2026-06-10T19:07:46.463Z"
-  },
-  {
-    "id": "cargill",
-    "name": "Cargill",
-    "careersUrl": "https://careers.cargill.com/en/search-jobs/India/23251/2/1269750/22/79/50/2",
-    "status": "success",
-    "lastScraped": "2026-06-10T19:18:13.027Z"
-  },
-  {
-    "id": "celonis",
-    "name": "Celonis",
-    "careersUrl": "https://careers.celonis.com/join-us/open-positions?groupedLocation=Bangalore%2C+India%7CRemote%2C+India",
-    "status": "success",
-    "lastScraped": "2026-06-10T19:28:16.238Z"
-  },
-  {
-    "id": "carrier",
-    "name": "Carrier",
-    "careersUrl": "https://jobs.carrier.com/en/search-jobs/Bengaluru%2C%20Karnataka%2C%20India/29289/4/1269750-1267701-1277331-1277333/12x9716/77x5946/100/0",
-    "status": "success",
-    "lastScraped": "2026-06-10T19:30:09.907Z"
-  },
-  {
-    "id": "jll-technologies",
-    "name": "JLL Technologies",
-    "careersUrl": "https://jll.wd1.myworkdayjobs.com/jllcareers?locationCountry=c4f78be1a8f14da0ab49ce1162348a5e",
-    "status": "success",
-    "lastScraped": "2026-06-10T20:04:20.849Z"
-  },
-  {
-    "id": "celigo",
-    "name": "Celigo",
-    "careersUrl": "https://www.celigo.com/careers/?_location=b733cd170a85b99231475987b1322eb2",
-    "status": "success",
-    "lastScraped": "2026-06-10T19:37:55.810Z"
-  },
-  {
-    "id": "cepheid",
-    "name": "Cepheid",
-    "careersUrl": "https://jobs.danaher.com/global/en/search-results?keywords=",
-    "status": "success",
-    "lastScraped": "2026-06-10T19:45:05.071Z"
-  },
-  {
-    "id": "chargepoint",
-    "name": "ChargePoint",
-    "careersUrl": "https://www.chargepoint.com/about/opportunities",
-    "status": "success",
-    "lastScraped": "2026-06-10T19:46:08.777Z"
-  },
-  {
-    "id": "cerner",
-    "name": "Cerner",
-    "careersUrl": "https://careers.oracle.com/en/sites/jobsearch/jobs?location=India&locationId=300000000106947&locationLevel=country&mode=location",
-    "status": "success",
-    "lastScraped": "2026-06-10T19:47:32.702Z"
-  },
-  {
-    "id": "check-point-software",
-    "name": "Check Point Software",
-    "careersUrl": "https://careers.checkpoint.com/index.php?q=&module=cpcareers&a=search&fa%5B%5D=country_ss%3AIndia&sort=",
-    "status": "success",
-    "lastScraped": "2026-06-10T19:47:42.442Z"
-  },
-  {
-    "id": "charles-river-laboratories",
-    "name": "Charles River Laboratories",
-    "careersUrl": "https://jobs.criver.com/job-search-results/?country=IN&radius=25&location=India",
-    "status": "success",
-    "lastScraped": "2026-06-10T19:53:00.284Z"
-  },
-  {
-    "id": "chubb",
-    "name": "Chubb",
-    "careersUrl": "https://fa-ewgu-saasfaprod1.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_2001/jobs?location=India&locationId=300000000467203&locationLevel=country&mode=location",
-    "status": "success",
-    "lastScraped": "2026-06-10T20:03:32.257Z"
-  },
-  {
     "id": "chevron",
     "name": "Chevron",
     "careersUrl": "https://careers.chevron.com/search-jobs?glat=30.701900482177734&glon=76.77220153808594",
-    "status": "failed",
-    "lastScraped": "2026-06-09T16:12:22.015Z"
+    "status": "success",
+    "lastScraped": "2026-06-11T06:04:57.667Z"
   },
   {
     "id": "ceridian-dayforce",
@@ -488,13 +194,6 @@
     "careersUrl": "https://careers.cloud.com/jobs/search?page=1&country_codes%5B%5D=IN&query=",
     "status": "failed",
     "lastScraped": "2026-06-09T16:14:25.727Z"
-  },
-  {
-    "id": "genpact",
-    "name": "Genpact",
-    "careersUrl": "https://genpact.wd108.myworkdayjobs.com/External_Careers?locations=faddece16d451000bf34b35eae2a0000&locations=faddece16d451000bf335d4335830000&locations=faddece16d451000bf369b6d5a040000&locations=faddece16d451000bf33b19980d10000&locations=faddece16d451000bf3d37688ca50000&locations=faddece16d451000bf3799e932a70000&locations=faddece16d451000bf33829b1d660000&locations=faddece16d451000bf382b1b6ada0000&locations=faddece16d451000bf3c2a51e8520000&locations=faddece16d451000bf3654f2ad0c0000&locations=faddece16d451000bf3d12ab49290000&locations=faddece16d451000bf3c88cb990f0000&locations=faddece16d451000bf3abce51e850000&locations=faddece16d451000bf4051c2f2080000&locations=faddece16d451000bf3d1bb2afcf0000&locations=faddece16d451000bf32ecada1f70000&locations=faddece16d451000bf35c44819a90000&locations=faddece16d451000bf3c80f8daeb0000&locations=faddece16d451000bf3c9d4601010000&locations=faddece16d451000bf3f05bfd76c0000&locations=faddece16d451000bf3cf52b8c630000&locations=faddece16d451000bf374df10fa90000&locations=faddece16d451000bf37890590770000&locations=faddece16d451000bf3887e2c7e10000&locations=faddece16d451000bf3be21bae0f0000&locations=faddece16d451000bf33e08c2fb50000&locations=faddece16d451000bf32ffeb20950000&locations=faddece16d451000bf37ad3571790000&locations=faddece16d451000bf38ec7a7f2e0000&locations=faddece16d451000bf355dde36f70000&locations=faddece16d451000bf3a7414fa770000&locations=faddece16d451000bf3a693d530e0000&locations=faddece16d451000bf3f6b6fd3460000&locations=faddece16d451000bf4036b599930000&locations=faddece16d451000bf32840a7aae0000",
-    "status": "success",
-    "lastScraped": "2026-06-10T20:04:03.128Z"
   },
   {
     "id": "continental",
@@ -2086,20 +1785,6 @@
     "lastScraped": "2026-06-09T16:39:52.896Z"
   },
   {
-    "id": "alteryx",
-    "name": "Alteryx",
-    "careersUrl": "https://alteryx.wd108.myworkdayjobs.com/AlteryxCareers?locationCountry=c4f78be1a8f14da0ab49ce1162348a5e",
-    "status": "success",
-    "lastScraped": "2026-06-10T20:04:15.305Z"
-  },
-  {
-    "id": "amadeus",
-    "name": "Amadeus",
-    "careersUrl": "https://amadeus.wd502.myworkdayjobs.com/jobs?locationCountry=c4f78be1a8f14da0ab49ce1162348a5e",
-    "status": "success",
-    "lastScraped": "2026-06-10T20:04:15.310Z"
-  },
-  {
     "id": "bristol-myers-squibb",
     "name": "Bristol Myers Squibb",
     "careersUrl": "https://jobs.bms.com/careers?domain=bms.com&start=0&location=india&pid=137480083642&sort_by=distance&filter_include_remote=1",
@@ -2112,6 +1797,335 @@
     "careersUrl": "https://jobs.bosch.com/en/?pages=1&country=in",
     "status": "failed",
     "lastScraped": "2026-06-09T16:40:10.101Z"
+  },
+  {
+    "id": "dataart",
+    "name": "DataArt",
+    "careersUrl": "https://www.dataart.team/vacancies?countries=5794",
+    "status": "failed",
+    "lastScraped": "2026-06-10T06:29:24.673Z"
+  },
+  {
+    "id": "honeywell",
+    "name": "Honeywell",
+    "careersUrl": "https://careers.honeywell.com/en/sites/Honeywell/jobs?lastSelectedFacet=LOCATIONS&mode=location&selectedLocationsFacet=300000000469485",
+    "status": "failed",
+    "lastScraped": "2026-06-10T06:32:45.041Z"
+  },
+  {
+    "id": "ets",
+    "name": "ETS",
+    "careersUrl": "https://newdev.pereless.com/85523/#/JobSearch/DLIND/NA",
+    "status": "failed",
+    "lastScraped": "2026-06-10T06:48:26.600Z"
+  },
+  {
+    "id": "forrester",
+    "name": "Forrester",
+    "careersUrl": "https://forrester.wd501.myworkdayjobs.com/careers?locations=a149255970d701e7095f6110b301c40f&locations=75e20e1b5013019253e51a45a6015209&locations=a149255970d7014f12155f10b301bf0f",
+    "status": "success",
+    "lastScraped": "2026-06-10T16:17:17.062Z"
+  },
+  {
+    "id": "brown-forman",
+    "name": "Brown-Forman",
+    "careersUrl": "https://careers.brown-forman.com/jobs/?location=India",
+    "status": "success",
+    "lastScraped": "2026-06-10T16:18:41.375Z"
+  },
+  {
+    "id": "fractal-analytics",
+    "name": "Fractal Analytics",
+    "careersUrl": "https://fractal.wd1.myworkdayjobs.com/Careers?locations=7edfb62955d310014b6351f083a60000&locations=4fedd31659ec01018833886e5c060000&locations=7edfb62955d310014b634f88574d0000&locations=ce4e62e669131000e2dc7e2e78a50000&locations=4fedd31659ec01018833637cbf900000&locations=3b3fb1d62c071000e2a0f48656560000",
+    "status": "success",
+    "lastScraped": "2026-06-10T16:30:40.424Z"
+  },
+  {
+    "id": "fluence",
+    "name": "Fluence",
+    "careersUrl": "https://fluenceenergy.wd12.myworkdayjobs.com/en-US/fluenceenergy-jobs?locations=e04e2d75fd280100d94e93becb9b0000",
+    "status": "success",
+    "lastScraped": "2026-06-10T16:37:36.327Z"
+  },
+  {
+    "id": "fnz",
+    "name": "FNZ",
+    "careersUrl": "https://fnz.wd3.myworkdayjobs.com/fnz_careers?locations=166dc176c3e210014834874e00900000",
+    "status": "success",
+    "lastScraped": "2026-06-10T17:01:18.953Z"
+  },
+  {
+    "id": "genesys",
+    "name": "Genesys",
+    "careersUrl": "https://genesys.wd1.myworkdayjobs.com/Genesys?locationCountry=c4f78be1a8f14da0ab49ce1162348a5e",
+    "status": "success",
+    "lastScraped": "2026-06-10T17:09:49.576Z"
+  },
+  {
+    "id": "finastra",
+    "name": "Finastra",
+    "careersUrl": "https://finastra.wd3.myworkdayjobs.com/FINC?locations=8061b46e841701674a93fa087a40597d&locations=9ab6e37cf0b510c4241704726a7e106e&locations=9883965210a71070f73ea6940e97dffb&locations=8061b46e841701e7db11200a7a40fe7d",
+    "status": "success",
+    "lastScraped": "2026-06-10T17:15:06.211Z"
+  },
+  {
+    "id": "illumina",
+    "name": "Illumina",
+    "careersUrl": "https://illumina.wd1.myworkdayjobs.com/illumina-careers?_gl=1*1lc2oj9*_gcl_aw*R0NMLjE3Nzk3MTk2MzMuQ2p3S0NBanc1c19RQmhBZEVpd0FERF9nQnQyeFAyV2N6OEZWdjNHYVFOUTR3NHlKY0xXLUxzZDRSRnZRWjM5bzJEZWR2UFRKWFh2ZXJSb0NucGNRQXZEX0J3RQ..*_gcl_au*Nzk3NDE3ODUyLjE3Nzk3MTk2MzAuMTM3MDAzNzU5My4xNzc5NzE5NjQxLjE3Nzk3MTk2NDE.*_ga*NDkzNDMxMTQ5LjE3Nzk3MTk2MzM.*_ga_RWQ04G1X8S*czE3Nzk3MTk2MzIkbzEkZzEkdDE3Nzk3MTk2NDIkajUwJGwwJGgw&locationCountry=c4f78be1a8f14da0ab49ce1162348a5e",
+    "status": "success",
+    "lastScraped": "2026-06-10T17:28:19.400Z"
+  },
+  {
+    "id": "gensler",
+    "name": "Gensler",
+    "careersUrl": "https://gensler.wd1.myworkdayjobs.com/genslercareers?locations=9c7925c3799401b47be540d0792a20c6&locations=3827c2ec7c0c1001f65f89d68b0d0000&locations=d1874f20633601b2e27d7bb3d117870a",
+    "status": "success",
+    "lastScraped": "2026-06-10T17:30:44.677Z"
+  },
+  {
+    "id": "hubspot",
+    "name": "HubSpot",
+    "careersUrl": "https://www.hubspot.com/careers/jobs?hubs_signup-cta=careers-nav-cta&page=1#office=bengaluru;",
+    "status": "success",
+    "lastScraped": "2026-06-10T17:32:31.463Z"
+  },
+  {
+    "id": "huron-consulting",
+    "name": "Huron Consulting",
+    "careersUrl": "https://huron.wd1.myworkdayjobs.com/huroncareers?locationCountry=c4f78be1a8f14da0ab49ce1162348a5e",
+    "status": "success",
+    "lastScraped": "2026-06-10T18:01:40.520Z"
+  },
+  {
+    "id": "cadence-design-systems",
+    "name": "Cadence Design Systems",
+    "careersUrl": "https://cadence.wd1.myworkdayjobs.com/External_Careers?locations=4a80e4a6e96c1000db1fec5d8aec0000&locations=b98fe865fec0100120cf435c0b040000&locations=6418637d4d5010bf8a99bda155db6142&locations=6418637d4d5010bf8a99b21035266138&locations=d1bbeffd71a2100121c577c184b10000&locations=6418637d4d5010bf8a99b84a103c613d&locations=84b6cfd69db310b0db9d79bf33759a36&locations=6418637d4d5010bf8a99abd03be56133&locations=6418637d4d5010bf8a99a4926e59612e",
+    "status": "success",
+    "lastScraped": "2026-06-10T18:10:15.461Z"
+  },
+  {
+    "id": "vmware",
+    "name": "VMware",
+    "careersUrl": "https://broadcom.wd1.myworkdayjobs.com/External_Career?locations=6d1be12dc134103be580f2ed396f3bdf&locations=877d747df7191002136421863fac0000&locations=2d466ab4e6e0013cf503069082349dd2&locations=0dd627624e2e0176f301cad8dcd9ab0b&locations=877d747df71910021363ea290d900000&locations=2a204116f85f01189cd964af936b70fb",
+    "status": "success",
+    "lastScraped": "2026-06-10T18:19:24.219Z"
+  },
+  {
+    "id": "agilent-technologies",
+    "name": "Agilent Technologies",
+    "careersUrl": "https://agilent.wd5.myworkdayjobs.com/Agilent_Student_Careers?locationCountry=c4f78be1a8f14da0ab49ce1162348a5e",
+    "status": "success",
+    "lastScraped": "2026-06-10T18:20:07.560Z"
+  },
+  {
+    "id": "jade-global",
+    "name": "Jade Global",
+    "careersUrl": "https://jadeglobal.wd5.myworkdayjobs.com/Jade_Careers?locations=8bedb2882e801001b6c62ed679650000&locations=8bedb2882e801001b6c622c7f31e0000&locations=8bedb2882e801001b6c636ad7fef0000&locations=8bedb2882e801001b6c6314124fc0000&locations=8bedb2882e801001b6c64cf853b20000&locations=8bedb2882e801001b6c65e6fcc630000&locations=8bedb2882e801001b6c63b8011300000&locations=8bedb2882e801001b6c66a78b37b0000&locations=87428186d072100013ba3dcef2fa0000",
+    "status": "success",
+    "lastScraped": "2026-06-10T18:35:55.010Z"
+  },
+  {
+    "id": "brother-international",
+    "name": "Brother International",
+    "careersUrl": "https://www.brother.in/en/contents/career",
+    "status": "success",
+    "lastScraped": "2026-06-10T18:36:18.381Z"
+  },
+  {
+    "id": "brookfield",
+    "name": "Brookfield",
+    "careersUrl": "https://www.brookfield.com/careers/career-opportunities?ZmllbGRfY2FyZWVyX2xvY2F0aW9uX3RhcmdldF9pZFtd=239%2C26",
+    "status": "success",
+    "lastScraped": "2026-06-10T18:38:49.397Z"
+  },
+  {
+    "id": "c3-ai",
+    "name": "C3 AI",
+    "careersUrl": "https://c3.ai/careers/",
+    "status": "success",
+    "lastScraped": "2026-06-10T18:39:12.075Z"
+  },
+  {
+    "id": "cred",
+    "name": "CRED",
+    "careersUrl": "https://careers.cred.club/openings",
+    "status": "success",
+    "lastScraped": "2026-06-10T18:39:14.499Z"
+  },
+  {
+    "id": "ch-robinson",
+    "name": "C.H. Robinson",
+    "careersUrl": "https://www.chrobinson.com/en-us/about-us/careers/search/#f-careers_job_region=India",
+    "status": "success",
+    "lastScraped": "2026-06-10T18:39:31.572Z"
+  },
+  {
+    "id": "bunge",
+    "name": "Bunge",
+    "careersUrl": "https://jobs.bunge.com/search/?createNewAlert=false&q=&optionsFacetsDD_country=IN&optionsFacetsDD_dept=",
+    "status": "success",
+    "lastScraped": "2026-06-10T18:46:39.882Z"
+  },
+  {
+    "id": "canon-india",
+    "name": "Canon India",
+    "careersUrl": "https://career.asia.canon:8086/psc/ps/EMPLOYEE/CIPLCAREER/c/HRS_HRAM.HRS_APP_SCHJOB.GBL?Page=HRS_APP_SCHJOB&Action=U&FOCUS=Applicant&SiteId=2226&",
+    "status": "success",
+    "lastScraped": "2026-06-10T18:46:42.527Z"
+  },
+  {
+    "id": "camunda",
+    "name": "Camunda",
+    "careersUrl": "https://camunda.com/careers/all-jobs/",
+    "status": "success",
+    "lastScraped": "2026-06-10T18:46:45.230Z"
+  },
+  {
+    "id": "ceva",
+    "name": "CEVA",
+    "careersUrl": "https://www.ceva-ip.com/career/location/apac/",
+    "status": "success",
+    "lastScraped": "2026-06-10T18:49:15.016Z"
+  },
+  {
+    "id": "carlyle-group",
+    "name": "Carlyle Group",
+    "careersUrl": "https://carlyle.avature.net/externalcareers/SearchJobs/?2449=%5B34721%5D&2449_format=1392&listFilterMode=1&jobRecordsPerPage=10&",
+    "status": "success",
+    "lastScraped": "2026-06-10T18:49:29.150Z"
+  },
+  {
+    "id": "intel",
+    "name": "Intel",
+    "careersUrl": "https://intel.wd1.myworkdayjobs.com/External?locations=1e4a4eb3adf101f44070f976bf8184cf",
+    "status": "success",
+    "lastScraped": "2026-06-10T19:01:28.667Z"
+  },
+  {
+    "id": "cashfree-payments",
+    "name": "Cashfree Payments",
+    "careersUrl": "https://www.cashfree.com/careers/",
+    "status": "success",
+    "lastScraped": "2026-06-10T19:02:52.398Z"
+  },
+  {
+    "id": "catalyst-brands",
+    "name": "Catalyst Brands",
+    "careersUrl": "https://careers-catalystbrand.icims.com/jobs/search?ss=1&searchRelation=keyword_all&searchLocation=13228-13245-Bangalore",
+    "status": "success",
+    "lastScraped": "2026-06-10T19:02:55.617Z"
+  },
+  {
+    "id": "calendly",
+    "name": "Calendly",
+    "careersUrl": "https://calendly.com/careers?location=Remote",
+    "status": "success",
+    "lastScraped": "2026-06-10T19:07:46.463Z"
+  },
+  {
+    "id": "cargill",
+    "name": "Cargill",
+    "careersUrl": "https://careers.cargill.com/en/search-jobs/India/23251/2/1269750/22/79/50/2",
+    "status": "success",
+    "lastScraped": "2026-06-10T19:18:13.027Z"
+  },
+  {
+    "id": "kla",
+    "name": "KLA",
+    "careersUrl": "https://kla.wd1.myworkdayjobs.com/Search?_ga=2.114994375.1345301171.1780297045-1621796480.1780297045&_gl=1*90sowa*_gcl_au*NDgyNjIwNjMuMTc4MDI5NzA0NQ..*_ga*MTYyMTc5NjQ4MC4xNzgwMjk3MDQ1*_ga_TZPEFM1MF5*czE3ODAyOTcwNDUkbzEkZzAkdDE3ODAyOTcwNDgkajU3JGwwJGgw&Country=c4f78be1a8f14da0ab49ce1162348a5e",
+    "status": "success",
+    "lastScraped": "2026-06-10T19:24:53.291Z"
+  },
+  {
+    "id": "celonis",
+    "name": "Celonis",
+    "careersUrl": "https://careers.celonis.com/join-us/open-positions?groupedLocation=Bangalore%2C+India%7CRemote%2C+India",
+    "status": "success",
+    "lastScraped": "2026-06-10T19:28:16.238Z"
+  },
+  {
+    "id": "carrier",
+    "name": "Carrier",
+    "careersUrl": "https://jobs.carrier.com/en/search-jobs/Bengaluru%2C%20Karnataka%2C%20India/29289/4/1269750-1267701-1277331-1277333/12x9716/77x5946/100/0",
+    "status": "success",
+    "lastScraped": "2026-06-10T19:30:09.907Z"
+  },
+  {
+    "id": "celigo",
+    "name": "Celigo",
+    "careersUrl": "https://www.celigo.com/careers/?_location=b733cd170a85b99231475987b1322eb2",
+    "status": "success",
+    "lastScraped": "2026-06-10T19:37:55.810Z"
+  },
+  {
+    "id": "cepheid",
+    "name": "Cepheid",
+    "careersUrl": "https://jobs.danaher.com/global/en/search-results?keywords=",
+    "status": "success",
+    "lastScraped": "2026-06-10T19:45:05.071Z"
+  },
+  {
+    "id": "chargepoint",
+    "name": "ChargePoint",
+    "careersUrl": "https://www.chargepoint.com/about/opportunities",
+    "status": "success",
+    "lastScraped": "2026-06-10T19:46:08.777Z"
+  },
+  {
+    "id": "cerner",
+    "name": "Cerner",
+    "careersUrl": "https://careers.oracle.com/en/sites/jobsearch/jobs?location=India&locationId=300000000106947&locationLevel=country&mode=location",
+    "status": "success",
+    "lastScraped": "2026-06-10T19:47:32.702Z"
+  },
+  {
+    "id": "check-point-software",
+    "name": "Check Point Software",
+    "careersUrl": "https://careers.checkpoint.com/index.php?q=&module=cpcareers&a=search&fa%5B%5D=country_ss%3AIndia&sort=",
+    "status": "success",
+    "lastScraped": "2026-06-10T19:47:42.442Z"
+  },
+  {
+    "id": "charles-river-laboratories",
+    "name": "Charles River Laboratories",
+    "careersUrl": "https://jobs.criver.com/job-search-results/?country=IN&radius=25&location=India",
+    "status": "success",
+    "lastScraped": "2026-06-10T19:53:00.284Z"
+  },
+  {
+    "id": "kyndryl",
+    "name": "Kyndryl",
+    "careersUrl": "https://kyndryl.wd5.myworkdayjobs.com/KyndrylEarlyCareers?locationCountry=c4f78be1a8f14da0ab49ce1162348a5e",
+    "status": "success",
+    "lastScraped": "2026-06-10T20:02:52.633Z"
+  },
+  {
+    "id": "chubb",
+    "name": "Chubb",
+    "careersUrl": "https://fa-ewgu-saasfaprod1.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_2001/jobs?location=India&locationId=300000000467203&locationLevel=country&mode=location",
+    "status": "success",
+    "lastScraped": "2026-06-10T20:03:32.257Z"
+  },
+  {
+    "id": "genpact",
+    "name": "Genpact",
+    "careersUrl": "https://genpact.wd108.myworkdayjobs.com/External_Careers?locations=faddece16d451000bf34b35eae2a0000&locations=faddece16d451000bf335d4335830000&locations=faddece16d451000bf369b6d5a040000&locations=faddece16d451000bf33b19980d10000&locations=faddece16d451000bf3d37688ca50000&locations=faddece16d451000bf3799e932a70000&locations=faddece16d451000bf33829b1d660000&locations=faddece16d451000bf382b1b6ada0000&locations=faddece16d451000bf3c2a51e8520000&locations=faddece16d451000bf3654f2ad0c0000&locations=faddece16d451000bf3d12ab49290000&locations=faddece16d451000bf3c88cb990f0000&locations=faddece16d451000bf3abce51e850000&locations=faddece16d451000bf4051c2f2080000&locations=faddece16d451000bf3d1bb2afcf0000&locations=faddece16d451000bf32ecada1f70000&locations=faddece16d451000bf35c44819a90000&locations=faddece16d451000bf3c80f8daeb0000&locations=faddece16d451000bf3c9d4601010000&locations=faddece16d451000bf3f05bfd76c0000&locations=faddece16d451000bf3cf52b8c630000&locations=faddece16d451000bf374df10fa90000&locations=faddece16d451000bf37890590770000&locations=faddece16d451000bf3887e2c7e10000&locations=faddece16d451000bf3be21bae0f0000&locations=faddece16d451000bf33e08c2fb50000&locations=faddece16d451000bf32ffeb20950000&locations=faddece16d451000bf37ad3571790000&locations=faddece16d451000bf38ec7a7f2e0000&locations=faddece16d451000bf355dde36f70000&locations=faddece16d451000bf3a7414fa770000&locations=faddece16d451000bf3a693d530e0000&locations=faddece16d451000bf3f6b6fd3460000&locations=faddece16d451000bf4036b599930000&locations=faddece16d451000bf32840a7aae0000",
+    "status": "success",
+    "lastScraped": "2026-06-10T20:04:03.128Z"
+  },
+  {
+    "id": "alteryx",
+    "name": "Alteryx",
+    "careersUrl": "https://alteryx.wd108.myworkdayjobs.com/AlteryxCareers?locationCountry=c4f78be1a8f14da0ab49ce1162348a5e",
+    "status": "success",
+    "lastScraped": "2026-06-10T20:04:15.305Z"
+  },
+  {
+    "id": "amadeus",
+    "name": "Amadeus",
+    "careersUrl": "https://amadeus.wd502.myworkdayjobs.com/jobs?locationCountry=c4f78be1a8f14da0ab49ce1162348a5e",
+    "status": "success",
+    "lastScraped": "2026-06-10T20:04:15.310Z"
   },
   {
     "id": "aveva",
@@ -2170,25 +2184,11 @@
     "lastScraped": "2026-06-10T20:04:15.474Z"
   },
   {
-    "id": "dataart",
-    "name": "DataArt",
-    "careersUrl": "https://www.dataart.team/vacancies?countries=5794",
-    "status": "failed",
-    "lastScraped": "2026-06-10T06:29:24.673Z"
-  },
-  {
     "id": "blackberry-qnx",
     "name": "BlackBerry QNX",
     "careersUrl": "https://bb.wd3.myworkdayjobs.com/BlackBerry/jobs?locations=b15feefdaa031001b5e1e32ca4710000",
     "status": "success",
     "lastScraped": "2026-06-10T20:04:15.538Z"
-  },
-  {
-    "id": "honeywell",
-    "name": "Honeywell",
-    "careersUrl": "https://careers.honeywell.com/en/sites/Honeywell/jobs?lastSelectedFacet=LOCATIONS&mode=location&selectedLocationsFacet=300000000469485",
-    "status": "failed",
-    "lastScraped": "2026-06-10T06:32:45.041Z"
   },
   {
     "id": "cpp-investments",
@@ -2247,13 +2247,6 @@
     "lastScraped": "2026-06-10T20:04:15.629Z"
   },
   {
-    "id": "ets",
-    "name": "ETS",
-    "careersUrl": "https://newdev.pereless.com/85523/#/JobSearch/DLIND/NA",
-    "status": "failed",
-    "lastScraped": "2026-06-10T06:48:26.600Z"
-  },
-  {
     "id": "cme-group",
     "name": "CME Group",
     "careersUrl": "https://cmegroup.wd1.myworkdayjobs.com/en-US/cme_careers?locations=7a3301e6ea5710f69c0ee6a821946acb",
@@ -2308,5 +2301,12 @@
     "careersUrl": "https://factset.wd108.myworkdayjobs.com/FactSetCareers?locations=23dde63515e70114f5a9b3afde207c0b&locations=c74be090cd8c1000c0f563a29ab80000&locations=e45ee8093d59018e80aae1439312d02f&locations=b6ef51aae812014a819d56be79189da1&locations=e45ee8093d59011f5fd98d4393127b2f",
     "status": "success",
     "lastScraped": "2026-06-10T20:04:15.720Z"
+  },
+  {
+    "id": "jll-technologies",
+    "name": "JLL Technologies",
+    "careersUrl": "https://jll.wd1.myworkdayjobs.com/jllcareers?locationCountry=c4f78be1a8f14da0ab49ce1162348a5e",
+    "status": "success",
+    "lastScraped": "2026-06-10T20:04:20.849Z"
   }
 ]
