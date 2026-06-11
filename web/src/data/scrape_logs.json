@@ -1,902 +1,902 @@
 [
   {
-    "id": "bdfc6848-8caf-4a78-934f-0efb7e0ae97c",
+    "id": "5f031d3d-3484-4a02-a8d2-f055c8b85c7b",
+    "companyId": "circana",
+    "companyName": "Circana",
+    "status": "failed",
+    "errors": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://jobs.circana.com/careers?start=0&location=India&pid=1133912916116&sort_by=distance&filter_include_remote=1\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 30056,
+    "timestamp": "2026-06-10T20:04:22.798Z"
+  },
+  {
+    "id": "a1badfce-8bdf-46f0-8357-c1af752f89e3",
+    "companyId": "jll-technologies",
+    "companyName": "JLL Technologies",
+    "status": "success",
+    "jobsFound": 55,
+    "executionTime": 2164611,
+    "timestamp": "2026-06-10T20:04:20.849Z"
+  },
+  {
+    "id": "afe934ac-55aa-4be5-8189-6f62c306742b",
     "companyId": "factset",
     "companyName": "FactSet",
     "status": "success",
     "jobsFound": 0,
-    "executionTime": 39,
-    "timestamp": "2026-06-10T07:07:46.654Z"
+    "executionTime": 4,
+    "timestamp": "2026-06-10T20:04:15.720Z"
   },
   {
-    "id": "ed966a1d-b7d1-4232-8ece-894a0f8843c6",
+    "id": "571f8396-df61-4b79-9213-57ca934a2f89",
     "companyId": "f5",
     "companyName": "F5",
     "status": "success",
     "jobsFound": 0,
-    "executionTime": 3,
-    "timestamp": "2026-06-10T07:07:46.653Z"
+    "executionTime": 4,
+    "timestamp": "2026-06-10T20:04:15.716Z"
   },
   {
-    "id": "07853e6d-853c-4e66-a4e0-34261c72dce5",
+    "id": "e5fc80d6-db6c-4034-a66d-dd6ad52acb2a",
     "companyId": "crowdstrike",
     "companyName": "CrowdStrike",
     "status": "success",
-    "jobsFound": 24,
-    "executionTime": 1160052,
-    "timestamp": "2026-06-10T07:07:46.652Z"
+    "jobsFound": 0,
+    "executionTime": 4,
+    "timestamp": "2026-06-10T20:04:15.712Z"
   },
   {
-    "id": "ec598591-a3c7-45bd-af16-9db7ceaed816",
+    "id": "3b7588d5-1e17-48e0-8cd2-2fbdc3a5e37b",
     "companyId": "epicor",
     "companyName": "Epicor",
     "status": "success",
     "jobsFound": 0,
-    "executionTime": 38,
-    "timestamp": "2026-06-10T07:07:46.650Z"
+    "executionTime": 4,
+    "timestamp": "2026-06-10T20:04:15.708Z"
   },
   {
-    "id": "d8f08f9e-8c32-4b2d-a999-4d584682f175",
+    "id": "88a7dc92-9c1f-4ebc-9927-ac31f543c4ee",
     "companyId": "elsevier",
     "companyName": "Elsevier",
     "status": "success",
-    "jobsFound": 18,
-    "executionTime": 933486,
-    "timestamp": "2026-06-10T07:07:46.615Z"
+    "jobsFound": 0,
+    "executionTime": 5,
+    "timestamp": "2026-06-10T20:04:15.704Z"
   },
   {
-    "id": "3b751ff4-46f1-4d0d-a264-54508edb3513",
+    "id": "b9cc83ad-752c-4648-8137-b7aca5bbe4aa",
     "companyId": "edwards-lifesciences",
     "companyName": "Edwards Lifesciences",
     "status": "success",
     "jobsFound": 0,
-    "executionTime": 175,
-    "timestamp": "2026-06-10T07:07:46.612Z"
+    "executionTime": 5,
+    "timestamp": "2026-06-10T20:04:15.699Z"
   },
   {
-    "id": "3ff600d8-0c27-4096-ab5c-ac6fe9ea9432",
+    "id": "1d0eaf11-b61d-4356-8e95-925691e16d76",
     "companyId": "csg",
     "companyName": "CSG",
     "status": "success",
-    "jobsFound": 27,
-    "executionTime": 1318097,
-    "timestamp": "2026-06-10T07:07:46.437Z"
+    "jobsFound": 0,
+    "executionTime": 5,
+    "timestamp": "2026-06-10T20:04:15.694Z"
   },
   {
-    "id": "fea6fdd6-efe2-4451-9e9e-d840aef86013",
+    "id": "c712b64a-b48c-4e5b-b470-acfa9a2cee30",
     "companyId": "cme-group",
     "companyName": "CME Group",
     "status": "success",
-    "jobsFound": 23,
-    "executionTime": 938997,
-    "timestamp": "2026-06-10T06:52:13.129Z"
+    "jobsFound": 0,
+    "executionTime": 4,
+    "timestamp": "2026-06-10T20:04:15.689Z"
   },
   {
-    "id": "f1d51c0f-6319-44f1-97dd-0541ee089f48",
+    "id": "b0f83265-988f-424a-be20-c24de807cefa",
     "companyId": "ets",
     "companyName": "ETS",
-    "status": "success",
-    "jobsFound": 0,
-    "executionTime": 36709,
-    "timestamp": "2026-06-10T06:48:26.600Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://newdev.pereless.com/85523/#/JobSearch/DLIND/NA\nCall log:\n\u001b[2m  - navigating to \"https://newdev.pereless.com/85523/#/JobSearch/DLIND/NA\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 56,
+    "timestamp": "2026-06-10T20:04:15.685Z"
   },
   {
-    "id": "d0c031ac-723d-4cce-a636-939556d883e5",
+    "id": "b7dae870-1070-4c42-bfaa-f75f35347d59",
     "companyId": "duck-creek",
     "companyName": "Duck Creek",
     "status": "success",
     "jobsFound": 0,
-    "executionTime": 1028,
-    "timestamp": "2026-06-10T06:47:49.891Z"
+    "executionTime": 4,
+    "timestamp": "2026-06-10T20:04:15.629Z"
   },
   {
-    "id": "9990fd95-491b-4c20-90b7-3bb00a69aff1",
+    "id": "93950501-f4e7-446c-aa04-26d232aa30f7",
     "companyId": "ciena",
     "companyName": "Ciena",
     "status": "success",
-    "jobsFound": 11,
-    "executionTime": 456327,
-    "timestamp": "2026-06-10T06:47:48.863Z"
+    "jobsFound": 0,
+    "executionTime": 4,
+    "timestamp": "2026-06-10T20:04:15.625Z"
   },
   {
-    "id": "917f0c54-5c30-4ebd-8c21-7f132c2f1994",
+    "id": "e08fff61-3376-4a9a-8583-fd97e68d30cb",
     "companyId": "browserstack",
     "companyName": "BrowserStack",
     "status": "success",
-    "jobsFound": 19,
-    "executionTime": 764998,
-    "timestamp": "2026-06-10T06:45:48.339Z"
+    "jobsFound": 0,
+    "executionTime": 5,
+    "timestamp": "2026-06-10T20:04:15.621Z"
   },
   {
-    "id": "7a5b5c81-9d58-45a0-b82b-dd2bbd663237",
+    "id": "d08fdee4-6a93-4d4c-b3b5-53365c980ce9",
     "companyId": "cloudera",
     "companyName": "Cloudera",
     "status": "success",
-    "jobsFound": 5,
-    "executionTime": 209410,
-    "timestamp": "2026-06-10T06:40:12.536Z"
+    "jobsFound": 0,
+    "executionTime": 4,
+    "timestamp": "2026-06-10T20:04:15.616Z"
   },
   {
-    "id": "e515b60c-d940-46d3-a897-57f2251f21cd",
+    "id": "428d2ced-0e65-47b0-8368-2ca40078f534",
     "companyId": "cengage",
     "companyName": "Cengage",
     "status": "success",
-    "jobsFound": 3,
-    "executionTime": 126001,
-    "timestamp": "2026-06-10T06:36:43.125Z"
+    "jobsFound": 0,
+    "executionTime": 4,
+    "timestamp": "2026-06-10T20:04:15.612Z"
   },
   {
-    "id": "5ca8ee38-806b-4e0c-9f7b-120dc165f828",
+    "id": "481a292e-d130-44b1-af90-021781a8732a",
     "companyId": "broadridge",
     "companyName": "Broadridge",
     "status": "success",
-    "jobsFound": 16,
-    "executionTime": 398358,
-    "timestamp": "2026-06-10T06:36:34.132Z"
+    "jobsFound": 0,
+    "executionTime": 4,
+    "timestamp": "2026-06-10T20:04:15.608Z"
   },
   {
-    "id": "a0d1b487-f3d2-492f-9608-3adf1bd2bec1",
-    "companyId": "brown-forman",
-    "companyName": "Brown-Forman",
-    "status": "failed",
-    "errors": "page.goto: net::ERR_CERT_AUTHORITY_INVALID at https://careers.brown-forman.com/jobs/?location=India\nCall log:\n  - navigating to \"https://careers.brown-forman.com/jobs/?location=India\", waiting until \"commit\"\n",
-    "executionTime": 1152,
-    "timestamp": "2026-06-10T06:34:37.124Z"
-  },
-  {
-    "id": "ef3adfb4-df83-41b5-8016-df96bf9d7ecc",
+    "id": "f4a20c69-e3e1-4aa8-bcea-e38186bd48b5",
     "companyId": "broadcom",
     "companyName": "Broadcom",
     "status": "success",
-    "jobsFound": 14,
-    "executionTime": 310510,
-    "timestamp": "2026-06-10T06:34:35.972Z"
+    "jobsFound": 0,
+    "executionTime": 4,
+    "timestamp": "2026-06-10T20:04:15.604Z"
   },
   {
-    "id": "2ace3abe-b3aa-4da5-a6d9-fd5109a791ae",
+    "id": "8550c3a6-ebae-44cc-a287-d3d4d76be5ce",
     "companyId": "cpp-investments",
     "companyName": "CPP Investments",
     "status": "success",
-    "jobsFound": 1,
-    "executionTime": 18299,
-    "timestamp": "2026-06-10T06:33:03.341Z"
+    "jobsFound": 0,
+    "executionTime": 5,
+    "timestamp": "2026-06-10T20:04:15.600Z"
   },
   {
-    "id": "d1b9fd12-6eac-4ab0-b89e-2b167778d304",
+    "id": "3a740003-02a4-414b-8a24-507b9c657522",
     "companyId": "honeywell",
     "companyName": "Honeywell",
-    "status": "success",
-    "jobsFound": 15,
-    "executionTime": 234426,
-    "timestamp": "2026-06-10T06:32:45.041Z"
-  },
-  {
-    "id": "a5642a8a-232a-432c-b25d-40e3c236fca5",
-    "companyId": "extreme-networks",
-    "companyName": "Extreme Networks",
     "status": "failed",
-    "errors": "l.content.join is not a function",
-    "executionTime": 65189,
-    "timestamp": "2026-06-10T06:29:55.774Z"
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://careers.honeywell.com/en/sites/Honeywell/jobs?lastSelectedFacet=LOCATIONS&mode=location&selectedLocationsFacet=300000000469485\nCall log:\n\u001b[2m  - navigating to \"https://careers.honeywell.com/en/sites/Honeywell/jobs?lastSelectedFacet=LOCATIONS&mode=location&selectedLocationsFacet=300000000469485\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 57,
+    "timestamp": "2026-06-10T20:04:15.595Z"
   },
   {
-    "id": "06b7cbbe-f3fe-46e5-ade0-b0fea7d8db57",
+    "id": "74b55b5d-aa5f-4127-88ae-3578a406fb56",
     "companyId": "blackberry-qnx",
     "companyName": "BlackBerry QNX",
     "status": "success",
     "jobsFound": 0,
-    "executionTime": 789,
-    "timestamp": "2026-06-10T06:29:25.462Z"
+    "executionTime": 5,
+    "timestamp": "2026-06-10T20:04:15.538Z"
   },
   {
-    "id": "fe608d62-00ef-444e-8391-fd7550384cd3",
+    "id": "ba00ade9-0a0b-4340-b06c-8d83f628a757",
     "companyId": "dataart",
     "companyName": "DataArt",
-    "status": "success",
-    "jobsFound": 0,
-    "executionTime": 25309,
-    "timestamp": "2026-06-10T06:29:24.673Z"
-  },
-  {
-    "id": "894c9a79-a354-46f0-95b6-747ae6b12817",
-    "companyId": "jacobs",
-    "companyName": "Jacobs",
     "status": "failed",
-    "errors": "page.evaluate: Execution context was destroyed, most likely because of a navigation",
-    "executionTime": 3759,
-    "timestamp": "2026-06-10T06:28:59.364Z"
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://www.dataart.team/vacancies?countries=5794\nCall log:\n\u001b[2m  - navigating to \"https://www.dataart.team/vacancies?countries=5794\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 59,
+    "timestamp": "2026-06-10T20:04:15.533Z"
   },
   {
-    "id": "1d7ac4dc-4521-4376-9be3-5801c0c605c2",
-    "companyId": "encora",
-    "companyName": "Encora",
-    "status": "failed",
-    "errors": "page.goto: Timeout 15000ms exceeded.\nCall log:\n  - navigating to \"https://careers.coforge.com/coforge/\", waiting until \"commit\"\n",
-    "executionTime": 30050,
-    "timestamp": "2026-06-10T06:28:55.605Z"
-  },
-  {
-    "id": "65470cf2-3447-4add-a81e-4a41182bc504",
-    "companyId": "coforge",
-    "companyName": "Coforge",
-    "status": "failed",
-    "errors": "page.goto: Timeout 15000ms exceeded.\nCall log:\n  - navigating to \"https://careers.coforge.com/coforge/\", waiting until \"commit\"\n",
-    "executionTime": 30093,
-    "timestamp": "2026-06-10T06:28:50.615Z"
-  },
-  {
-    "id": "8744639d-bfc0-4f22-8ca7-3a378164bfc3",
-    "companyId": "cyient",
-    "companyName": "Cyient",
-    "status": "failed",
-    "errors": "page.goto: Timeout 15000ms exceeded.\nCall log:\n  - navigating to \"https://careers.cyient.com/cyient/\", waiting until \"commit\"\n",
-    "executionTime": 30061,
-    "timestamp": "2026-06-10T06:28:50.585Z"
-  },
-  {
-    "id": "3deaeca7-97db-4737-85d2-34a6a6f91c3a",
-    "companyId": "crisil",
-    "companyName": "CRISIL",
-    "status": "failed",
-    "errors": "page.goto: Timeout 15000ms exceeded.\nCall log:\n  - navigating to \"https://career.crisil.com/crisil/\", waiting until \"commit\"\n",
-    "executionTime": 30047,
-    "timestamp": "2026-06-10T06:28:25.555Z"
-  },
-  {
-    "id": "a32d227e-fb3a-4703-8e2b-597b3476b67e",
-    "companyId": "adidas",
-    "companyName": "Adidas",
-    "status": "failed",
-    "errors": "page.goto: Timeout 15000ms exceeded.\nCall log:\n  - navigating to \"https://careers.adidas-group.com/jobs?location=%5B%7B%22country%22%3A%22India%22%7D%5D&offset=0&keywords=&location_manual=India\", waiting until \"commit\"\n",
-    "executionTime": 30165,
-    "timestamp": "2026-06-10T06:28:20.523Z"
-  },
-  {
-    "id": "e2f4f7aa-8d44-44be-bc5d-b802952056b8",
-    "companyId": "automation-anywhere",
-    "companyName": "Automation Anywhere",
-    "status": "failed",
-    "errors": "page.goto: Timeout 15000ms exceeded.\nCall log:\n  - navigating to \"https://www.automationanywhere.com/company/careers/all\", waiting until \"commit\"\n",
-    "executionTime": 30160,
-    "timestamp": "2026-06-10T06:28:20.522Z"
-  },
-  {
-    "id": "14eb8079-59d2-4046-a11c-d8d8f33f0c80",
-    "companyId": "cbre",
-    "companyName": "CBRE",
-    "status": "failed",
-    "errors": "page.evaluate: Execution context was destroyed, most likely because of a navigation",
-    "executionTime": 5146,
-    "timestamp": "2026-06-10T06:27:55.508Z"
-  },
-  {
-    "id": "7c6bdb3e-9c0c-4dc7-bc53-c943dae52226",
+    "id": "23a0498d-bce1-4954-86d9-55941151a714",
     "companyId": "3m",
     "companyName": "3M",
     "status": "success",
-    "jobsFound": 100,
-    "executionTime": 110130,
-    "timestamp": "2026-06-09T16:41:17.866Z"
+    "jobsFound": 0,
+    "executionTime": 15,
+    "timestamp": "2026-06-10T20:04:15.474Z"
   },
   {
-    "id": "dfe80e80-9c2c-4164-9bea-ffc9d2eff546",
+    "id": "cc41bb5e-d3e5-40e2-84fa-1f0c4fcc4032",
     "companyId": "airbus",
     "companyName": "Airbus",
     "status": "success",
-    "jobsFound": 91,
-    "executionTime": 63279,
-    "timestamp": "2026-06-09T16:41:09.235Z"
+    "jobsFound": 0,
+    "executionTime": 7,
+    "timestamp": "2026-06-10T20:04:15.459Z"
   },
   {
-    "id": "1f477b2b-9b88-4b06-8918-99567e692497",
+    "id": "af72c906-d4f3-405d-9300-b2f2c280d2de",
     "companyId": "autodesk",
     "companyName": "Autodesk",
     "status": "success",
-    "jobsFound": 82,
-    "executionTime": 35025,
-    "timestamp": "2026-06-09T16:40:55.208Z"
+    "jobsFound": 0,
+    "executionTime": 10,
+    "timestamp": "2026-06-10T20:04:15.452Z"
   },
   {
-    "id": "07d500f3-96ec-45e1-b1c7-6f7cd0903a83",
+    "id": "efc904f7-3e5c-4ed5-9d5c-e9f1f62e4f86",
     "companyId": "analog-devices",
     "companyName": "Analog Devices",
     "status": "success",
-    "jobsFound": 94,
-    "executionTime": 46581,
-    "timestamp": "2026-06-09T16:40:48.960Z"
+    "jobsFound": 0,
+    "executionTime": 5,
+    "timestamp": "2026-06-10T20:04:15.442Z"
   },
   {
-    "id": "368c90f7-872c-46fe-aea2-971a67dd9c0a",
+    "id": "94dc7d46-89a1-4fa6-8553-23846100f1db",
     "companyId": "arctic-wolf",
     "companyName": "Arctic Wolf",
     "status": "success",
-    "jobsFound": 52,
-    "executionTime": 5200,
-    "timestamp": "2026-06-09T16:40:21.687Z"
+    "jobsFound": 0,
+    "executionTime": 4,
+    "timestamp": "2026-06-10T20:04:15.437Z"
   },
   {
-    "id": "721b80c7-3106-47a7-ac20-e46fdb2a6d55",
+    "id": "eb38d0a2-ecc9-4748-b4e1-eb39a673e4f8",
     "companyId": "apollo-global-management",
     "companyName": "Apollo Global Management",
     "status": "success",
-    "jobsFound": 46,
-    "executionTime": 8292,
-    "timestamp": "2026-06-09T16:40:20.183Z"
+    "jobsFound": 0,
+    "executionTime": 7,
+    "timestamp": "2026-06-10T20:04:15.433Z"
   },
   {
-    "id": "7c64608b-4395-4512-b19a-823db09ba0de",
+    "id": "e71672a0-53ea-4f57-8f4b-6372d8c61961",
     "companyId": "aspentech",
     "companyName": "AspenTech",
     "status": "success",
-    "jobsFound": 26,
-    "executionTime": 6386,
-    "timestamp": "2026-06-09T16:40:16.487Z"
+    "jobsFound": 0,
+    "executionTime": 5,
+    "timestamp": "2026-06-10T20:04:15.426Z"
   },
   {
-    "id": "fa50b4fa-df2d-4c08-b867-c7e3f2fe6a98",
+    "id": "36afea44-88df-425c-8ea8-a90d177accf0",
     "companyId": "aveva",
     "companyName": "AVEVA",
     "status": "success",
-    "jobsFound": 35,
-    "executionTime": 31294,
-    "timestamp": "2026-06-09T16:40:11.891Z"
+    "jobsFound": 0,
+    "executionTime": 8,
+    "timestamp": "2026-06-10T20:04:15.421Z"
   },
   {
-    "id": "aa3b49c2-4a96-4639-98b7-840deab92c4d",
+    "id": "d1831f61-6465-4eeb-aebc-efd0c3341264",
     "companyId": "bosch",
     "companyName": "Bosch",
-    "status": "success",
-    "jobsFound": 8,
-    "executionTime": 60169,
-    "timestamp": "2026-06-09T16:40:10.101Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://jobs.bosch.com/en/?pages=1&country=in\nCall log:\n\u001b[2m  - navigating to \"https://jobs.bosch.com/en/?pages=1&country=in\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 49,
+    "timestamp": "2026-06-10T20:04:15.412Z"
   },
   {
-    "id": "52b13a95-b535-4f94-8ded-be2a3ddb49af",
+    "id": "dd85e8c0-2d3c-4a6f-8d33-3d3500a97d26",
     "companyId": "bristol-myers-squibb",
     "companyName": "Bristol Myers Squibb",
-    "status": "success",
-    "jobsFound": 17,
-    "executionTime": 48203,
-    "timestamp": "2026-06-09T16:40:05.956Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://jobs.bms.com/careers?domain=bms.com&start=0&location=india&pid=137480083642&sort_by=distance&filter_include_remote=1\nCall log:\n\u001b[2m  - navigating to \"https://jobs.bms.com/careers?domain=bms.com&start=0&location=india&pid=137480083642&sort_by=distance&filter_include_remote=1\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 53,
+    "timestamp": "2026-06-10T20:04:15.363Z"
   },
   {
-    "id": "ad42e730-32d2-46b6-a53c-82743e729261",
+    "id": "7f941613-391b-44f1-a989-006524e191d5",
     "companyId": "amadeus",
     "companyName": "Amadeus",
     "status": "success",
-    "jobsFound": 11,
-    "executionTime": 5530,
-    "timestamp": "2026-06-09T16:40:02.378Z"
+    "jobsFound": 0,
+    "executionTime": 5,
+    "timestamp": "2026-06-10T20:04:15.310Z"
   },
   {
-    "id": "301f6e98-f3df-447a-93e6-8d81c479085f",
+    "id": "20b914f0-ae61-457c-8d84-87bd6e8f3ee7",
     "companyId": "alteryx",
     "companyName": "Alteryx",
     "status": "success",
-    "jobsFound": 9,
-    "executionTime": 3952,
-    "timestamp": "2026-06-09T16:39:56.848Z"
+    "jobsFound": 0,
+    "executionTime": 4,
+    "timestamp": "2026-06-10T20:04:15.305Z"
   },
   {
-    "id": "1aa15ec8-9470-4d90-a66a-ee2dcaf3e06d",
+    "id": "236cee4f-df68-4d65-bc92-92e7fa1463e1",
     "companyId": "boomi",
     "companyName": "Boomi",
-    "status": "success",
-    "jobsFound": 8,
-    "executionTime": 25756,
-    "timestamp": "2026-06-09T16:39:52.896Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://boomi.com/company/careers/#greenhouseapp\nCall log:\n\u001b[2m  - navigating to \"https://boomi.com/company/careers/#greenhouseapp\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 54,
+    "timestamp": "2026-06-10T20:04:15.301Z"
   },
   {
-    "id": "4dd2bf00-c0e2-4537-80e4-0c72a6cefcab",
+    "id": "77f0cc18-ac30-46ca-849f-7db59d024818",
     "companyId": "bounteous-x-accolite",
     "companyName": "Bounteous x Accolite",
-    "status": "success",
-    "jobsFound": 11,
-    "executionTime": 46153,
-    "timestamp": "2026-06-09T16:39:40.597Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://www.bounteous.com/careers/search-results/?location=India\nCall log:\n\u001b[2m  - navigating to \"https://www.bounteous.com/careers/search-results/?location=India\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 54,
+    "timestamp": "2026-06-10T20:04:15.247Z"
   },
   {
-    "id": "cb7d5b2b-9dff-474f-a83c-63c1f5ab873d",
+    "id": "69f1a496-c0b7-4e04-ae59-c1cf76daa763",
     "companyId": "brillio",
     "companyName": "Brillio",
-    "status": "success",
-    "jobsFound": 10,
-    "executionTime": 12325,
-    "timestamp": "2026-06-09T16:39:27.736Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://careers.brillio.com/job-listing/?job_title=&country=India&workplace=\nCall log:\n\u001b[2m  - navigating to \"https://careers.brillio.com/job-listing/?job_title=&country=India&workplace=\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 59,
+    "timestamp": "2026-06-10T20:04:15.193Z"
   },
   {
-    "id": "a409667a-4572-4db2-b49a-848de2a486f2",
+    "id": "361ca09a-a9ae-4729-bca8-5ccfc8a3d185",
     "companyId": "boeing",
     "companyName": "Boeing",
-    "status": "success",
-    "jobsFound": 5,
-    "executionTime": 22003,
-    "timestamp": "2026-06-09T16:39:27.140Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://jobs.boeing.com/search-jobs/India/185/2/1269750/22/79/50/2\nCall log:\n\u001b[2m  - navigating to \"https://jobs.boeing.com/search-jobs/India/185/2/1269750/22/79/50/2\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 54,
+    "timestamp": "2026-06-10T20:04:15.134Z"
   },
   {
-    "id": "b2e9d9d6-e516-4618-a670-09e8effa84e7",
+    "id": "07559054-c3b4-424a-a524-e6d696bcd09b",
     "companyId": "bio-rad-laboratories",
     "companyName": "Bio-Rad Laboratories",
-    "status": "success",
-    "jobsFound": 18,
-    "executionTime": 53108,
-    "timestamp": "2026-06-09T16:39:17.753Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://careers.bio-rad.com/jobs/search?page=1&country_codes%5B%5D=IN&query=\nCall log:\n\u001b[2m  - navigating to \"https://careers.bio-rad.com/jobs/search?page=1&country_codes%5B%5D=IN&query=\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 54,
+    "timestamp": "2026-06-10T20:04:15.080Z"
   },
   {
-    "id": "b45804d6-5591-4602-a57f-70506954c8ea",
+    "id": "340ca791-8541-4f58-90a5-1b0907fec52f",
     "companyId": "black-veatch",
     "companyName": "Black & Veatch",
-    "status": "success",
-    "jobsFound": 10,
-    "executionTime": 31732,
-    "timestamp": "2026-06-09T16:39:15.411Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://careers.bv.com/search/?q=&locationsearch=India\nCall log:\n\u001b[2m  - navigating to \"https://careers.bv.com/search/?q=&locationsearch=India\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 54,
+    "timestamp": "2026-06-10T20:04:15.026Z"
   },
   {
-    "id": "bfeeb60f-e305-4ca2-a3fe-0f4bc09fae29",
+    "id": "96fad3fb-3337-49b7-a1d1-6ad7985c22ee",
     "companyId": "bloomberg",
     "companyName": "Bloomberg",
-    "status": "success",
-    "jobsFound": 13,
-    "executionTime": 42702,
-    "timestamp": "2026-06-09T16:39:09.932Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://bloomberg.avature.net/careers/SearchJobs/?1845=%5B162477%2C162478%2C162575%5D&1845_format=3996&listFilterMode=1&jobRecordsPerPage=12&#\nCall log:\n\u001b[2m  - navigating to \"https://bloomberg.avature.net/careers/SearchJobs/?1845=%5B162477%2C162478%2C162575%5D&1845_format=3996&listFilterMode=1&jobRecordsPerPage=12&#\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 55,
+    "timestamp": "2026-06-10T20:04:14.972Z"
   },
   {
-    "id": "59d10815-1d65-49ce-8634-85bf1477c21a",
+    "id": "365e04bc-768b-482a-aa07-6ba36955c437",
     "companyId": "blue-yonder",
     "companyName": "Blue Yonder",
-    "status": "success",
-    "jobsFound": 13,
-    "executionTime": 19390,
-    "timestamp": "2026-06-09T16:39:05.137Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://careers.blueyonder.com/us/en/search-results\nCall log:\n\u001b[2m  - navigating to \"https://careers.blueyonder.com/us/en/search-results\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 53,
+    "timestamp": "2026-06-10T20:04:14.917Z"
   },
   {
-    "id": "eae27f22-f55c-4700-8c67-ef96b869f2ad",
+    "id": "723c7acc-f706-4fa8-9a6e-3fcfa5ed818e",
     "companyId": "barclays",
     "companyName": "Barclays",
-    "status": "success",
-    "jobsFound": 15,
-    "executionTime": 80413,
-    "timestamp": "2026-06-09T16:38:54.443Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://search.jobs.barclays/search-jobs?glat=30.7019&glon=76.7722\nCall log:\n\u001b[2m  - navigating to \"https://search.jobs.barclays/search-jobs?glat=30.7019&glon=76.7722\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 54,
+    "timestamp": "2026-06-10T20:04:14.864Z"
   },
   {
-    "id": "cd3c1efe-ab11-48bd-a427-268a5cf272f4",
+    "id": "a7914c2b-1e7f-4b7f-83c0-0b98e39aaa9f",
     "companyId": "blackrock",
     "companyName": "BlackRock",
-    "status": "success",
-    "jobsFound": 13,
-    "executionTime": 40332,
-    "timestamp": "2026-06-09T16:38:45.747Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://careers.blackrock.com/search-jobs/India/45831/2/1269750/22/79/0/2\nCall log:\n\u001b[2m  - navigating to \"https://careers.blackrock.com/search-jobs/India/45831/2/1269750/22/79/0/2\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 54,
+    "timestamp": "2026-06-10T20:04:14.810Z"
   },
   {
-    "id": "375fdd24-2a7a-4320-ab08-521e3bcfb594",
+    "id": "660400c8-cc39-476c-ba3a-d43539c3b1c2",
     "companyId": "blackline",
     "companyName": "BlackLine",
-    "status": "success",
-    "jobsFound": 15,
-    "executionTime": 51225,
-    "timestamp": "2026-06-09T16:38:43.679Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://careers.blackline.com/careers-home/jobs?country=India&page=1\nCall log:\n\u001b[2m  - navigating to \"https://careers.blackline.com/careers-home/jobs?country=India&page=1\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 55,
+    "timestamp": "2026-06-10T20:04:14.756Z"
   },
   {
-    "id": "4b8e1051-8fcd-4644-a26f-bdd190010589",
+    "id": "358f7552-f158-4885-8805-385f8b08e0f8",
     "companyId": "blue-prism",
     "companyName": "Blue Prism",
-    "status": "success",
-    "jobsFound": 0,
-    "executionTime": 3372,
-    "timestamp": "2026-06-09T16:38:27.230Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://wd1.myworkdaysite.com/recruiting/ssctech/SSCTechnologies?locationCountry=c4f78be1a8f14da0ab49ce1162348a5e\nCall log:\n\u001b[2m  - navigating to \"https://wd1.myworkdaysite.com/recruiting/ssctech/SSCTechnologies?locationCountry=c4f78be1a8f14da0ab49ce1162348a5e\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 54,
+    "timestamp": "2026-06-10T20:04:14.701Z"
   },
   {
-    "id": "b157b90d-a32c-4549-b324-619b56c8b643",
+    "id": "9656d6f3-f4b7-4b88-931e-076a7c297ebc",
     "companyId": "bechtel",
     "companyName": "Bechtel",
-    "status": "success",
-    "jobsFound": 18,
-    "executionTime": 40100,
-    "timestamp": "2026-06-09T16:38:24.645Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://jobs.baxter.com/en/search-jobs/India/152/2/1269750/22/79/50/2\nCall log:\n\u001b[2m  - navigating to \"https://jobs.baxter.com/en/search-jobs/India/152/2/1269750/22/79/50/2\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 50,
+    "timestamp": "2026-06-10T20:04:14.647Z"
   },
   {
-    "id": "92b46540-8a35-4947-91da-76fa81d71d46",
+    "id": "130756f2-fce0-412a-9e85-cc9ba90411c3",
     "companyId": "baxter",
     "companyName": "Baxter",
-    "status": "success",
-    "jobsFound": 18,
-    "executionTime": 54872,
-    "timestamp": "2026-06-09T16:38:23.858Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://jobs.baxter.com/en/search-jobs/India/152/2/1269750/22/79/50/2\nCall log:\n\u001b[2m  - navigating to \"https://jobs.baxter.com/en/search-jobs/India/152/2/1269750/22/79/50/2\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 54,
+    "timestamp": "2026-06-10T20:04:14.597Z"
   },
   {
-    "id": "894d8cb8-e1e7-4fa6-acbf-928e9db55f86",
+    "id": "0c5bc735-8e2f-435e-8cf4-d30d562f5cab",
     "companyId": "birlasoft",
     "companyName": "Birlasoft",
-    "status": "success",
-    "jobsFound": 15,
-    "executionTime": 31233,
-    "timestamp": "2026-06-09T16:38:05.415Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://jobs.birlasoft.com/search/?q=India&q2=&alertId=&title=&department=&location=India&date=&facility=#searchresults\nCall log:\n\u001b[2m  - navigating to \"https://jobs.birlasoft.com/search/?q=India&q2=&alertId=&title=&department=&location=India&date=&facility=#searchresults\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 54,
+    "timestamp": "2026-06-10T20:04:14.543Z"
   },
   {
-    "id": "d8f0927f-2626-40a5-9e6e-503bbb1f7fe5",
+    "id": "d3bc8da0-c714-4fe7-80ae-a3f8d7bbaf21",
     "companyId": "bcg",
     "companyName": "BCG",
-    "status": "success",
-    "jobsFound": 17,
-    "executionTime": 70887,
-    "timestamp": "2026-06-09T16:37:52.453Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://careers.bcg.com/global/en/search-results?rk=page-targeted-jobs-page1305-prod-7TrB23bK&sortBy=Most%20relevant\nCall log:\n\u001b[2m  - navigating to \"https://careers.bcg.com/global/en/search-results?rk=page-targeted-jobs-page1305-prod-7TrB23bK&sortBy=Most%20relevant\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 54,
+    "timestamp": "2026-06-10T20:04:14.489Z"
   },
   {
-    "id": "7ba29bc4-9e33-4fb4-a39f-6b6876cd0a63",
+    "id": "2ec20247-54ff-448e-9397-cf7a6d9dc1d3",
     "companyId": "baker-hughes",
     "companyName": "Baker Hughes",
-    "status": "success",
-    "jobsFound": 10,
-    "executionTime": 31602,
-    "timestamp": "2026-06-09T16:37:44.545Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://careers.bakerhughes.com/global/en/search-results\nCall log:\n\u001b[2m  - navigating to \"https://careers.bakerhughes.com/global/en/search-results\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 54,
+    "timestamp": "2026-06-10T20:04:14.435Z"
   },
   {
-    "id": "1d229408-74d6-4426-ac98-5fd593f829f9",
+    "id": "989d6955-5a43-4b35-af4c-ef25b9e30d3a",
     "companyId": "bny-mellon",
     "companyName": "BNY Mellon",
-    "status": "success",
-    "jobsFound": 19,
-    "executionTime": 41046,
-    "timestamp": "2026-06-09T16:37:34.182Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://eofe.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/BNY-Careers/jobs?location=India&locationId=300000000378365&locationLevel=country&mode=location\nCall log:\n\u001b[2m  - navigating to \"https://eofe.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/BNY-Careers/jobs?location=India&locationId=300000000378365&locationLevel=country&mode=location\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 53,
+    "timestamp": "2026-06-10T20:04:14.381Z"
   },
   {
-    "id": "8264b88f-a1bd-4f1b-95a2-b1335516dd7f",
+    "id": "35077ec1-2378-4eb3-a8bc-50bf4ae079fd",
     "companyId": "auth0",
     "companyName": "Auth0",
-    "status": "success",
-    "jobsFound": 22,
-    "executionTime": 78507,
-    "timestamp": "2026-06-09T16:37:34.030Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://www.okta.com/company/careers/job-listing/?department=All&location=5997\nCall log:\n\u001b[2m  - navigating to \"https://www.okta.com/company/careers/job-listing/?department=All&location=5997\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 53,
+    "timestamp": "2026-06-10T20:04:14.328Z"
   },
   {
-    "id": "f999343a-59b8-4276-aad2-8b20b9fd6df5",
+    "id": "b45336e5-2dda-4756-a610-0460ba7f5970",
     "companyId": "bharat-pe",
     "companyName": "Bharat Pe",
-    "status": "success",
-    "jobsFound": 2,
-    "executionTime": 26196,
-    "timestamp": "2026-06-09T16:37:28.986Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://bharatpe.darwinbox.in/ms/candidatev2/main/careers/allJobs\nCall log:\n\u001b[2m  - navigating to \"https://bharatpe.darwinbox.in/ms/candidatev2/main/careers/allJobs\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 53,
+    "timestamp": "2026-06-10T20:04:14.275Z"
   },
   {
-    "id": "807cc783-b736-4bbe-aa96-c75c7f9d8389",
+    "id": "4910df63-aa23-4340-99f9-1c57a1c1f3ec",
     "companyId": "barracuda-networks",
     "companyName": "Barracuda Networks",
-    "status": "success",
-    "jobsFound": 0,
-    "executionTime": 22490,
-    "timestamp": "2026-06-09T16:37:12.943Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://www.barracuda.com/company/careers?location=Bangalore%252C%2520India\nCall log:\n\u001b[2m  - navigating to \"https://www.barracuda.com/company/careers?location=Bangalore%252C%2520India\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 54,
+    "timestamp": "2026-06-10T20:04:14.222Z"
   },
   {
-    "id": "33110ce3-8032-403c-b9bc-5670c06621f7",
+    "id": "d3c51bfc-fa75-4b4c-9955-2589a9088320",
     "companyId": "bmc-software",
     "companyName": "BMC Software",
-    "status": "success",
-    "jobsFound": 20,
-    "executionTime": 68696,
-    "timestamp": "2026-06-09T16:37:02.790Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://jobs.bmc.com/Careers/SearchJobs/?16484=%5B9406%5D&16484_format=5516&listFilterMode=1&jobRecordsPerPage=6&\nCall log:\n\u001b[2m  - navigating to \"https://jobs.bmc.com/Careers/SearchJobs/?16484=%5B9406%5D&16484_format=5516&listFilterMode=1&jobRecordsPerPage=6&\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 55,
+    "timestamp": "2026-06-10T20:04:14.168Z"
   },
   {
-    "id": "b899001f-141e-40a3-9914-81f6fb3eb5a4",
+    "id": "5de31601-6293-49d1-bf83-a84e880ccdc8",
     "companyId": "astrazeneca",
     "companyName": "AstraZeneca",
-    "status": "success",
-    "jobsFound": 17,
-    "executionTime": 69654,
-    "timestamp": "2026-06-09T16:36:53.136Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://careers.astrazeneca.com/search-jobs/India/7684/2\nCall log:\n\u001b[2m  - navigating to \"https://careers.astrazeneca.com/search-jobs/India/7684/2\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 53,
+    "timestamp": "2026-06-10T20:04:14.113Z"
   },
   {
-    "id": "df40a613-76ad-4aef-9075-948912d3d115",
+    "id": "dc017e0d-9cc0-4b6b-95f0-32532717bc1b",
     "companyId": "bp",
     "companyName": "BP",
-    "status": "success",
-    "jobsFound": 0,
-    "executionTime": 26093,
-    "timestamp": "2026-06-09T16:36:50.453Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://careers.bp.com/listing?production_bp_jobs%5Bquery%5D=India&production_bp_jobs%5BrefinementList%5D%5Blocation_list%5D%5B0%5D=India\nCall log:\n\u001b[2m  - navigating to \"https://careers.bp.com/listing?production_bp_jobs%5Bquery%5D=India&production_bp_jobs%5BrefinementList%5D%5Blocation_list%5D%5B0%5D=India\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 57,
+    "timestamp": "2026-06-10T20:04:14.060Z"
   },
   {
-    "id": "ffd4d9b9-ef88-49ae-9524-b2fcd870d3f0",
+    "id": "93deb2da-7ab1-447e-9f24-6edee0ab7aa0",
     "companyId": "bt-group",
     "companyName": "BT Group",
-    "status": "success",
-    "jobsFound": 1,
-    "executionTime": 10215,
-    "timestamp": "2026-06-09T16:36:41.566Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://jobs.bt.com/search/?q=&locationsearch=India&searchResultView=LIST&markerViewed=&carouselIndex=&facetFilters=%7B%22jobLocationCountry%22%3A%5B%22India%22%5D%7D&pageNumber=0\nCall log:\n\u001b[2m  - navigating to \"https://jobs.bt.com/search/?q=&locationsearch=India&searchResultView=LIST&markerViewed=&carouselIndex=&facetFilters=%7B%22jobLocationCountry%22%3A%5B%22India%22%5D%7D&pageNumber=0\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 63,
+    "timestamp": "2026-06-10T20:04:14.003Z"
   },
   {
-    "id": "ef6296ed-78cd-4bc4-9ff5-ae058b690b1a",
+    "id": "15a1c7ea-1cdf-47c6-9c27-3dd5365820ca",
     "companyId": "atlassian",
     "companyName": "Atlassian",
-    "status": "success",
-    "jobsFound": 23,
-    "executionTime": 51085,
-    "timestamp": "2026-06-09T16:36:31.351Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://www.atlassian.com/company/careers/all-jobs?team=&location=&search=India\nCall log:\n\u001b[2m  - navigating to \"https://www.atlassian.com/company/careers/all-jobs?team=&location=&search=India\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 55,
+    "timestamp": "2026-06-10T20:04:13.940Z"
   },
   {
-    "id": "9ef91703-19cd-4d3d-ba83-e36f6d571e9c",
+    "id": "6a00aee7-1704-4d0f-a666-21525991f11b",
     "companyId": "bain-capability-network",
     "companyName": "Bain Capability Network",
-    "status": "success",
-    "jobsFound": 0,
-    "executionTime": 2207,
-    "timestamp": "2026-06-09T16:36:24.360Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://www.bain.com/careers/find-a-role/?filters=offices(274,276,275)|\nCall log:\n\u001b[2m  - navigating to \"https://www.bain.com/careers/find-a-role/?filters=offices(274,276,275)|\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 59,
+    "timestamp": "2026-06-10T20:04:13.885Z"
   },
   {
-    "id": "b1779ca9-f1a5-419e-a049-76eeb9f900c0",
+    "id": "235af4b7-cbb3-42c5-9d60-36ac42c39216",
     "companyId": "basf",
     "companyName": "BASF",
-    "status": "success",
-    "jobsFound": 1,
-    "executionTime": 28892,
-    "timestamp": "2026-06-09T16:36:22.153Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://basf.jobs/?locale=en_US&utm_source=careersite&utm_medium=global_en&utm_campaign=homepage_careers%C2%A4tPage=1&pageSize=10&addresses%2Fcountry=India\nCall log:\n\u001b[2m  - navigating to \"https://basf.jobs/?locale=en_US&utm_source=careersite&utm_medium=global_en&utm_campaign=homepage_careers%C2%A4tPage=1&pageSize=10&addresses%2Fcountry=India\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 53,
+    "timestamp": "2026-06-10T20:04:13.826Z"
   },
   {
-    "id": "360daff5-0bcb-4351-b07f-94904f36e569",
+    "id": "45940879-6c0a-4f95-8dbd-003cda5f50f7",
     "companyId": "atkins-ralis",
     "companyName": "Atkins Réalis",
-    "status": "success",
-    "jobsFound": 12,
-    "executionTime": 62788,
-    "timestamp": "2026-06-09T16:36:15.523Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://careers.atkinsrealis.com/en/jobs?location=India\nCall log:\n\u001b[2m  - navigating to \"https://careers.atkinsrealis.com/en/jobs?location=India\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 54,
+    "timestamp": "2026-06-10T20:04:13.773Z"
   },
   {
-    "id": "d17c09c6-c216-47f9-b939-d383a7ad4b76",
+    "id": "d0489aa4-73d0-4839-9b19-0d44ce24e1d7",
     "companyId": "aptiv",
     "companyName": "Aptiv",
-    "status": "success",
-    "jobsFound": 23,
-    "executionTime": 71158,
-    "timestamp": "2026-06-09T16:35:54.094Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://www.aptiv.com/en/jobs/search?country=India\nCall log:\n\u001b[2m  - navigating to \"https://www.aptiv.com/en/jobs/search?country=India\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 53,
+    "timestamp": "2026-06-10T20:04:13.719Z"
   },
   {
-    "id": "797c3462-449c-4e90-ac1f-57b6f13950a5",
+    "id": "e72fb29e-6c17-412d-9d2e-e345e4788c0a",
     "companyId": "avaloq",
     "companyName": "Avaloq",
-    "status": "success",
-    "jobsFound": 0,
-    "executionTime": 2656,
-    "timestamp": "2026-06-09T16:35:53.261Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://www.avaloq.com/careers/job-openings\nCall log:\n\u001b[2m  - navigating to \"https://www.avaloq.com/careers/job-openings\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 53,
+    "timestamp": "2026-06-10T20:04:13.666Z"
   },
   {
-    "id": "7bb96e66-0789-414d-b100-d4888b993088",
+    "id": "0fac628c-a0d1-4189-b051-bf641e25e10f",
     "companyId": "arm",
     "companyName": "Arm",
-    "status": "success",
-    "jobsFound": 19,
-    "executionTime": 34648,
-    "timestamp": "2026-06-09T16:35:50.605Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://careers.arm.com/search-jobs/India?orgIds=33099&alp=1269750&alt=2\nCall log:\n\u001b[2m  - navigating to \"https://careers.arm.com/search-jobs/India?orgIds=33099&alp=1269750&alt=2\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 53,
+    "timestamp": "2026-06-10T20:04:13.613Z"
   },
   {
-    "id": "5136f5b7-1f7b-4d50-b19c-0d7c7a38aba0",
+    "id": "e02cf52d-5a32-441d-abb7-bce2954ffdea",
     "companyId": "arista-networks",
     "companyName": "Arista Networks",
-    "status": "success",
-    "jobsFound": 14,
-    "executionTime": 72408,
-    "timestamp": "2026-06-09T16:35:43.482Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://www.arista.com/en/careers\nCall log:\n\u001b[2m  - navigating to \"https://www.arista.com/en/careers\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 54,
+    "timestamp": "2026-06-10T20:04:13.560Z"
   },
   {
-    "id": "50eb26d9-672c-4e2f-89b4-ecb01b9e97e0",
+    "id": "a68a71db-0351-4ddd-90c3-dc273db88e7f",
     "companyId": "ascendion",
     "companyName": "Ascendion",
-    "status": "success",
-    "jobsFound": 19,
-    "executionTime": 54247,
-    "timestamp": "2026-06-09T16:35:40.266Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://jobs.ascendion.com/careers?start=0&pid=1970324837278383&sort_by=hot\nCall log:\n\u001b[2m  - navigating to \"https://jobs.ascendion.com/careers?start=0&pid=1970324837278383&sort_by=hot\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 53,
+    "timestamp": "2026-06-10T20:04:13.506Z"
   },
   {
-    "id": "771911f2-8e52-4b81-a412-ee776601f2c6",
+    "id": "828cc09f-7c7a-4322-80e9-38b05b3980d7",
     "companyId": "arcadis",
     "companyName": "Arcadis",
-    "status": "success",
-    "jobsFound": 18,
-    "executionTime": 43060,
-    "timestamp": "2026-06-09T16:35:15.957Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://jobs.arcadis.com/careers?domain=arcadis.com&start=0&location=India&pid=563671530037214&sort_by=distance&filter_include_remote=1\nCall log:\n\u001b[2m  - navigating to \"https://jobs.arcadis.com/careers?domain=arcadis.com&start=0&location=India&pid=563671530037214&sort_by=distance&filter_include_remote=1\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 58,
+    "timestamp": "2026-06-10T20:04:13.453Z"
   },
   {
-    "id": "a4b64ba7-91a2-42aa-b788-4d8ad02c9b9d",
+    "id": "dbff83ce-765f-4d91-b7e8-cb244dd16e1b",
     "companyId": "applied-materials",
     "companyName": "Applied Materials",
-    "status": "success",
-    "jobsFound": 19,
-    "executionTime": 46109,
-    "timestamp": "2026-06-09T16:35:12.735Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://careers.appliedmaterials.com/careers?start=0&location=India&pid=790316006231&sort_by=distance&filter_include_remote=1\nCall log:\n\u001b[2m  - navigating to \"https://careers.appliedmaterials.com/careers?start=0&location=India&pid=790316006231&sort_by=distance&filter_include_remote=1\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 53,
+    "timestamp": "2026-06-10T20:04:13.395Z"
   },
   {
-    "id": "b183ac5b-b5aa-4eff-886b-6e185562e7a2",
+    "id": "8c40593f-aa5f-4394-b253-688bd5a4bf2e",
     "companyId": "aqua-security",
     "companyName": "Aqua Security",
-    "status": "success",
-    "jobsFound": 15,
-    "executionTime": 32451,
-    "timestamp": "2026-06-09T16:34:46.019Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://www.aquasec.com/about-us/careers/\nCall log:\n\u001b[2m  - navigating to \"https://www.aquasec.com/about-us/careers/\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 54,
+    "timestamp": "2026-06-10T20:04:13.342Z"
   },
   {
-    "id": "eefca0ae-1609-4093-9bee-532e1cf951ab",
+    "id": "0cfe6dde-0d0c-4f09-9fe7-7652305ad575",
     "companyId": "knowbe4",
     "companyName": "KnowBe4",
-    "status": "success",
-    "jobsFound": 22,
-    "executionTime": 126093,
-    "timestamp": "2026-06-09T16:34:42.936Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://www.knowbe4.com/careers/job-openings?filter=Bengaluru,%20India\nCall log:\n\u001b[2m  - navigating to \"https://www.knowbe4.com/careers/job-openings?filter=Bengaluru,%20India\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 54,
+    "timestamp": "2026-06-10T20:04:13.288Z"
   },
   {
-    "id": "5e750b54-fc0f-4788-8d0e-b92a37726158",
+    "id": "ba5d9209-1ee9-4687-9ccb-034784bd1f7b",
     "companyId": "appdynamics",
     "companyName": "AppDynamics",
-    "status": "success",
-    "jobsFound": 10,
-    "executionTime": 40202,
-    "timestamp": "2026-06-09T16:34:32.897Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://careers.cisco.com/global/en/search-results?keywords=India\nCall log:\n\u001b[2m  - navigating to \"https://careers.cisco.com/global/en/search-results?keywords=India\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 54,
+    "timestamp": "2026-06-10T20:04:13.234Z"
   },
   {
-    "id": "25838e7a-a3df-4680-8f07-8145be933bf9",
+    "id": "4d929a1a-9917-4be8-9710-1cdffdcd4d30",
     "companyId": "armis",
     "companyName": "Armis",
-    "status": "success",
-    "jobsFound": 6,
-    "executionTime": 292,
-    "timestamp": "2026-06-09T16:34:31.074Z"
+    "status": "failed",
+    "errors": "getaddrinfo ENOTFOUND boards-api.greenhouse.io",
+    "executionTime": 2,
+    "timestamp": "2026-06-10T20:04:13.180Z"
   },
   {
-    "id": "2cd7e37b-9531-44b6-82d1-961e298067cd",
+    "id": "2de18ab0-0228-4d55-93f0-12a9f82f9a09",
     "companyId": "arcesium",
     "companyName": "Arcesium",
-    "status": "success",
-    "jobsFound": 10,
-    "executionTime": 7387,
-    "timestamp": "2026-06-09T16:34:30.782Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://www.arcesium.com/careers#open-positions\nCall log:\n\u001b[2m  - navigating to \"https://www.arcesium.com/careers#open-positions\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 54,
+    "timestamp": "2026-06-10T20:04:13.178Z"
   },
   {
-    "id": "48b4ab2c-5c8f-4d1c-a797-44f0a1e2f14c",
+    "id": "8f2e8ce1-4893-4bbb-ae81-a940dd73241b",
     "companyId": "amgen",
     "companyName": "Amgen",
-    "status": "success",
-    "jobsFound": 14,
-    "executionTime": 49021,
-    "timestamp": "2026-06-09T16:34:26.626Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://careers.amgen.com/en/search-jobs/India/87/2/1269750/22/79/50/2\nCall log:\n\u001b[2m  - navigating to \"https://careers.amgen.com/en/search-jobs/India/87/2/1269750/22/79/50/2\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 55,
+    "timestamp": "2026-06-10T20:04:13.124Z"
   },
   {
-    "id": "507b800d-b047-4bde-aada-b387aa643ed8",
+    "id": "d64904b8-cf0f-4ea7-887e-b30ca96faa41",
     "companyId": "altran",
     "companyName": "Altran",
-    "status": "success",
-    "jobsFound": 22,
-    "executionTime": 66645,
-    "timestamp": "2026-06-09T16:34:23.395Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://www.capgemini.com/careers/join-capgemini/job-search/?page=1&size=11&country_code=en-in\nCall log:\n\u001b[2m  - navigating to \"https://www.capgemini.com/careers/join-capgemini/job-search/?page=1&size=11&country_code=en-in\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 54,
+    "timestamp": "2026-06-10T20:04:13.069Z"
   },
   {
-    "id": "026e85a4-3da8-4eea-95e1-d1ef59d26e65",
+    "id": "8935d271-0b04-43ac-a335-45be12cb193f",
     "companyId": "appian",
     "companyName": "Appian",
-    "status": "success",
-    "jobsFound": 12,
-    "executionTime": 29730,
-    "timestamp": "2026-06-09T16:34:13.568Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://careers.appian.com/jobs?jobs-location=jobs-location:chennai--india&text=\nCall log:\n\u001b[2m  - navigating to \"https://careers.appian.com/jobs?jobs-location=jobs-location:chennai--india&text=\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 54,
+    "timestamp": "2026-06-10T20:04:13.015Z"
   },
   {
-    "id": "92bbaad8-0d0a-45c1-84aa-bb11baf239a0",
+    "id": "3cc71f46-9829-47e9-8c52-53d5a6118397",
     "companyId": "adm",
     "companyName": "ADM",
-    "status": "success",
-    "jobsFound": 0,
-    "executionTime": 37195,
-    "timestamp": "2026-06-09T16:33:52.695Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://sjobs.brassring.com/TGnewUI/Search/home/HomeWithPreLoad?partnerid=25416&siteid=5429&PageType=searchResults&SearchType=linkquery&LinkID=4393910#keyWordSearch=&Location%20Country=India\nCall log:\n\u001b[2m  - navigating to \"https://sjobs.brassring.com/TGnewUI/Search/home/HomeWithPreLoad?partnerid=25416&siteid=5429&PageType=searchResults&SearchType=linkquery&LinkID=4393910#keyWordSearch=&Location%20Country=India\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 56,
+    "timestamp": "2026-06-10T20:04:12.961Z"
   },
   {
-    "id": "77c80c5d-28d7-4c9f-b619-d326e72c9f45",
+    "id": "8383c6fa-9d9a-4e38-9fd8-470194cc084d",
     "companyId": "american-express",
     "companyName": "American Express",
-    "status": "success",
-    "jobsFound": 5,
-    "executionTime": 4077,
-    "timestamp": "2026-06-09T16:33:43.838Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://careers.americanexpress.com/en/sites/CX_1/jobs?intlink=us-amex-career-en-us-search&location=India\nCall log:\n\u001b[2m  - navigating to \"https://careers.americanexpress.com/en/sites/CX_1/jobs?intlink=us-amex-career-en-us-search&location=India\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 53,
+    "timestamp": "2026-06-10T20:04:12.905Z"
   },
   {
-    "id": "adf1673a-d507-46b1-8760-d19edd9d8f23",
+    "id": "1dca0d41-1c9c-4ef6-934a-33942230a567",
     "companyId": "aon",
     "companyName": "Aon",
-    "status": "success",
-    "jobsFound": 1,
-    "executionTime": 22716,
-    "timestamp": "2026-06-09T16:33:39.761Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://jobs.aon.com/jobs?location=India&woe=12%C2%AEionCode=IN&stretchUnit=MILES&stretch=0&page=1\nCall log:\n\u001b[2m  - navigating to \"https://jobs.aon.com/jobs?location=India&woe=12%C2%AEionCode=IN&stretchUnit=MILES&stretch=0&page=1\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 56,
+    "timestamp": "2026-06-10T20:04:12.852Z"
   },
   {
-    "id": "3c812f66-6666-4798-b577-b74b05fe797e",
+    "id": "af843a97-5c99-40ed-affc-e32cf6666d2a",
     "companyId": "anthropic",
     "companyName": "Anthropic",
-    "status": "success",
-    "jobsFound": 3,
-    "executionTime": 11147,
-    "timestamp": "2026-06-09T16:33:37.605Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://www.anthropic.com/careers/jobs?office=4051957008\nCall log:\n\u001b[2m  - navigating to \"https://www.anthropic.com/careers/jobs?office=4051957008\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 53,
+    "timestamp": "2026-06-10T20:04:12.796Z"
   },
   {
-    "id": "23b35794-7491-488f-afb2-3c9253603dd4",
+    "id": "1ead7abb-6e63-4885-b855-054fa62b8314",
     "companyId": "airwallex",
     "companyName": "Airwallex",
-    "status": "success",
-    "jobsFound": 12,
-    "executionTime": 31091,
-    "timestamp": "2026-06-09T16:33:26.458Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://careers.airwallex.com/jobs/?location%5B%5D=bangalore&order=newest\nCall log:\n\u001b[2m  - navigating to \"https://careers.airwallex.com/jobs/?location%5B%5D=bangalore&order=newest\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 63,
+    "timestamp": "2026-06-10T20:04:12.743Z"
   },
   {
-    "id": "abe26c9a-eaa5-4a1a-834f-a44297fd4dd5",
+    "id": "5d7bf6e7-a2f0-4310-8474-7f7a4db0d2f2",
     "companyId": "amazon",
     "companyName": "Amazon",
-    "status": "success",
-    "jobsFound": 1,
-    "executionTime": 6515,
-    "timestamp": "2026-06-09T16:33:17.045Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://www.amazon.jobs/en/search?offset=0&result_limit=10&sort=relevant&country%5B%5D=IND&distanceType=Mi&radius=24km&latitude=&longitude=&loc_group_id=&loc_query=India&base_query=&city=&country=IND%C2%AEion=&county=&query_options=&\nCall log:\n\u001b[2m  - navigating to \"https://www.amazon.jobs/en/search?offset=0&result_limit=10&sort=relevant&country%5B%5D=IND&distanceType=Mi&radius=24km&latitude=&longitude=&loc_group_id=&loc_query=India&base_query=&city=&country=IND%C2%AEion=&county=&query_options=&\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 55,
+    "timestamp": "2026-06-10T20:04:12.680Z"
   },
   {
-    "id": "136d1ba5-79bc-41bf-8af4-79261d2f7fd9",
+    "id": "f530aeb7-52a9-4f9d-99f3-e1300b7cf28f",
     "companyId": "altimetrik",
     "companyName": "Altimetrik",
-    "status": "success",
-    "jobsFound": 10,
-    "executionTime": 25844,
-    "timestamp": "2026-06-09T16:33:16.750Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://altimetrik.ripplehire.com/candidate/?token=SWCslMw2ct8eSm7LyqVb&source=CAREERSITE#list/location=Bangalore%2BBengaluru%2BChennai%2BHyderabad%2BMumbai%2BPune\nCall log:\n\u001b[2m  - navigating to \"https://altimetrik.ripplehire.com/candidate/?token=SWCslMw2ct8eSm7LyqVb&source=CAREERSITE#list/location=Bangalore%2BBengaluru%2BChennai%2BHyderabad%2BMumbai%2BPune\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 55,
+    "timestamp": "2026-06-10T20:04:12.625Z"
   },
   {
-    "id": "195305c2-d3f0-43d9-8258-8a26603e3bc7",
+    "id": "07b30704-b6d3-41d9-ad5f-305230e8b6e7",
     "companyId": "alation",
     "companyName": "Alation",
-    "status": "success",
-    "jobsFound": 21,
-    "executionTime": 37240,
-    "timestamp": "2026-06-09T16:33:15.500Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://www.alation.com/careers/all-careers/\nCall log:\n\u001b[2m  - navigating to \"https://www.alation.com/careers/all-careers/\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 54,
+    "timestamp": "2026-06-10T20:04:12.570Z"
   },
   {
-    "id": "aa0e7f5f-7271-48e5-9e15-f891e2345ca9",
+    "id": "3f6da9a7-c36e-4455-9cf8-c557534e7fc7",
     "companyId": "alight-solutions",
     "companyName": "Alight Solutions",
-    "status": "success",
-    "jobsFound": 10,
-    "executionTime": 30259,
-    "timestamp": "2026-06-09T16:33:10.530Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://careers.alight.com/us/en/search-results?qcountry=India\nCall log:\n\u001b[2m  - navigating to \"https://careers.alight.com/us/en/search-results?qcountry=India\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 54,
+    "timestamp": "2026-06-10T20:04:12.516Z"
   },
   {
-    "id": "886db7a2-826a-4b8f-bcd5-78d96779da80",
+    "id": "c9e0cdff-adbb-44a1-8801-6b47155a6abb",
     "companyId": "alvarez-marsal",
     "companyName": "Alvarez & Marsal",
-    "status": "success",
-    "jobsFound": 0,
-    "executionTime": 2200,
-    "timestamp": "2026-06-09T16:32:55.367Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://careers.alvarezandmarsal.com/search/jobs/in/country/india\nCall log:\n\u001b[2m  - navigating to \"https://careers.alvarezandmarsal.com/search/jobs/in/country/india\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 53,
+    "timestamp": "2026-06-10T20:04:12.462Z"
   },
   {
-    "id": "e09365b0-50da-4ad9-b450-2a17fa91d517",
+    "id": "99defaef-61c7-4b7f-9022-7d01afa518b4",
     "companyId": "airtel-digital",
     "companyName": "Airtel Digital",
-    "status": "success",
-    "jobsFound": 11,
-    "executionTime": 42782,
-    "timestamp": "2026-06-09T16:32:53.167Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://airtel.darwinbox.in/ms/candidatev2/main/careers/allJobs\nCall log:\n\u001b[2m  - navigating to \"https://airtel.darwinbox.in/ms/candidatev2/main/careers/allJobs\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 54,
+    "timestamp": "2026-06-10T20:04:12.409Z"
   },
   {
-    "id": "2ad2c46c-9c3f-4f05-9796-42d2cb50b2b4",
+    "id": "4e869c45-309d-4cbc-b8d8-a68c696ac2ce",
     "companyId": "altair-engineering",
     "companyName": "Altair Engineering",
-    "status": "success",
-    "jobsFound": 0,
-    "executionTime": 4298,
-    "timestamp": "2026-06-09T16:32:50.906Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://jobs.sw.siemens.com/locations/ind/jobs/\nCall log:\n\u001b[2m  - navigating to \"https://jobs.sw.siemens.com/locations/ind/jobs/\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 56,
+    "timestamp": "2026-06-10T20:04:12.354Z"
   },
   {
-    "id": "11c7153f-eec6-4868-9d21-08e7a3deb8d9",
+    "id": "d946f12a-95c9-4c30-bb25-704f18ab0bed",
     "companyId": "alphagrep",
     "companyName": "Alphagrep",
-    "status": "success",
-    "jobsFound": 0,
-    "executionTime": 8186,
-    "timestamp": "2026-06-09T16:32:46.608Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://www.alpha-grep.com/career/#eut-content-area\nCall log:\n\u001b[2m  - navigating to \"https://www.alpha-grep.com/career/#eut-content-area\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 54,
+    "timestamp": "2026-06-10T20:04:12.298Z"
   },
   {
-    "id": "e003150b-2053-486b-a3c3-3bbdf87fb38d",
+    "id": "8a3cbd75-6ce6-49c1-868b-e0ae54705590",
     "companyId": "airbnb",
     "companyName": "Airbnb",
-    "status": "success",
-    "jobsFound": 0,
-    "executionTime": 25601,
-    "timestamp": "2026-06-09T16:32:40.270Z"
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://careers.airbnb.com/positions/?_where_you_work=india%2Cbangalore-india%2Cgurugram-india\nCall log:\n\u001b[2m  - navigating to \"https://careers.airbnb.com/positions/?_where_you_work=india%2Cbangalore-india%2Cgurugram-india\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 56,
+    "timestamp": "2026-06-10T20:04:12.244Z"
+  },
+  {
+    "id": "3c0096c8-540e-45af-a320-afcd59d728cd",
+    "companyId": "ansr",
+    "companyName": "ANSR",
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://ansr.com/careers/#explore\nCall log:\n\u001b[2m  - navigating to \"https://ansr.com/careers/#explore\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 56,
+    "timestamp": "2026-06-10T20:04:12.188Z"
+  },
+  {
+    "id": "b6fa73a6-5cc8-4364-a914-045913dfc16e",
+    "companyId": "akamai",
+    "companyName": "Akamai",
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://jobs.akamai.com/en/sites/CX_1/jobs?location=India&locationId=300000000469285&locationLevel=country&mode=location\nCall log:\n\u001b[2m  - navigating to \"https://jobs.akamai.com/en/sites/CX_1/jobs?location=India&locationId=300000000469285&locationLevel=country&mode=location\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 53,
+    "timestamp": "2026-06-10T20:04:12.132Z"
+  },
+  {
+    "id": "3818fc3f-27d9-4244-bd09-8bec8c8fa8c2",
+    "companyId": "aiven",
+    "companyName": "Aiven",
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://aiven.io/careers/job?office=India\nCall log:\n\u001b[2m  - navigating to \"https://aiven.io/careers/job?office=India\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 56,
+    "timestamp": "2026-06-10T20:04:12.079Z"
+  },
+  {
+    "id": "777f5139-e100-490b-a77a-eb191d7b7173",
+    "companyId": "abb",
+    "companyName": "ABB",
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://careers.abb/global/en/search-results?keywords=India\nCall log:\n\u001b[2m  - navigating to \"https://careers.abb/global/en/search-results?keywords=India\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 54,
+    "timestamp": "2026-06-10T20:04:12.023Z"
+  },
+  {
+    "id": "d0b25e6c-9449-4a25-8cdf-1a1557db8dfd",
+    "companyId": "palo-alto-networks",
+    "companyName": "Palo Alto Networks",
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://jobs.paloaltonetworks.com/en/search-jobs\nCall log:\n\u001b[2m  - navigating to \"https://jobs.paloaltonetworks.com/en/search-jobs\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 51,
+    "timestamp": "2026-06-10T20:04:11.969Z"
+  },
+  {
+    "id": "1b2eadd6-00f1-4547-870a-38a4ac3ea129",
+    "companyId": "adobe",
+    "companyName": "Adobe",
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://careers.adobe.com/us/en/search-results?keywords=India\nCall log:\n\u001b[2m  - navigating to \"https://careers.adobe.com/us/en/search-results?keywords=India\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 54,
+    "timestamp": "2026-06-10T20:04:11.918Z"
+  },
+  {
+    "id": "d4d495f1-cc9d-4e62-a7ca-c767b881d02f",
+    "companyId": "agoda",
+    "companyName": "Agoda",
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://careersatagoda.com/vacancies/?keyword=&country=india\nCall log:\n\u001b[2m  - navigating to \"https://careersatagoda.com/vacancies/?keyword=&country=india\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 54,
+    "timestamp": "2026-06-10T20:04:11.864Z"
+  },
+  {
+    "id": "536d7819-15de-4050-9d16-8d685f75011c",
+    "companyId": "abbvie",
+    "companyName": "AbbVie",
+    "status": "failed",
+    "errors": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://careers.abbvie.com/en/jobs?q=India&options=&page=1&la=0&lo=0&lr=100\nCall log:\n\u001b[2m  - navigating to \"https://careers.abbvie.com/en/jobs?q=India&options=&page=1&la=0&lo=0&lr=100\", waiting until \"commit\"\u001b[22m\n",
+    "executionTime": 54,
+    "timestamp": "2026-06-10T20:04:11.810Z"
   }
 ]
