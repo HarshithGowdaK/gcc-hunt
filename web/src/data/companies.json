@@ -63,18 +63,11 @@
     "lastScraped": null
   },
   {
-    "id": "chevron",
-    "name": "Chevron",
-    "careersUrl": "https://careers.chevron.com/search-jobs?glat=30.701900482177734&glon=76.77220153808594",
-    "status": "success",
-    "lastScraped": "2026-06-11T06:04:57.667Z"
-  },
-  {
     "id": "ceridian-dayforce",
     "name": "Ceridian Dayforce",
     "careersUrl": "https://jobs.dayforcehcm.com/mydayforce/alljobs?locationString=India&distance=1&locationId=330&locationType=2",
-    "status": "failed",
-    "lastScraped": "2026-06-09T16:12:43.006Z"
+    "status": "success",
+    "lastScraped": "2026-06-11T07:25:06.812Z"
   },
   {
     "id": "clickup",
@@ -2308,5 +2301,12 @@
     "careersUrl": "https://jll.wd1.myworkdayjobs.com/jllcareers?locationCountry=c4f78be1a8f14da0ab49ce1162348a5e",
     "status": "success",
     "lastScraped": "2026-06-10T20:04:20.849Z"
+  },
+  {
+    "id": "chevron",
+    "name": "Chevron",
+    "careersUrl": "https://careers.chevron.com/search-jobs?glat=30.701900482177734&glon=76.77220153808594",
+    "status": "success",
+    "lastScraped": "2026-06-11T06:04:57.667Z"
   }
 ]

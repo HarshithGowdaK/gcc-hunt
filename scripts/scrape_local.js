@@ -601,7 +601,7 @@ let aiQuotaExceeded = false;
  * "Internship / Apprenticeship" into two separate options.
  */
 async function parseJobPostingWithAI(text, jobTitle, jobLocation) {
-  if (aiQuotaExceeded) return null;
+  return null; // AI disabled per user request, falling back to generic rule-based heuristics
 
   const cleanText = text.substring(0, 15000);
   let retries = 0;
