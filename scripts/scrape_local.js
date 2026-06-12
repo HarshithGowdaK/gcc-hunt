@@ -196,6 +196,12 @@ function detectATS(url) {
   if (u.includes('myworkdayjobs.com'))                                        return 'workday';
   if (u.includes('lever.co'))                                                 return 'lever';
   if (u.includes('greenhouse.io') || u.includes('boards.greenhouse.io'))     return 'greenhouse';
+  if (u.includes('eightfold')) return 'eightfold';
+  if (u.includes('phenom')) return 'phenom';
+  if (u.includes('successfactors')) return 'successfactors';
+  if (u.includes('oraclecloud') || u.includes('oracle')) return 'oracle';
+  if (u.includes('icims')) return 'icims';
+  if (u.includes('smartrecruiters')) return 'smartrecruiters';
   return 'generic';
 }
 
@@ -236,7 +242,58 @@ function classifyIndustry(title, department) {
 // SECTION 3 — NVIDIA LLAMA AI PARSING ENGINE
 // =============================================================================
 
+
 let aiQuotaExceeded = false;
+
+function shouldUseAIClassification(title, description) {
+  const validation = classifyWithValidation(
+    `${String(title || '')}\n${String(description || '')}`,
+    String(title || '')
+  );
+  if (
+    validation.confidence >= 0.85 ||
+    validation.experienceFound ||
+    validation.years !== null
+  ) {
+    return false;
+  }
+  return (
+    validation.confidence < 0.75 &&
+    validation.years == null &&
+    !validation.experienceFound
+  );
+}
+
+function isObviousNonIndiaRole(title) {
+  return /\b(europe|emea|germany|france|italy|poland|australia|new zealand|canada|united states|usa|uk|saudi|japan|china|singapore|korea)\b/i.test(String(title || ''));
+}
+
+const INDIA_REGEX = /\b(india|pan\s*india|remote\s*india|bangalore|bengaluru|hyderabad|chennai|pune|mumbai|gurugram|gurgaon|noida|ahmedabad|kolkata|kochi|coimbatore)\b/i;
+
+function containsIndiaReference(text) {
+  return INDIA_REGEX.test(String(text || ''));
+}
+
+function isValidJobCandidate(title) {
+  const t = String(title || '').trim().toLowerCase();
+  if (t.length < 3) return false;
+
+  const blocked = [
+    'view and apply','open jobs','latest vacancies','clear filters',
+    'india (english)','canada (english)','united states (english)',
+    'all other countries (english)','fostering belonging',
+    'cohesity gives back','lca notice','careers','search jobs',
+    'skip to main content', 'skip to content', 'main content',
+    'home', 'menu', 'site map', 'privacy', 'terms', 'contact us',
+    'accessibility', 'search', 'careers home'
+  ];
+
+  for (const b of blocked) {
+    if (t.includes(b)) return false;
+  }
+
+  return true;
+}
 
 /**
  * [FIX-07] Updated experienceLevel enum in the prompt to match the seven
@@ -248,7 +305,7 @@ async function parseJobPostingWithAI(text, jobTitle, jobLocation) {
 
   const cleanText = text.substring(0, 15000);
   let retries = 0;
-  const maxRetries = 4;
+  const maxRetries = 2;
   let baseDelay = 5000;
 
   const promptContent = `Analyze this GCC job posting and extract structured details from the FULL page text.
@@ -305,25 +362,35 @@ employmentType: "Full-time" | "Part-time" | "Contract" | "Internship" | "Apprent
             'Authorization': `Bearer ${process.env.NVIDIA_API_KEY || ''}`,
             'Accept'       : 'application/json',
           },
-          timeout: 40000,
+          timeout: 15000,
         }
       );
 
       const candidate = response.data?.choices?.[0]?.message?.content;
       if (candidate) {
-        let jsonStr = candidate;
-        const match = candidate.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
-        if (match) {
-          jsonStr = match[1];
-        } else {
-          const start = candidate.indexOf('{');
-          const end = candidate.lastIndexOf('}');
-          if (start !== -1 && end !== -1) {
-            jsonStr = candidate.slice(start, end + 1);
-          }
+        let jsonStr = String(candidate || '').trim();
+
+        jsonStr = jsonStr
+          .replace(/```json/gi, '')
+          .replace(/```/g, '')
+          .trim();
+
+        const jsonMatch = jsonStr.match(/\{[\s\S]*\}/);
+
+        if (!jsonMatch) {
+          console.warn('[NVIDIA AI] No JSON object found in response. Falling back to heuristics.');
+          return null;
         }
-        jsonStr = jsonStr.trim();
-        const parsed  = JSON.parse(jsonStr);
+
+        jsonStr = jsonMatch[0];
+
+        let parsed;
+        try {
+          parsed = JSON.parse(jsonStr);
+        } catch (parseErr) {
+          console.warn(`[NVIDIA AI] JSON parse failed: ${parseErr.message}`);
+          return null;
+        }
 
         parsed.experienceLevel = normaliseAILevel(parsed.experienceLevel);
         parsed.yearsExperience = parsed.minYearsExperience ?? parsed.yearsExperience ?? null;
@@ -337,6 +404,11 @@ employmentType: "Full-time" | "Part-time" | "Contract" | "Internship" | "Apprent
       if (errMsg.toLowerCase().includes('quota') || errMsg.toLowerCase().includes('billing') || status === 402 || status === 401) {
         console.warn(`[NVIDIA AI] Quota/Auth error: "${errMsg}". Disabling AI parser for this run.`);
         aiQuotaExceeded = true;
+        return null;
+      }
+
+      if (errMsg && errMsg.toLowerCase().includes('timeout')) {
+        console.warn('[NVIDIA AI] Request timeout. Falling back to heuristics.');
         return null;
       }
 
@@ -375,7 +447,7 @@ function sleep(ms) {
  * @param {number}   n    Max attempts.
  * @param {number}   delayMs Base delay in ms (doubles each retry).
  */
-async function withRetry(fn, n = 3, delayMs = 2000) {
+async function withRetry(fn, n = 3, delayMs = 1000) {
   let lastErr;
   for (let attempt = 1; attempt <= n; attempt++) {
     try {
@@ -383,13 +455,59 @@ async function withRetry(fn, n = 3, delayMs = 2000) {
     } catch (err) {
       lastErr = err;
       if (attempt < n) {
-        const wait = delayMs * Math.pow(2, attempt - 1);
+        const wait = delayMs * Math.pow(2, attempt - 1) + Math.random() * 1000;
         console.warn(`  [Retry ${attempt}/${n}] Error: ${err.message}. Retrying in ${(wait / 1000).toFixed(1)}s...`);
         await sleep(wait);
       }
     }
   }
   throw lastErr;
+}
+
+async function pMap(array, asyncFn, limit = 8) {
+  const results = [];
+  const executing = [];
+  for (const item of array) {
+    const p = Promise.resolve().then(() => asyncFn(item));
+    results.push(p);
+    if (limit <= array.length) {
+      const e = p.then(() => executing.splice(executing.indexOf(e), 1));
+      executing.push(e);
+      if (executing.length >= limit) await Promise.race(executing);
+    }
+  }
+  return Promise.all(results);
+}
+
+async function killCookieBanners(page) {
+  try {
+    await page.evaluate(() => {
+      // Remove specific selectors
+      document
+        .querySelectorAll('[id*="cookie" i],[class*="cookie" i],[id*="consent" i],[class*="consent" i],#onetrust-banner-sdk,#onetrust-consent-sdk,#system-ialert')
+        .forEach(el => {
+          try {
+            el.style.display = 'none';
+            el.remove();
+          } catch {}
+        });
+      
+      // Remove overlays, fixed blockers, and pointer-event interceptors
+      document.querySelectorAll('*').forEach(el => {
+        const style = window.getComputedStyle(el);
+        if (style.position === 'fixed' || style.position === 'absolute' || style.position === 'sticky') {
+          const idClass = (el.id + ' ' + el.className).toLowerCase();
+          if (idClass.includes('overlay') || idClass.includes('popup') || idClass.includes('modal') || idClass.includes('dialog') || style.zIndex > 100) {
+            try {
+              el.style.pointerEvents = 'none';
+              el.style.display = 'none';
+              el.remove();
+            } catch {}
+          }
+        }
+      });
+    });
+  } catch {}
 }
 
 /**
@@ -480,11 +598,14 @@ async function scrapeWorkday(companyId, companyName, careersUrl) {
         const postings = response.data.jobPostings || [];
         if (postings.length === 0) { hasMore = false; return; }
 
-        for (const posting of postings) {
+        let consecutiveFailures = 0;
+        const mappedJobs = await pMap(postings, async (posting) => {
+          if (!isValidJobCandidate(posting.title)) {
+            console.warn(`[Filter] Rejected: blocked title -> ${posting.title}`);
+            return null;
+          }
           const normLoc = normalizeLocation(posting.locationsText);
-          if (!normLoc) continue;
-
-          await sleep(1500); // pacing
+          if (!normLoc) return null;
 
           const jobUrl      = `https://${host}/${site.toLowerCase()}${posting.externalPath}`;
           const detailApiUrl= `https://${host}/wday/cxs/${tenant}/${site}${posting.externalPath}`;
@@ -495,21 +616,34 @@ async function scrapeWorkday(companyId, companyName, careersUrl) {
           let applyUrl = jobUrl;
           let aiParsed = null;
 
-          try {
-            // [FIX-13] Retry detail fetch
-            const detailRes = await withRetry(() =>
-              axios.get(detailApiUrl, { headers: AXIOS_HEADERS, timeout: 8000 })
-            );
-            if (detailRes.data?.jobPostingInfo) {
-              const info = detailRes.data.jobPostingInfo;
-              rawText  = (info.jobDescription || '').replace(/<[^>]*>/g, '\n').replace(/\s+/g, ' ').trim();
-              deptName = info.department || '';
-              timeType = info.timeType   || '';
-              if (info.applyUrl) applyUrl = info.applyUrl;
-              aiParsed = await parseJobPostingWithAI(rawText, posting.title, posting.locationsText);
+          const quickValidation = classifyWithValidation(posting.title);
+          if (quickValidation.confidence >= 0.85) {
+             // Fast path: Skip detail fetch if title alone yields high confidence
+          } else if (consecutiveFailures >= 20) {
+             console.warn('[Workday] Too many failures. Skipping remaining detail fetches.');
+          } else {
+            try {
+              // [FIX-13] Retry detail fetch
+              const detailRes = await withRetry(() =>
+                axios.get(detailApiUrl, { headers: AXIOS_HEADERS, timeout: 15000 })
+              );
+              consecutiveFailures = 0;
+              if (detailRes.data?.jobPostingInfo) {
+                const info = detailRes.data.jobPostingInfo;
+                rawText  = (info.jobDescription || '').replace(/<[^>]*>/g, '\n').replace(/\s+/g, ' ').trim();
+                deptName = info.department || '';
+                timeType = info.timeType   || '';
+                if (info.applyUrl) applyUrl = info.applyUrl;
+                if (shouldUseAIClassification(posting.title, rawText)) {
+                  aiParsed = await parseJobPostingWithAI(rawText, posting.title, posting.locationsText);
+                } else {
+                  aiParsed = null;
+                }
+              }
+            } catch (detailErr) {
+              consecutiveFailures++;
+              console.warn(`[Workday] Detail fetch failed for "${posting.title}": ${detailErr.message}. Using basic data.`);
             }
-          } catch (detailErr) {
-            console.warn(`[Workday] Detail fetch failed for "${posting.title}": ${detailErr.message}. Using basic data.`);
           }
 
           const { description, skills, exp, remoteStatus, empType } =
@@ -519,7 +653,7 @@ async function scrapeWorkday(companyId, companyName, careersUrl) {
             ? detectEmploymentType(posting.title, description, timeType)
             : empType;
 
-          jobs.push({
+          return {
             id             : generateJobId(companyId, posting.title, posting.locationsText || '', jobUrl, posting.jobReqId),
             companyId,
             companyName,
@@ -540,7 +674,11 @@ async function scrapeWorkday(companyId, companyName, careersUrl) {
             remoteStatus,
             department     : deptName,
             industry       : classifyIndustry(posting.title, deptName),
-          });
+          };
+        }, 8);
+
+        for (const j of mappedJobs) {
+          if (j) jobs.push(j);
         }
 
         // [FIX-08] Removed 1000-job hard cap. Pagination runs until the API
@@ -580,19 +718,25 @@ async function scrapeGreenhouse(companyId, companyName, careersUrl) {
   );
   const postings = response.data.jobs || [];
 
-  for (const posting of postings) {
+  const mappedJobs = await pMap(postings, async (posting) => {
     const locationName = posting.location?.name || '';
+    if (!isValidJobCandidate(posting.title)) {
+      console.warn(`[Filter] Rejected: blocked title -> ${posting.title}`);
+      return null;
+    }
     const normLoc      = normalizeLocation(locationName);
-    if (!normLoc) continue;
+    if (!normLoc) return null;
 
     const rawText = (posting.content || '').replace(/<[^>]*>/g, '\n').replace(/\s+/g, ' ').trim();
     const deptName= posting.departments?.[0]?.name || '';
 
-    const aiParsed = await parseJobPostingWithAI(rawText, posting.title, locationName);
+    const aiParsed = shouldUseAIClassification(posting.title, rawText)
+      ? await parseJobPostingWithAI(rawText, posting.title, locationName)
+      : null;
     const { description, skills, exp, remoteStatus, empType } =
       resolveClassification(aiParsed, rawText, posting.title);
 
-    jobs.push({
+    return {
       id             : generateJobId(companyId, posting.title, locationName, posting.absolute_url, posting.id?.toString()),
       companyId,
       companyName,
@@ -613,7 +757,11 @@ async function scrapeGreenhouse(companyId, companyName, careersUrl) {
       remoteStatus,
       department     : deptName,
       industry       : classifyIndustry(posting.title, deptName),
-    });
+    };
+  }, 8);
+
+  for (const j of mappedJobs) {
+    if (j) jobs.push(j);
   }
   return jobs;
 }
@@ -632,10 +780,14 @@ async function scrapeLever(companyId, companyName, careersUrl) {
   );
   const postings = response.data || [];
 
-  for (const posting of postings) {
+  const mappedJobs = await pMap(postings, async (posting) => {
     const loc     = posting.categories?.location || '';
+    if (!isValidJobCandidate(posting.title)) {
+      console.warn(`[Filter] Rejected: blocked title -> ${posting.title}`);
+      return null;
+    }
     const normLoc = normalizeLocation(loc);
-    if (!normLoc) continue;
+    if (!normLoc) return null;
 
     let rawText = posting.descriptionPlain || '';
     if (posting.lists) {
@@ -646,11 +798,13 @@ async function scrapeLever(companyId, companyName, careersUrl) {
     }
 
     const deptName = posting.categories?.department || posting.categories?.team || '';
-    const aiParsed = await parseJobPostingWithAI(rawText, posting.title, loc);
+    const aiParsed = shouldUseAIClassification(posting.title, rawText)
+      ? await parseJobPostingWithAI(rawText, posting.title, loc)
+      : null;
     const { description, skills, exp, remoteStatus, empType } =
       resolveClassification(aiParsed, rawText, posting.title);
 
-    jobs.push({
+    return {
       id             : generateJobId(companyId, posting.title, loc, posting.hostedUrl, posting.id),
       companyId,
       companyName,
@@ -671,12 +825,114 @@ async function scrapeLever(companyId, companyName, careersUrl) {
       remoteStatus,
       department     : deptName,
       industry       : classifyIndustry(posting.title, deptName),
-    });
+    };
+  }, 8);
+
+  for (const j of mappedJobs) {
+    if (j) jobs.push(j);
   }
   return jobs;
 }
 
-// ─── 5d. Generic (Playwright)  [FIX-10, FIX-11, FIX-12, FIX-13] ─────────────
+// ─── 5d. SmartRecruiters ──────────────────────────────────────────────────────
+
+async function scrapeSmartRecruiters(companyId, companyName, careersUrl) {
+  const jobs = [];
+  const parsed = new URL(careersUrl);
+  const companySlug = parsed.pathname.split('/').filter(Boolean).pop();
+  
+  const apiUrl = `https://api.smartrecruiters.com/v1/companies/${companySlug}/postings`;
+  let response;
+  try {
+    response = await withRetry(() => axios.get(apiUrl, { headers: AXIOS_HEADERS, timeout: 15000 }));
+  } catch (e) {
+    console.warn(`[SmartRecruiters] Failed to fetch index for ${companyName}: ${e.message}`);
+    return jobs;
+  }
+  const postings = response.data.content || [];
+
+  const mappedJobs = await pMap(postings, async (posting) => {
+    if (!isValidJobCandidate(posting.name)) return null;
+    const loc = posting.location?.city || posting.location?.country || '';
+    const normLoc = normalizeLocation(loc);
+    if (!normLoc) return null;
+
+    const detailApiUrl = `https://api.smartrecruiters.com/v1/companies/${companySlug}/postings/${posting.id}`;
+    let rawText = '';
+    try {
+      const detailRes = await withRetry(() => axios.get(detailApiUrl, { headers: AXIOS_HEADERS, timeout: 15000 }));
+      rawText = (detailRes.data.jobAd?.sections?.jobDescription?.text || '') + ' ' + (detailRes.data.jobAd?.sections?.qualifications?.text || '');
+      rawText = rawText.replace(/<[^>]*>/g, '\n').replace(/\s+/g, ' ').trim();
+    } catch {}
+
+    const aiParsed = shouldUseAIClassification(posting.name, rawText)
+      ? await parseJobPostingWithAI(rawText, posting.name, loc)
+      : null;
+    const { description, skills, exp, remoteStatus, empType } = resolveClassification(aiParsed, rawText, posting.name);
+
+    return {
+      id: generateJobId(companyId, posting.name, loc, posting.refNumber || posting.id, posting.id),
+      companyId, companyName, title: posting.name, description, location: loc,
+      city: normLoc.city, state: normLoc.state, country: 'India',
+      experienceLevel: exp.level, yearsExperience: exp.years, yearsExperienceMax: exp.maxYears ?? exp.years,
+      classificationMeta: exp.validation, employmentType: empType, skills,
+      applyUrl: `https://jobs.smartrecruiters.com/${companySlug}/${posting.id}`,
+      jobUrl: `https://jobs.smartrecruiters.com/${companySlug}/${posting.id}`,
+      remoteStatus, department: posting.department?.label || '', industry: classifyIndustry(posting.name, posting.department?.label)
+    };
+  }, 8);
+
+  for (const j of mappedJobs) if (j) jobs.push(j);
+  return jobs;
+}
+
+// ─── 5e. Eightfold ────────────────────────────────────────────────────────────
+
+async function scrapeEightfold(companyId, companyName, careersUrl) {
+  const jobs = [];
+  const parsed = new URL(careersUrl);
+  const host = parsed.hostname;
+  const apiUrl = `https://${host}/api/apply/v2/jobs`;
+  let response;
+  try {
+    response = await withRetry(() => axios.get(apiUrl, { headers: AXIOS_HEADERS, timeout: 15000 }));
+  } catch (e) {
+    console.warn(`[Eightfold] Failed to fetch index for ${companyName}: ${e.message}`);
+    return jobs;
+  }
+  const postings = response.data.positions || [];
+
+  const mappedJobs = await pMap(postings, async (posting) => {
+    if (!isValidJobCandidate(posting.name)) return null;
+    const loc = posting.location || (posting.locations && posting.locations[0]) || '';
+    const normLoc = normalizeLocation(loc);
+    if (!normLoc) return null;
+
+    let rawText = posting.job_description || '';
+    rawText = rawText.replace(/<[^>]*>/g, '\n').replace(/\s+/g, ' ').trim();
+
+    const aiParsed = shouldUseAIClassification(posting.name, rawText)
+      ? await parseJobPostingWithAI(rawText, posting.name, loc)
+      : null;
+    const { description, skills, exp, remoteStatus, empType } = resolveClassification(aiParsed, rawText, posting.name);
+
+    return {
+      id: generateJobId(companyId, posting.name, loc, apiUrl, posting.id?.toString()),
+      companyId, companyName, title: posting.name, description, location: loc,
+      city: normLoc.city, state: normLoc.state, country: 'India',
+      experienceLevel: exp.level, yearsExperience: exp.years, yearsExperienceMax: exp.maxYears ?? exp.years,
+      classificationMeta: exp.validation, employmentType: empType, skills,
+      applyUrl: careersUrl + '?pid=' + posting.id,
+      jobUrl: careersUrl + '?pid=' + posting.id,
+      remoteStatus, department: posting.department || '', industry: classifyIndustry(posting.name, posting.department)
+    };
+  }, 8);
+
+  for (const j of mappedJobs) if (j) jobs.push(j);
+  return jobs;
+}
+
+// ─── 5f. Generic (Playwright)  [FIX-10, FIX-11, FIX-12, FIX-13] ─────────────
 
 async function scrapeGeneric(companyId, companyName, careersUrl) {
   const jobs = [];
@@ -710,6 +966,8 @@ async function scrapeGeneric(companyId, companyName, careersUrl) {
       }
     }
     await sleep(2000);
+
+    await killCookieBanners(page);
 
     // ── Helper to handle "Execution context was destroyed" errors safely ─────
     async function safeEvaluate(fn) {
@@ -759,6 +1017,7 @@ async function scrapeGeneric(companyId, companyName, careersUrl) {
     }
 
     // ── Location filter ───────────────────────────────────────────────────────
+    await killCookieBanners(page);
     try {
       const locationInputs = await page.$$(
         'input[placeholder*="location" i], input[placeholder*="city" i], input[placeholder*="country" i], input[id*="location" i], input[name*="location" i], input[aria-label*="location" i]'
@@ -847,57 +1106,126 @@ async function scrapeGeneric(companyId, companyName, careersUrl) {
       let rawJobs = [];
       try {
         rawJobs = await safeEvaluate(() => {
-        const results = [];
-        for (const a of Array.from(document.querySelectorAll('a'))) {
-          const href = a.href;
-          if (!href) continue;
-          const isJob =
-            /\/(job|jobs|posting|careers|vacancy|detail|position)\//i.test(href) ||
-            href.includes('career-detail');
-          if (!isJob) continue;
+          const results = [];
 
-          let title = a.innerText.trim();
-          if (!title && a.parentElement) title = a.parentElement.innerText.trim();
-          if (!title) continue;
-          title = title.split('\n')[0].trim();
-          if (title.length < 5) continue;
+          // Prefer job-card containers first
+          const jobContainers = document.querySelectorAll(`
+            [data-automation-id*="job" i],
+            [data-testid*="job" i],
+            [class*="job-card" i],
+            [class*="jobcard" i],
+            [class*="job-item" i],
+            [class*="jobitem" i],
+            [class*="job-row" i],
+            [class*="jobrow" i],
+            [class*="opening" i],
+            [class*="position" i],
+            [class*="career-item" i],
+            [class*="posting" i],
+            li[data-automation-id],
+            tr[data-automation-id]
+          `);
 
-          const boilerplate = [
-            'cookie policy','privacy policy','terms of service','terms of use','ai usage','using ai',
-            'our story','our teams','dashboard','profile','sign in','sign-in','login','log in','log-in',
-            'logout','log out','search & apply','homepage','deutsch','english','español','français',
-            'italiano','português','japanese','german','french','italian','spanish','korean','chinese',
-            'portuguese','careers','our platform','culture','benefits','awards','search','apply now',
-            'apply','you can still apply','click here','read more','learn more','go back','back to search',
-            'view profile','talent community','talent network','join us','close','cancel','accept',
-            'decline','agree','cookies','all jobs','job search','open positions','view jobs','view openings',
-            'job openings','careers portal','careers home','about us','contact us','home','faq','help',
-            'support','sitemap','skip to main content','main content','skip to navigation','navigation',
-            'skip to content','português - brasil','português - pt','română','slovenčina, slovenský jazyk',
-            '中文 - 简体','中文 - 繁體','polski','nederlands','magyar','suomi','svenska','dansk','česky',
-            'türkçe','tiếng việt','русский','ภาษาไทย','日本語','한국어','עברית','العربية'
-          ];
-          if (boilerplate.includes(title.toLowerCase())) continue;
-          if (/^(skip to|language|select language|accessibility)/i.test(title)) continue;
+          for (const container of Array.from(jobContainers)) {
+            const link = container.querySelector('a[href]');
+            if (!link) continue;
 
-          // [FIX-15] Do NOT default to 'India'. If no Indian city/country keyword
-          // is found near this link, loc stays null. The detail-fetch phase below
-          // will attempt a second pass on the detail page itself. If India still
-          // can't be confirmed, the job is dropped so non-India roles don't leak.
-          let loc = null;
-          let p = a.parentElement;
-          let depth = 0;
-          while (p && depth < 3) {
-            const m = (p.innerText || '').match(
-              /bangalore|bengaluru|hyderabad|pune|chennai|mumbai|gurgaon|gurugram|noida|kochi|\bindia\b/i
-            );
-            if (m) { loc = m[0]; break; }
-            p = p.parentElement; depth++;
+            const href = link.href;
+            if (!href) continue;
+
+            const titleEl =
+              container.querySelector('h1,h2,h3,h4,h5,[class*="title" i],[data-automation-id*="title" i]') ||
+              link;
+
+            let title = (titleEl.innerText || link.innerText || '').trim().split('\n')[0].trim();
+            if (!title || title.length < 3) continue;
+
+            const titleLower = title.toLowerCase();
+            if (
+              titleLower.includes('privacy') ||
+              titleLower.includes('cookie') ||
+              titleLower.includes('terms') ||
+              titleLower.includes('language') ||
+              titleLower.includes('accessibility') ||
+              titleLower.includes('learn more') ||
+              titleLower.includes('read more') ||
+              titleLower.includes('about us') ||
+              titleLower.includes('contact us') ||
+              titleLower.includes('benefits') ||
+              titleLower.includes('culture') ||
+              titleLower.includes('our story')
+            ) {
+              // eslint-disable-next-line no-console
+              console.warn(`[Filter] Rejected: not a job posting -> ${title}`);
+              continue;
+            }
+
+            results.push({
+              title,
+              url: href,
+              location: container.innerText || ''
+            });
           }
-          results.push({ title, url: href, location: loc });
-        }
-        return results;
-      });
+
+          // Fallback: scan all anchor tags if nothing found
+          if (results.length === 0) {
+            for (const a of Array.from(document.querySelectorAll('a'))) {
+              const href = a.href;
+              if (!href) continue;
+              // Stricter job URL detection
+              const isJob =
+                /\/(job|jobs|posting|position|opportunity|opening)\//i.test(href) ||
+                href.includes('jobId=') ||
+                href.includes('job_id=') ||
+                href.includes('gh_jid=') ||
+                href.includes('/job-description/') ||
+                href.includes('/job-details/') ||
+                href.includes('/careers/job/');
+              if (!isJob) continue;
+
+              let title = (a.innerText || '').trim();
+              if (!title && a.parentElement) title = a.parentElement.innerText.trim();
+              if (!title) continue;
+              title = title.split('\n')[0].trim();
+              if (title.length < 3) continue;
+
+              const titleLower = title.toLowerCase();
+              if (
+                titleLower.includes('privacy') ||
+                titleLower.includes('cookie') ||
+                titleLower.includes('terms') ||
+                titleLower.includes('language') ||
+                titleLower.includes('accessibility') ||
+                titleLower.includes('learn more') ||
+                titleLower.includes('read more') ||
+                titleLower.includes('about us') ||
+                titleLower.includes('contact us') ||
+                titleLower.includes('benefits') ||
+                titleLower.includes('culture') ||
+                titleLower.includes('our story')
+              ) {
+                // eslint-disable-next-line no-console
+                console.warn(`[Filter] Rejected: not a job posting -> ${title}`);
+                continue;
+              }
+
+              // [FIX-15] Do NOT default to 'India'. If no Indian city/country keyword
+              // is found near this link, loc stays null.
+              let loc = null;
+              let p = a.parentElement;
+              let depth = 0;
+              while (p && depth < 3) {
+                const m = (p.innerText || '').match(
+                  /bangalore|bengaluru|hyderabad|pune|chennai|mumbai|gurgaon|gurugram|noida|kochi|\bindia\b/i
+                );
+                if (m) { loc = m[0]; break; }
+                p = p.parentElement; depth++;
+              }
+              results.push({ title, url: href, location: loc });
+            }
+          }
+          return results;
+        });
       } catch (e) {
         console.warn(`[Generic Scraper] Failed to extract links from page ${pageNum}: ${e.message}`);
       }
@@ -918,6 +1246,7 @@ async function scrapeGeneric(companyId, companyName, careersUrl) {
       );
 
       if (nextButton) {
+        await killCookieBanners(page);
         const isDisabled = await nextButton.evaluate(el =>
           el.hasAttribute('disabled') ||
           el.classList.contains('disabled') ||
@@ -937,9 +1266,43 @@ async function scrapeGeneric(companyId, companyName, careersUrl) {
 
     console.log(`[Generic Scraper] ${companyName} — ${allRawJobs.length} total jobs found across ${pageNum} page(s).`);
 
+    // Deduplicate by URL (before detail-page scraping)
+    const uniqueJobs = [];
+    const seenJobUrls = new Set();
+    for (const job of allRawJobs) {
+      if (!job?.url) continue;
+      const normalizedUrl = job.url.split('#')[0].split('?')[0];
+      if (seenJobUrls.has(normalizedUrl)) continue;
+      seenJobUrls.add(normalizedUrl);
+      uniqueJobs.push(job);
+    }
+    allRawJobs.length = 0;
+    allRawJobs.push(...uniqueJobs);
+    console.log(`[Generic Scraper] Deduplicated to ${allRawJobs.length} candidate jobs.`);
+
+    // Generic scraper is now a last-resort fallback.
+    // ATS-specific adapters should be preferred whenever detectATS() identifies a platform.
     // ── [FIX-10] Process ALL jobs, not just first 15 ──────────────────────────
-    for (const item of allRawJobs) {
-      await sleep(1500);
+    const mappedJobs = await pMap(allRawJobs, async (item) => {
+      await sleep(250);
+
+      // Minimum job-quality check before detail-page scraping
+      if (!item.title || typeof item.title !== 'string') return null;
+      const words = item.title.trim().split(/\s+/);
+      if (words.length < 2) {
+        console.warn(`[Filter] Rejected: not a job posting -> ${item.title}`);
+        return null;
+      }
+
+      if (!isValidJobCandidate(item.title)) {
+        console.warn(`[Filter] Rejected: blocked title -> ${item.title}`);
+        return null;
+      }
+
+      if (isObviousNonIndiaRole(item.title)) {
+        console.warn(`[Filter] Rejected: non-India role -> ${item.title}`);
+        return null;
+      }
 
       let rawText  = `Job listing available at ${item.url}`;
       let aiParsed = null;
@@ -950,7 +1313,9 @@ async function scrapeGeneric(companyId, companyName, careersUrl) {
         await withRetry(async () => {
           const detailPage = await context.newPage();
           try {
-            await detailPage.goto(item.url, { waitUntil: 'domcontentloaded', timeout: 12000 });
+            await killCookieBanners(detailPage);
+            await detailPage.goto(item.url, { waitUntil: 'domcontentloaded', timeout: 15000 });
+            await killCookieBanners(detailPage);
             rawText = await detailPage.evaluate(() => {
               const main = document.querySelector(
                 'main, article, [class*="job-details" i], [class*="description" i], [id*="description" i]'
@@ -961,13 +1326,23 @@ async function scrapeGeneric(companyId, companyName, careersUrl) {
 
             // [FIX-15] If listing page had no India location, verify from detail page text.
             if (!confirmedLocation) {
-              const indiaMatch = rawText.match(
-                /bangalore|bengaluru|hyderabad|pune|chennai|mumbai|gurgaon|gurugram|noida|kochi|\bindia\b/i
-              );
-              confirmedLocation = indiaMatch ? indiaMatch[0] : null;
+              if (containsIndiaReference(rawText)) {
+                const match = rawText.match(INDIA_REGEX);
+                confirmedLocation = match ? match[0] : 'India';
+              }
             }
 
-            aiParsed = await parseJobPostingWithAI(rawText, item.title, confirmedLocation || item.location || 'India');
+            const shouldUseAI = shouldUseAIClassification(item.title, rawText);
+            if (shouldUseAI) {
+              aiParsed = await parseJobPostingWithAI(
+                rawText,
+                item.title,
+                confirmedLocation || item.location || ''
+              );
+            } else {
+              console.log(`[AI] Skipped NVIDIA for ${item.title} (high confidence local classification)`);
+              aiParsed = null;
+            }
           } finally {
             await detailPage.close();
           }
@@ -978,25 +1353,34 @@ async function scrapeGeneric(companyId, companyName, careersUrl) {
 
       // [FIX-15] Resolve location — check title as last resort, then drop if still unknown.
       if (!confirmedLocation) {
-        const titleMatch = (item.title || '').match(
-          /bangalore|bengaluru|hyderabad|pune|chennai|mumbai|gurgaon|gurugram|noida|kochi|\bindia\b/i
-        );
-        confirmedLocation = titleMatch ? titleMatch[0] : null;
+        if (containsIndiaReference(item.title)) {
+          const match = item.title.match(INDIA_REGEX);
+          confirmedLocation = match ? match[0] : 'India';
+        }
       }
 
       // Drop jobs with no verifiable India location.
+      const indiaConfirmed =
+        containsIndiaReference(confirmedLocation) ||
+        containsIndiaReference(item.title) ||
+        containsIndiaReference(rawText);
+
+      if (!indiaConfirmed) {
+        console.warn(`[Filter] Rejected: non-India role -> ${item.title}`);
+        return null;
+      }
+
       if (!confirmedLocation) {
-        console.log(`[Generic Scraper] Dropping "${item.title}" — no India location confirmed on listing or detail page.`);
-        continue;
+        confirmedLocation = 'India';
       }
 
       const normLoc = normalizeLocation(confirmedLocation);
-      if (!normLoc) continue;
+      if (!normLoc) return null;
 
       const { description, skills, exp, remoteStatus, empType } =
         resolveClassification(aiParsed, rawText, item.title);
 
-      jobs.push({
+      return {
         id             : generateJobId(companyId, item.title, confirmedLocation, item.url),
         companyId,
         companyName,
@@ -1016,7 +1400,11 @@ async function scrapeGeneric(companyId, companyName, careersUrl) {
         jobUrl         : item.url,
         remoteStatus,
         industry       : classifyIndustry(item.title, ''),
-      });
+      };
+    }, 8);
+
+    for (const j of mappedJobs) {
+      if (j) jobs.push(j);
     }
   } finally {
     await page.close();
@@ -1115,6 +1503,8 @@ async function runLocalScraper() {
         if      (ats === 'workday')    jobsResult = await scrapeWorkday(comp.id,   comp.name, comp.careersUrl);
         else if (ats === 'greenhouse') jobsResult = await scrapeGreenhouse(comp.id, comp.name, comp.careersUrl);
         else if (ats === 'lever')      jobsResult = await scrapeLever(comp.id,      comp.name, comp.careersUrl);
+        else if (ats === 'smartrecruiters') jobsResult = await scrapeSmartRecruiters(comp.id, comp.name, comp.careersUrl);
+        else if (ats === 'eightfold')  jobsResult = await scrapeEightfold(comp.id,  comp.name, comp.careersUrl);
         else                           jobsResult = await scrapeGeneric(comp.id,    comp.name, comp.careersUrl);
 
         const duration = Date.now() - compStartTime;
