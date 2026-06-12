@@ -69,8 +69,14 @@ async function start() {
   await Storage.load();
 
   const companies = await loadCompanies();
-  const LIMIT = process.env.LIMIT ? parseInt(process.env.LIMIT, 10) : companies.length;
-  const targetCompanies = companies.slice(0, LIMIT);
+  let targetCompanies = companies;
+  if (process.env.COMPANY_ID) {
+    const q = process.env.COMPANY_ID.toLowerCase();
+    targetCompanies = companies.filter(c => c.id.toLowerCase() === q || c.name.toLowerCase().includes(q));
+  } else {
+    const LIMIT = process.env.LIMIT ? parseInt(process.env.LIMIT, 10) : companies.length;
+    targetCompanies = companies.slice(0, LIMIT);
+  }
   console.log(`Loaded ${targetCompanies.length} companies to crawl.`);
 
   for (const comp of targetCompanies) {
@@ -140,7 +146,8 @@ async function start() {
 
       for (const job of jobs) {
         if (!JobHelpers.isValidJobCandidate(job.title)) {
-          Observability.recordRejected(company.id, 'invalid_title');
+          Observability.recordRejected(company.id, 'invalid_title', 'validation');
+          console.warn(JSON.stringify({ rejected: true, reason: "invalid_title", stage: "validation", title: job.title }));
           skipped++;
           continue;
         }
@@ -153,19 +160,32 @@ async function start() {
           job.url
         );
 
-        if (!locPreview.isIndia) {
+        if (!locPreview.isIndia && locPreview.country !== 'Unknown') {
           Observability.recordLocationRejected(company.id, locPreview.country, 'discovery_location_filter');
+          console.warn(JSON.stringify({ rejected: true, reason: `location_rejected_${locPreview.country}`, stage: "discovery_location", title: job.title }));
           skipped++;
           continue;
         }
 
+        const fps = Deduplicator.buildFingerprints(company.id, job.title, job.location || locPreview.resolvedLocation, job.reqId, '');
         if (Deduplicator.isEarlyDuplicate(company.id, job.title, job.location || locPreview.resolvedLocation, job.reqId)) {
           Observability.recordDuplicate(company.id);
+          const matchedMeta = Storage.getMatchedJobMeta(fps);
+          console.warn(JSON.stringify({ 
+            rejected: true, 
+            reason: "duplicate_early", 
+            stage: "discovery_dedup", 
+            title: job.title,
+            matchedJobId: matchedMeta?.id,
+            matchedCompany: matchedMeta?.companyId,
+            matchedTitle: matchedMeta?.title
+          }));
           skipped++;
           continue;
         }
 
         enqueued++;
+        Observability.recordQueued(company.id);
         Queues.detailQueue.enqueue({ company, adapter, job }).catch(err => {
           console.error(`[Orchestrator] Detail enqueue error: ${err.message}`);
         });
@@ -176,17 +196,47 @@ async function start() {
     },
 
     detail: async ({ company, adapter, job }) => {
+      console.log(`[Diagnostic] DETAIL_START - Job: ${job.reqId || job.title}`);
+      Observability.recordDetailStart(company.id);
+      
       if (CircuitBreakers.isCompanyPaused(company.id)) return;
       try {
         const rawText = await adapter.fetchJob(job.url, job.reqId, job);
+        console.log(`[Diagnostic] DETAIL_SUCCESS - Job: ${job.reqId || job.title}`);
+        Observability.recordDetailSuccess(company.id);
         Observability.recordParsed(company.id);
 
         Queues.classificationQueue.enqueue({ company, adapter, job, rawText }).catch(err => {
           console.error(`[Orchestrator] Classification enqueue error: ${err.message}`);
         });
       } catch (err) {
+        let reason = 'parse_failure';
+        if (err.message.includes('timeout') || err.message.includes('Timeout')) {
+          reason = 'timeout';
+          console.log(`[Diagnostic] DETAIL_TIMEOUT - Job: ${job.reqId || job.title}`);
+        } else if (err.message.includes('403')) {
+          reason = '403_forbidden';
+        } else if (err.message.includes('404')) {
+          reason = '404_not_found';
+        } else if (err.message.includes('missing_detail_url')) {
+          reason = 'missing_detail_url';
+        } else {
+          console.log(`[Diagnostic] DETAIL_FAIL - Job: ${job.reqId || job.title} - ${err.message}`);
+        }
+        
+        Observability.recordDetailFailure(company.id, reason);
         CircuitBreakers.recordCompanyFailure(company.id);
-        Observability.recordRejected(company.id, `detail_fetch: ${err.message}`);
+        Observability.recordRejected(company.id, `detail_fetch_${reason}`, 'detail_fetch');
+        console.warn(JSON.stringify({ 
+          rejected: true, 
+          stage: "detail", 
+          reason: reason, 
+          company: company.name, 
+          title: job.title, 
+          url: job.url,
+          statusCode: err.response?.status || (err.message.match(/\b(403|404|429|500|502|503|504)\b/)?.[0] || 'none'),
+          error: err.message
+        }));
       }
     },
 
@@ -201,8 +251,10 @@ async function start() {
         job.url
       );
 
-      if (!locScore.isIndia) {
+      if (!locScore.isIndia && locScore.country !== 'Unknown') {
         Observability.recordLocationRejected(company.id, locScore.country, 'classification_location_rejected');
+        Observability.recordRejected(company.id, `classification_location_rejected_${locScore.country}`, 'classification_location');
+        console.warn(JSON.stringify({ rejected: true, reason: `classification_location_rejected_${locScore.country}`, stage: "classification_location", title: job.title }));
         return;
       }
 
@@ -227,6 +279,7 @@ async function start() {
 
       if (!fingerprints) {
         Observability.recordDuplicate(company.id);
+        console.warn(JSON.stringify({ rejected: true, reason: "duplicate_content", stage: "classification_dedup", title: job.title }));
         return;
       }
 
@@ -245,6 +298,10 @@ async function start() {
           years: arbitrated.years ?? expResult.years,
           minYears: arbitrated.minYears ?? expResult.minYears,
           maxYears: arbitrated.maxYears ?? expResult.maxYears,
+          effectiveYears: arbitrated.effectiveYears ?? expResult.effectiveYears,
+          confidence: arbitrated.confidence ?? expResult.confidence,
+          hasConflict: arbitrated.hasConflict ?? expResult.hasConflict,
+          classificationSource: arbitrated.classificationSource || expResult.classificationSource || 'rule-engine',
           validation: arbitrated.validation || expResult.validation,
         },
         skills: arbitrated.skills,
@@ -269,6 +326,7 @@ async function start() {
       }
 
       Storage.saveJob(record);
+      console.log(`[Diagnostic] Job: "${record.title}" | minYears: ${record.minYears} | maxYears: ${record.maxYears} | effectiveYears: ${record.effectiveYears} | finalLevel: "${record.experienceLevel}" | source: ${record.classificationSource}`);
       Observability.recordAccepted(company.id);
     },
 
@@ -316,7 +374,23 @@ async function start() {
   await CloudflareResilience.closeAll();
 
   console.log('=== Crawl Complete ===');
-  console.log('Coverage:', JSON.stringify(Observability.generateCoverageReport(), null, 2));
+  console.log('\n=== Company Health Dashboard ===');
+  const coverageReport = Observability.generateCoverageReport();
+  console.table(coverageReport);
+  
+  console.log('\n=== Detail Failure Distribution ===');
+  console.table(Observability.generateFailureDistribution());
+  
+  console.log('\n=== PIPELINE ASSERTIONS ===');
+  let imbalanceFound = false;
+  for (const m of coverageReport) {
+    if (m.queued !== m.detailStarted || m.detailStarted !== (m.detailSucceeded + m.detailFailed)) {
+      console.warn(`[PIPELINE_ERROR] Imbalance detected for ${m.company}: Queued(${m.queued}) != Started(${m.detailStarted}) OR Started(${m.detailStarted}) != Success(${m.detailSucceeded}) + Fail(${m.detailFailed})`);
+      imbalanceFound = true;
+    }
+  }
+  if (!imbalanceFound) console.log('[OK] All pipeline queues perfectly balanced.');
+  
   console.log('ATS Report:', JSON.stringify(Observability.generateATSReport(), null, 2));
   console.log('Queue Stats:', JSON.stringify(Queues.getAllStats(), null, 2));
 }

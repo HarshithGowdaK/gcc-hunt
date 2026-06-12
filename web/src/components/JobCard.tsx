@@ -13,6 +13,8 @@ interface JobCardProps {
     experienceLevel?: string;
     yearsExperience?: number;
     yearsExperienceMax?: number;
+    minYears?: number;
+    maxYears?: number;
     employmentType?: string;
     skills: string[];
     applyUrl: string;
@@ -106,12 +108,16 @@ export default function JobCard({ job, isActive = false, onClick }: JobCardProps
             <Briefcase className="h-3 w-3 text-[#7A8471]" />
             {job.experienceLevel || 'Not Specified'}
           </span>
-          {job.yearsExperience !== undefined && job.yearsExperience > 0 && (
+          {((job.minYears !== undefined && job.minYears !== null) || (job.yearsExperience !== undefined && job.yearsExperience !== null)) && (
             <span className="flex items-center gap-1 shrink-0">
               <Layers className="h-3 w-3 text-[#7A8471]" />
-              {job.yearsExperienceMax && job.yearsExperienceMax > job.yearsExperience
-                ? `${job.yearsExperience}-${job.yearsExperienceMax} Yrs`
-                : `${job.yearsExperience}+ Yrs`}
+              {(() => {
+                const min = job.minYears !== undefined && job.minYears !== null ? job.minYears : job.yearsExperience;
+                const max = job.maxYears !== undefined && job.maxYears !== null ? job.maxYears : job.yearsExperienceMax;
+                return max !== undefined && max !== null && max > (min || 0)
+                  ? `${min}-${max} Yrs`
+                  : `${min || 0}+ Yrs`;
+              })()}
             </span>
           )}
           <span className="text-[#7A8471]">•</span>

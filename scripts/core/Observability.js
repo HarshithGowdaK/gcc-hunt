@@ -14,9 +14,14 @@ class Observability {
     if (!this.metrics.has(companyId)) {
       this.metrics.set(companyId, {
         jobsDiscovered: 0,
+        jobsQueued: 0,
+        detailStarted: 0,
+        detailSucceeded: 0,
+        detailFailed: 0,
         jobsParsed: 0,
         jobsAccepted: 0,
         jobsRejected: 0,
+        validationRejected: 0,
         duplicatesRemoved: 0,
         locationRejected: 0,
         aiCalls: 0,
@@ -32,6 +37,7 @@ class Observability {
           locationFailures: {},
           aiSkipReasons: {},
           atsSelection: {},
+          detailFailures: {},
         },
       });
     }
@@ -42,6 +48,24 @@ class Observability {
     this.getCompanyMetrics(companyId).jobsDiscovered += count;
   }
 
+  recordQueued(companyId) {
+    this.getCompanyMetrics(companyId).jobsQueued += 1;
+  }
+
+  recordDetailStart(companyId) {
+    this.getCompanyMetrics(companyId).detailStarted += 1;
+  }
+
+  recordDetailSuccess(companyId) {
+    this.getCompanyMetrics(companyId).detailSucceeded += 1;
+  }
+
+  recordDetailFailure(companyId, reasonCategory) {
+    const m = this.getCompanyMetrics(companyId);
+    m.detailFailed += 1;
+    m.reasons.detailFailures[reasonCategory] = (m.reasons.detailFailures[reasonCategory] || 0) + 1;
+  }
+
   recordParsed(companyId) {
     this.getCompanyMetrics(companyId).jobsParsed += 1;
   }
@@ -50,9 +74,12 @@ class Observability {
     this.getCompanyMetrics(companyId).jobsAccepted += 1;
   }
 
-  recordRejected(companyId, reason) {
+  recordRejected(companyId, reason, stage = 'unknown') {
     const m = this.getCompanyMetrics(companyId);
     m.jobsRejected += 1;
+    if (stage === 'validation' || stage === 'discovery_location') {
+      m.validationRejected += 1;
+    }
     m.reasons.rejections[reason] = (m.reasons.rejections[reason] || 0) + 1;
   }
 
@@ -116,18 +143,37 @@ class Observability {
   }
 
   generateCoverageReport() {
-    const report = {};
+    const report = [];
     for (const [id, m] of this.metrics) {
-      report[id] = {
+      const ats = m.atsDetected || 'unknown';
+      const jobsLost = m.jobsDiscovered - m.jobsAccepted;
+      report.push({
+        company: id,
+        ats,
         discovered: m.jobsDiscovered,
-        parsed: m.jobsParsed,
-        accepted: m.jobsAccepted,
-        rejected: m.jobsRejected,
-        duplicates: m.duplicatesRemoved,
-        quality: this.generateQualityReport(id),
-      };
+        queued: m.jobsQueued,
+        detailStarted: m.detailStarted,
+        detailSucceeded: m.detailSucceeded,
+        detailFailed: m.detailFailed,
+        classified: m.jobsParsed,
+        finalJobs: m.jobsAccepted,
+        jobsLost,
+      });
     }
-    return report;
+    return report.sort((a, b) => b.jobsLost - a.jobsLost);
+  }
+
+  generateFailureDistribution() {
+    const distribution = {};
+    for (const m of this.metrics.values()) {
+      for (const [reason, count] of Object.entries(m.reasons.detailFailures)) {
+        distribution[reason] = (distribution[reason] || 0) + count;
+      }
+    }
+    // Sort distribution by count descending
+    return Object.fromEntries(
+      Object.entries(distribution).sort(([, a], [, b]) => b - a)
+    );
   }
 
   generateATSReport() {

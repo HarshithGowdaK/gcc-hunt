@@ -19,7 +19,7 @@ class Deduplicator {
     const primary = reqId ? `${companyId}:${reqId}` : null;
     const normTitle = this._normalizeString(title);
     const normLoc = this._normalizeString(location);
-    const secondary = `${companyId}:${normTitle}:${normLoc}`;
+    const secondary = `${companyId}:${normTitle}:${normLoc}:${reqId || 'no_req'}`;
     const content = description && description.length > 50 ? this._hashContent(description) : null;
     return { primary, secondary, content };
   }

@@ -576,12 +576,15 @@ function JobsContent() {
                 <div className="flex justify-between border-b border-[#E5E1D8]/60 pb-1.5">
                   <span className="text-[#7A8471] font-semibold">Experience Tier</span>
                   <span className="text-[#161616]">
-                    {activeJobDetails.experienceLevel || 'Mid Level'}
-                    {' ('}
-                    {activeJobDetails.yearsExperienceMax && activeJobDetails.yearsExperienceMax > (activeJobDetails.yearsExperience || 0)
-                      ? `${activeJobDetails.yearsExperience}-${activeJobDetails.yearsExperienceMax}`
-                      : (activeJobDetails.yearsExperience || '0-2')}
-                    {' yrs)'}
+                    {activeJobDetails.experienceLevel || 'Not Specified'}
+                    {(() => {
+                      const min = activeJobDetails.minYears !== undefined && activeJobDetails.minYears !== null ? activeJobDetails.minYears : activeJobDetails.yearsExperience;
+                      const max = activeJobDetails.maxYears !== undefined && activeJobDetails.maxYears !== null ? activeJobDetails.maxYears : activeJobDetails.yearsExperienceMax;
+                      if (min === undefined || min === null) return '';
+                      return max !== undefined && max !== null && max > min
+                        ? ` (${min}-${max} yrs)`
+                        : ` (${min}+ yrs)`;
+                    })()}
                   </span>
                 </div>
                 <div className="flex justify-between border-b border-[#E5E1D8]/60 pb-1.5">

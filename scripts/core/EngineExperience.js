@@ -16,6 +16,17 @@ class EngineExperience {
     const validation = classifyWithValidation(fullText, title);
     const expDetails = extractExperienceDetails(fullText);
 
+    const computeEffectiveYears = (min, max) => {
+      if (min === null && max === null) return null;
+      if (min !== null && max !== null) return Math.round((min + max) / 2);
+      return min !== null ? min : max;
+    };
+    
+    const safeEffectiveYears = computeEffectiveYears(
+      validation.minYears !== undefined ? validation.minYears : expDetails.minYears,
+      validation.maxYears !== undefined ? validation.maxYears : expDetails.maxYears
+    );
+
     const evidence = [
       ...(validation.signals || []),
       ...(validation.reason ? [validation.reason] : []),
@@ -28,15 +39,18 @@ class EngineExperience {
 
     return {
       level: validation.experienceLevel,
-      years: validation.years,
-      minYears: validation.minYears,
-      maxYears: validation.maxYears,
+      years: validation.years || safeEffectiveYears,
+      effectiveYears: safeEffectiveYears,
+      minYears: validation.minYears !== undefined ? validation.minYears : expDetails.minYears,
+      maxYears: validation.maxYears !== undefined ? validation.maxYears : expDetails.maxYears,
       confidence: validation.confidence,
       evidence,
       validation,
       hasConflict,
       hasMultipleRanges,
       experienceFound: validation.experienceFound,
+      evidenceSource: validation.evidenceSource || 'none',
+      classificationSource: validation.classificationSource || 'rule-engine',
     };
   }
 }

@@ -40,6 +40,7 @@ const SKILLS_LIST = [
 const BLOCKED_TITLES = [
   'view and apply', 'open jobs', 'latest vacancies', 'clear filters',
   'india (english)', 'canada (english)', 'united states (english)',
+  'english (united states)', 'south africa',
   'all other countries (english)', 'fostering belonging',
   'cohesity gives back', 'lca notice', 'careers', 'search jobs',
   'skip to main content', 'skip to content', 'main content',
@@ -47,7 +48,7 @@ const BLOCKED_TITLES = [
   'accessibility', 'search', 'careers home',
 ];
 
-const COUNTRY_NAME_TITLES = /^(argentina|australia|austria|belgium|brazil|canada|chile|china|colombia|denmark|finland|france|germany|hong kong|indonesia|ireland|israel|italy|japan|korea|mexico|netherlands|new zealand|norway|poland|portugal|singapore|spain|sweden|switzerland|taiwan|thailand|uk|united kingdom|united states|usa|vietnam)$/i;
+const COUNTRY_NAME_TITLES = /^(argentina|australia|austria|belgium|brazil|canada|chile|china|colombia|denmark|finland|france|germany|hong kong|india|indonesia|ireland|israel|italy|japan|korea|mexico|netherlands|new zealand|norway|poland|portugal|singapore|south africa|spain|sweden|switzerland|taiwan|thailand|uk|united kingdom|united states|usa|vietnam)$/i;
 
 function normalizeLocation(locationStr) {
   if (!locationStr) return null;
@@ -115,11 +116,26 @@ function classifyIndustry(title, department) {
 
 function isValidJobCandidate(title) {
   const t = String(title || '').trim().toLowerCase();
-  if (t.length < 3) return false;
-  if (COUNTRY_NAME_TITLES.test(t.trim())) return false;
-  for (const b of BLOCKED_TITLES) {
-    if (t.includes(b)) return false;
-  }
+  
+  if (t.length < 3 || t.length > 150) return false;
+  if (/^https?:\/\//.test(t)) return false; // url-like
+  if (COUNTRY_NAME_TITLES.test(t.trim())) return false; // Country exact match
+  
+  // Exact match denylist for structural navigation terms
+  const navBlocks = [
+    'home', 'login', 'register', 'apply', 'search', 'clear filters', 
+    'saved jobs', 'human resources', 'menu', 'site map', 'privacy', 
+    'terms', 'contact us', 'accessibility', 'careers home', 'view and apply', 
+    'open jobs', 'latest vacancies', 'skip to main content', 'skip to content', 
+    'main content', 'careers', 'search jobs', 'apply now', 'locations', 
+    'jobs', 'students', 'india', 'south africa', 'engineering', 'sales',
+    'india (english)', 'canada (english)', 'united states (english)',
+    'english (united states)', 'all other countries (english)',
+    'fostering belonging', 'cohesity gives back', 'lca notice'
+  ];
+  
+  if (navBlocks.includes(t)) return false;
+  
   return true;
 }
 

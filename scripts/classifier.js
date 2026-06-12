@@ -14,25 +14,51 @@
  */
 
 const SENIORITY_LEVELS = {
-  INTERNSHIP : 'Internship / Apprenticeship',
-  ENTRY      : 'Entry Level',
-  MID        : 'Mid Level',
-  SENIOR     : 'Senior Level',
-  LEAD       : 'Lead / Management',
-  EXECUTIVE  : 'Executive Leadership',
+  INTERN      : 'Intern',
+  APPRENTICE  : 'Apprenticeship',
+  TRAINEE     : 'Trainee',
+  GRADUATE    : 'Graduate',
+  ENTRY       : 'Entry Level',
+  ASSOCIATE   : 'Associate',
+  JUNIOR      : 'Junior',
+  MID         : 'Mid Level',
+  SENIOR      : 'Senior',
+  LEAD        : 'Lead',
+  PRINCIPAL   : 'Principal',
+  STAFF       : 'Staff',
+  SENIOR_STAFF: 'Senior Staff',
+  ARCHITECT   : 'Architect',
+  MANAGER     : 'Manager',
+  SENIOR_MGR  : 'Senior Manager',
+  DIRECTOR    : 'Director',
+  VP          : 'VP',
 };
 
 const LEVEL_KEYS = {
-  [SENIORITY_LEVELS.ENTRY]     : 'entry',
-  [SENIORITY_LEVELS.MID]       : 'mid',
-  [SENIORITY_LEVELS.SENIOR]    : 'senior',
-  [SENIORITY_LEVELS.LEAD]     : 'lead',
-  [SENIORITY_LEVELS.EXECUTIVE] : 'executive',
+  [SENIORITY_LEVELS.INTERN]      : 'entry',
+  [SENIORITY_LEVELS.APPRENTICE]  : 'entry',
+  [SENIORITY_LEVELS.TRAINEE]     : 'entry',
+  [SENIORITY_LEVELS.GRADUATE]    : 'entry',
+  [SENIORITY_LEVELS.ENTRY]       : 'entry',
+  [SENIORITY_LEVELS.ASSOCIATE]   : 'entry',
+  [SENIORITY_LEVELS.JUNIOR]      : 'entry',
+  [SENIORITY_LEVELS.MID]         : 'mid',
+  [SENIORITY_LEVELS.SENIOR]      : 'senior',
+  [SENIORITY_LEVELS.LEAD]        : 'lead',
+  [SENIORITY_LEVELS.PRINCIPAL]   : 'executive',
+  [SENIORITY_LEVELS.STAFF]       : 'lead',
+  [SENIORITY_LEVELS.SENIOR_STAFF]: 'lead',
+  [SENIORITY_LEVELS.ARCHITECT]   : 'lead',
+  [SENIORITY_LEVELS.MANAGER]     : 'lead',
+  [SENIORITY_LEVELS.SENIOR_MGR]  : 'executive',
+  [SENIORITY_LEVELS.DIRECTOR]    : 'executive',
+  [SENIORITY_LEVELS.VP]          : 'executive',
 };
 
 const EMPTY_RESULT = Object.freeze({
   minYears: null,
   maxYears: null,
+  effectiveYears: null,
   allFound: [],
   rawMatches: [],
 });
@@ -42,25 +68,21 @@ const KEY_TO_LEVEL = {
   mid      : SENIORITY_LEVELS.MID,
   senior   : SENIORITY_LEVELS.SENIOR,
   lead     : SENIORITY_LEVELS.LEAD,
-  executive: SENIORITY_LEVELS.EXECUTIVE,
+  executive: SENIORITY_LEVELS.PRINCIPAL,
 };
 
 // ─── STEP 1: Internship / Apprenticeship ─────────────────────────────────────
 
 const INTERNSHIP_PATTERNS = [
-  /\bintern\b/i,
-  /\binternship\b/i,
-  /\bsummer intern\b/i,
-  /\bwinter intern\b/i,
-  /\bstudent intern\b/i,
-  /\bgraduate intern\b/i,
-  /\bapprentice\b/i,
-  /\bapprenticeship\b/i,
-  /\bgraduate apprentice\b/i,
-  /\bengineering apprentice\b/i,
-  /\btrade apprentice\b/i,
-  /\bco-?op\b/i,
-  /\bindustrial trainee\b/i,
+  /\binterns?\b/i,
+  /\binternships?\b/i,
+  /\bapprentices?\b/i,
+  /\bapprenticeships?\b/i,
+  /\bco-?ops?\b/i,
+  /\bcoops?\b/i,
+  /\bstudent programs?\b/i,
+  /\bgraduate trainees?\b/i,
+  /\bmanagement trainees?\b/i,
 ];
 
 function detectInternship(fullText) {
@@ -147,12 +169,20 @@ function extractExperienceDetails(description) {
   } else {
     const peak = Math.max(...allValues);
     primaryMin = peak;
-    primaryMax = peak;
+    primaryMax = null;
+  }
+
+  let effectiveYears = null;
+  if (primaryMax !== null && primaryMin !== null && primaryMax !== primaryMin) {
+    effectiveYears = (primaryMin + primaryMax) / 2;
+  } else if (primaryMin !== null) {
+    effectiveYears = primaryMin;
   }
 
   return {
     minYears  : primaryMin,
     maxYears  : primaryMax,
+    effectiveYears: effectiveYears,
     allFound  : allValues,
     rawMatches: [...new Set(candidates.map(c => c.raw))],
   };
@@ -312,18 +342,19 @@ function classifyWithValidation(description, title) {
       experienceFound: null,
       minYears: null,
       maxYears: null,
+      effectiveYears: null,
       allExperienceFound: [],
       matchedKeywords: [],
       signals: [],
       reason: 'No text supplied.',
       years: 4,
       score: null,
+      hasConflict: false,
+      classificationSource: 'rule-engine'
     };
   }
 
   const fullText = titleText + '\n' + descText;
-
-  const signals = [];
 
   // STEP 1: Internship / Apprenticeship — highest priority, hard stop
   if (detectInternship(fullText)) {
@@ -341,12 +372,16 @@ function classifyWithValidation(description, title) {
       experienceFound   : '0 years',
       minYears          : 0,
       maxYears          : 0,
+      effectiveYears    : 0,
       allExperienceFound: [],
       matchedKeywords   : matched,
       signals           : ['internship/apprenticeship detected'],
       reason            : 'Internship or apprenticeship indicators found — classification stopped.',
       years             : 0,
       score             : null,
+      hasConflict       : false,
+      evidenceSource    : 'job_description',
+      classificationSource: 'rule-engine'
     };
   }
 
@@ -358,7 +393,66 @@ function classifyWithValidation(description, title) {
       : `${minYears} year${minYears !== 1 ? 's' : ''}`)
     : null;
 
-  // STEP 3–4: Build score object
+  // STEP 3: Deterministic experience dominance (Years of experience overrides title)
+  if (minYears !== null) {
+    const effectiveYears = maxYears !== null && maxYears !== minYears
+      ? (minYears + maxYears) / 2
+      : minYears;
+
+    let finalLevel = SENIORITY_LEVELS.MID;
+    if (effectiveYears <= 1) {
+      finalLevel = SENIORITY_LEVELS.ENTRY;
+    } else if (effectiveYears <= 3) {
+      finalLevel = SENIORITY_LEVELS.JUNIOR;
+    } else if (effectiveYears <= 5) {
+      finalLevel = SENIORITY_LEVELS.MID;
+    } else if (effectiveYears <= 8) {
+      finalLevel = SENIORITY_LEVELS.SENIOR;
+    } else if (effectiveYears < 12) {
+      finalLevel = SENIORITY_LEVELS.LEAD;
+    } else {
+      finalLevel = SENIORITY_LEVELS.PRINCIPAL;
+    }
+
+    // CONFLICT DETECTION
+    let titleLevel = null;
+    if (EXECUTIVE_SIGNALS.some(re => re.test(titleText))) {
+      titleLevel = SENIORITY_LEVELS.PRINCIPAL;
+    } else if (LEAD_SIGNALS.some(re => re.test(titleText))) {
+      titleLevel = SENIORITY_LEVELS.LEAD;
+    } else if (SENIOR_SIGNALS.some(re => re.test(titleText))) {
+      titleLevel = SENIORITY_LEVELS.SENIOR;
+    } else if (ENTRY_SIGNALS.some(re => re.test(titleText))) {
+      titleLevel = SENIORITY_LEVELS.ENTRY;
+    } else if (MID_SIGNALS.some(re => re.test(titleText))) {
+      titleLevel = SENIORITY_LEVELS.MID;
+    }
+
+    const hasConflict = titleLevel !== null && titleLevel !== finalLevel;
+
+    return {
+      classification    : finalLevel,
+      experienceLevel   : finalLevel,
+      confidence        : 0.98,
+      confidencePercent : 98,
+      experienceFound,
+      minYears,
+      maxYears,
+      effectiveYears,
+      allExperienceFound: rawMatches,
+      matchedKeywords   : titleLevel ? [titleLevel] : [],
+      signals           : [`required experience ${experienceFound}`],
+      reason            : `Experience requirement (${experienceFound}) overrides title signals.`,
+      years             : effectiveYears,
+      score             : null,
+      hasConflict,
+      evidenceSource    : 'job_description',
+      classificationSource: 'rule-engine'
+    };
+  }
+
+  // STEP 4: Fallback to keyword scoring (if no years found)
+  const signals = [];
   const score = { entry: 0, mid: 0, senior: 0, lead: 0, executive: 0 };
 
   applySignalMatches(fullText, ENTRY_SIGNALS, 'entry', 10, score, signals);
@@ -367,10 +461,6 @@ function classifyWithValidation(description, title) {
   applySignalMatches(fullText, LEAD_SIGNALS, 'lead', 20, score, signals);
   applySignalMatches(fullText, EXECUTIVE_SIGNALS, 'executive', 25, score, signals);
 
-  // STEP 4: Experience weighting (dominates title)
-  applyExperienceWeighting(minYears, maxYears, score, signals);
-
-  // STEP 6: Description-based seniority phrases
   for (let i = 0; i < DESC_SENIORITY_PHRASES.length; i++) {
     const phrase = DESC_SENIORITY_PHRASES[i];
     if (phrase.re.test(fullText)) {
@@ -379,53 +469,38 @@ function classifyWithValidation(description, title) {
     }
   }
 
-  // STEP 5: GCC override rules
-  const override = applyGccOverrides(titleText, minYears, maxYears);
-  if (override) {
-    return {
-      classification    : override.level,
-      experienceLevel   : override.level,
-      confidence        : 0.92,
-      confidencePercent : 92,
-      experienceFound,
-      minYears,
-      maxYears,
-      allExperienceFound: rawMatches,
-      matchedKeywords   : override.signals,
-      signals           : [...signals, ...override.signals],
-      reason            : override.reason,
-      years             : minYears ?? levelToDefaultYears(override.level),
-      score,
-    };
-  }
-
-  // STEP 7: Final decision
   const { level, confidence, score: finalScore } = scoreToLevel(score);
-  const yearsNumeric = minYears !== null ? minYears : levelToDefaultYears(level);
+  const yearsNumeric = levelToDefaultYears(level);
 
   let reason;
-  if (minYears !== null) {
-    reason = `Experience requirement (${experienceFound}) weighted over title signals → ${level}.`;
-  } else if (finalScore[LEVEL_KEYS[level]] > 0) {
+  let evidenceSrc = 'title';
+  let finalClassification = level;
+  if (finalScore[LEVEL_KEYS[level]] > 0) {
     reason = `Seniority signals in title/description → ${level}.`;
   } else {
-    reason = 'No strong signal found. Defaulting to Mid Level.';
+    reason = 'No strong signal found. Level left undefined.';
+    finalClassification = null;
+    evidenceSrc = 'none';
   }
 
   return {
-    classification    : level,
-    experienceLevel   : level,
+    classification    : finalClassification,
+    experienceLevel   : finalClassification,
     confidence        : Math.round(confidence) / 100,
     confidencePercent : confidence,
-    experienceFound,
-    minYears,
-    maxYears,
-    allExperienceFound: rawMatches,
+    experienceFound   : null,
+    minYears          : null,
+    maxYears          : null,
+    effectiveYears    : null,
+    allExperienceFound: [],
     matchedKeywords   : [...new Set(signals)],
     signals,
     reason,
-    years             : yearsNumeric,
+    years             : finalClassification ? yearsNumeric : null,
     score             : finalScore,
+    hasConflict       : false,
+    evidenceSource    : evidenceSrc,
+    classificationSource: 'rule-engine'
   };
 }
 

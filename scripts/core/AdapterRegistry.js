@@ -9,6 +9,7 @@ const OracleAdapter = require('../adapters/OracleAdapter');
 const PhenomAdapter = require('../adapters/PhenomAdapter');
 const GenericAdapter = require('../adapters/GenericAdapter');
 const BrowserATSAdapter = require('../adapters/BrowserATSAdapter');
+const AshbyAdapter = require('../adapters/AshbyAdapter');
 
 const BROWSER_ATS = [
   'successfactors', 'cornerstone', 'icims', 'taleo', 'avature',
@@ -23,6 +24,7 @@ const registry = {
   eightfold: EightfoldAdapter,
   oracle: OracleAdapter,
   phenom: PhenomAdapter,
+  ashby: AshbyAdapter,
   generic: GenericAdapter,
 };
 

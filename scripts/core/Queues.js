@@ -102,7 +102,7 @@ class Queues {
 
   init(workers) {
     this.discoveryQueue = new AdaptiveQueue('Discovery', 5, workers.discovery);
-    this.detailQueue = new AdaptiveQueue('Detail', 15, workers.detail);
+    this.detailQueue = new AdaptiveQueue('Detail', parseInt(process.env.DETAIL_CONCURRENCY) || 15, workers.detail);
     this.classificationQueue = new AdaptiveQueue('Classification', 10, workers.classification);
     this.aiQueue = new AdaptiveQueue('AI', 3, workers.ai);
     this.aiQueue.maxConcurrency = 5;

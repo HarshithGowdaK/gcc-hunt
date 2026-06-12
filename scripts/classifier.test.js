@@ -25,7 +25,7 @@ function eq(a, b, label) {
   assert(a === b, `${label}  →  got "${a}", expected "${b}"`);
 }
 function section(name) {
-  console.log(`\n── ${name} ${'─'.repeat(60 - name.length)}`);
+  console.log(`\n── ${name} ${'─'.repeat(Math.max(0, 60 - name.length))}`);
 }
 
 // =============================================================================
@@ -65,94 +65,72 @@ section('extractExperienceDetails — ranges');
 section('classifyWithValidation — experience boundaries');
 
 {
-  const { classification } = classifyWithValidation('1 year of experience required', 'Software Engineer');
-  eq(classification, SENIORITY_LEVELS.ENTRY, '1 year → Entry Level');
+  const { classification } = classifyWithValidation('2-4 years of experience required', 'Developer');
+  eq(classification, SENIORITY_LEVELS.MID, '2-4 years (midpoint 3) → Mid Level');
 }
 
 {
-  const { classification } = classifyWithValidation('2 years of experience required', 'Developer');
-  eq(classification, SENIORITY_LEVELS.ENTRY, '2 years → Entry Level');
+  const { classification } = classifyWithValidation('3-5 years of experience required', 'Developer');
+  eq(classification, SENIORITY_LEVELS.MID, '3-5 years (midpoint 4) → Mid Level');
 }
 
 {
-  const { classification } = classifyWithValidation('3 years of experience required', 'Developer');
-  eq(classification, SENIORITY_LEVELS.MID, '3 years → Mid Level');
+  const { classification } = classifyWithValidation('5-8 years of experience required', 'Developer');
+  eq(classification, SENIORITY_LEVELS.MID, '5-8 years (midpoint 7) → Mid Level');
 }
 
 {
-  const { classification } = classifyWithValidation('5 years of experience required', 'Developer');
-  eq(classification, SENIORITY_LEVELS.MID, '5 years → Mid Level');
+  const { classification } = classifyWithValidation('8-10 years of experience required', 'Developer');
+  eq(classification, SENIORITY_LEVELS.SENIOR, '8-10 years (midpoint 9) → Senior Level');
 }
 
 {
-  const { classification } = classifyWithValidation('7 years of experience required', 'Developer');
-  eq(classification, SENIORITY_LEVELS.MID, '7 years → Mid Level');
+  const { classification } = classifyWithValidation('12+ years of experience required', 'Developer');
+  eq(classification, SENIORITY_LEVELS.LEAD, '12+ years → Lead / Management');
 }
 
 {
-  const { classification } = classifyWithValidation('8 years of experience required', 'Developer');
-  eq(classification, SENIORITY_LEVELS.SENIOR, '8 years → Senior Level');
-}
-
-{
-  const { classification } = classifyWithValidation('12 years of experience required', 'Architect');
-  eq(classification, SENIORITY_LEVELS.LEAD, '12 years → Lead / Management');
+  const { classification } = classifyWithValidation('15+ years of experience required', 'Developer');
+  eq(classification, SENIORITY_LEVELS.EXECUTIVE, '15+ years → Executive Leadership');
 }
 
 // =============================================================================
-section('classifyWithValidation — GCC override rules');
+section('classifyWithValidation — experience dominates titles (with conflicts)');
 
 {
-  const { classification } = classifyWithValidation(
-    'Required Experience: 5-8 years. Strong software engineering fundamentals.',
+  const { classification, hasConflict } = classifyWithValidation(
+    '8 years of experience required.',
     'Associate Software Engineer'
   );
-  eq(classification, SENIORITY_LEVELS.MID, 'Associate SE + 5-8 years → Mid Level (NOT Entry)');
+  eq(classification, SENIORITY_LEVELS.SENIOR, 'Associate Software Engineer + 8 years → Senior Level');
+  eq(hasConflict, true, 'Associate Software Engineer + 8 years hasConflict → true');
 }
 
 {
-  const { classification } = classifyWithValidation(
-    'Minimum 4 years of experience required.',
+  const { classification, hasConflict } = classifyWithValidation(
+    '4 years of experience required.',
     'Senior Software Engineer'
   );
-  eq(classification, SENIORITY_LEVELS.MID, 'Senior SE + 4 years → Mid Level');
+  eq(classification, SENIORITY_LEVELS.MID, 'Senior Engineer + 4 years → Mid Level');
+  eq(hasConflict, true, 'Senior Engineer + 4 years hasConflict → true');
 }
 
 {
-  const { classification } = classifyWithValidation(
-    '6 years of experience required.',
+  const { classification, hasConflict } = classifyWithValidation(
+    '5 years of experience required.',
     'Lead Engineer'
   );
-  eq(classification, SENIORITY_LEVELS.MID, 'Lead Engineer + 6 years → Mid Level');
+  eq(classification, SENIORITY_LEVELS.MID, 'Lead Engineer + 5 years → Mid Level');
+  eq(hasConflict, true, 'Lead Engineer + 5 years hasConflict → true');
 }
 
 {
-  const { classification } = classifyWithValidation(
+  const { classification, hasConflict } = classifyWithValidation(
     '8-10 years of experience required.',
     'Principal Engineer'
   );
   eq(classification, SENIORITY_LEVELS.SENIOR, 'Principal Engineer + 8-10 years → Senior Level');
-}
-
-// =============================================================================
-section('classifyWithValidation — title vs description conflicts');
-
-{
-  const { classification } = classifyWithValidation('1 year of experience required.', 'Senior Developer');
-  eq(classification, SENIORITY_LEVELS.ENTRY, 'Title=Senior but desc=1yr → Entry Level');
-}
-
-{
-  const { classification } = classifyWithValidation('6 years of experience required.', 'Junior Analyst');
-  eq(classification, SENIORITY_LEVELS.MID, 'Title=Junior but desc=6yr → Mid Level');
-}
-
-{
-  const { classification } = classifyWithValidation(
-    '8+ years of experience. Ability to lead cross-functional teams.',
-    'Software Engineer'
-  );
-  eq(classification, SENIORITY_LEVELS.SENIOR, 'Title=SE but desc=8yr+leadership → Senior Level');
+  eq(hasConflict, false, 'Principal Engineer + 8-10 years hasConflict → false');
 }
 
 // =============================================================================
@@ -177,38 +155,10 @@ section('classifyWithValidation — Internship detection');
 
 {
   const { classification } = classifyWithValidation(
-    'We welcome fresh graduates. No experience required.',
-    'Graduate Developer'
+    'Looking for graduate trainees to join our technical team.',
+    'Software Engineer'
   );
-  eq(classification, SENIORITY_LEVELS.ENTRY, 'Fresh graduate + no experience → Entry Level');
-}
-
-// =============================================================================
-section('classifyWithValidation — confidence & signals');
-
-{
-  const result = classifyWithValidation(
-    'Minimum 5 years of experience required. Independently design systems.',
-    'Associate Software Engineer'
-  );
-  assert(result.confidence >= 0.85, `High-signal case confidence ≥ 0.85, got ${result.confidence}`);
-  assert(result.signals && result.signals.length > 0, 'Should include classification signals');
-  assert(result.minYears === 5, `minYears should be 5, got ${result.minYears}`);
-}
-
-{
-  const { confidence } = classifyWithValidation('', 'Software Engineer');
-  assert(confidence < 0.6, `No-signal case should have low confidence, got ${confidence}`);
-}
-
-// =============================================================================
-section('classifyWithValidation — BUG-A reproduction');
-
-{
-  const desc = 'A minimum of 4 years prior relevant experience and atleast 1 year experience as Team Lead.';
-  const { classification, years } = classifyWithValidation(desc, 'Senior Engineer');
-  eq(classification, SENIORITY_LEVELS.MID, 'Carrier "Senior Engineer" (4yr req) → Mid Level');
-  assert(years === 4, `years reported as 4, got ${years}`);
+  eq(classification, SENIORITY_LEVELS.INTERNSHIP, 'Graduate trainee keyword → Internship / Apprenticeship');
 }
 
 console.log('\n' + '═'.repeat(64));

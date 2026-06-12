@@ -15,10 +15,19 @@ let aiQuotaExceeded = false;
 
 function needsArbitration(job, locScore, expResult) {
   if (locScore.confidence < 0.95) return { needed: true, reason: 'location_confidence_low' };
-  if (expResult.confidence < 0.95) return { needed: true, reason: 'experience_confidence_low' };
-  if (expResult.hasConflict) return { needed: true, reason: 'experience_signals_conflict' };
-  if (expResult.hasMultipleRanges) return { needed: true, reason: 'multiple_experience_ranges' };
   if (!job.description && !job._rawText) return { needed: true, reason: 'missing_description' };
+
+  // If years are found deterministically, do NOT run AI unless there are multiple conflicting ranges
+  if (expResult.minYears !== null) {
+    if (expResult.hasMultipleRanges) {
+      return { needed: true, reason: 'multiple_experience_ranges' };
+    }
+    return { needed: false, reason: 'deterministic_rules_sufficient' };
+  }
+
+  // If no years found, check if keyword classification has low confidence
+  if (expResult.confidence < 0.75) return { needed: true, reason: 'experience_confidence_low' };
+
   return { needed: false, reason: 'high_confidence_rules' };
 }
 
@@ -103,11 +112,15 @@ function mergeAIWithRules(aiParsed, rawText, title) {
       years: validation.years,
       minYears: validation.minYears,
       maxYears: validation.maxYears,
+      effectiveYears: validation.effectiveYears,
       remoteStatus: JobHelpers.parseRemoteStatus(title, '', rawText),
       employmentType: JobHelpers.detectEmploymentType(title, rawText),
       validation,
       aiUsed: false,
       skipReason: CircuitBreakers.isAIDisabled() ? 'ai_circuit_breaker' : 'ai_unavailable',
+      confidence: validation.confidence,
+      hasConflict: validation.hasConflict,
+      classificationSource: validation.classificationSource || 'rule-engine',
     };
   }
 
@@ -115,19 +128,30 @@ function mergeAIWithRules(aiParsed, rawText, title) {
   const aiValidation = classifyWithValidation(description, title);
   const useRules = validation.confidence >= 0.85 || validation.experienceFound;
 
+  const level = useRules ? validation.experienceLevel : (aiParsed.experienceLevel || aiValidation.experienceLevel);
+  const minYears = useRules ? validation.minYears : (aiParsed.minYearsExperience ?? aiValidation.minYears);
+  const maxYears = useRules ? validation.maxYears : (aiParsed.maxYearsExperience ?? aiValidation.maxYears);
+  const effectiveYears = (minYears !== null && maxYears !== null)
+    ? Math.round((minYears + maxYears) / 2)
+    : minYears;
+
   return {
     description,
     skills: aiParsed.skills || JobHelpers.extractSkills(title, description),
-    level: useRules ? validation.experienceLevel : (aiParsed.experienceLevel || aiValidation.experienceLevel),
-    years: useRules ? validation.years : (aiParsed.minYearsExperience ?? aiValidation.years),
-    minYears: useRules ? validation.minYears : (aiParsed.minYearsExperience ?? aiValidation.minYears),
-    maxYears: useRules ? validation.maxYears : (aiParsed.maxYearsExperience ?? aiValidation.maxYears),
+    level,
+    years: effectiveYears ?? (useRules ? validation.years : (aiParsed.minYearsExperience ?? aiValidation.years)),
+    minYears,
+    maxYears,
+    effectiveYears,
     remoteStatus: aiParsed.remoteStatus || JobHelpers.parseRemoteStatus(title, aiParsed.location, description),
     employmentType: aiParsed.employmentType || JobHelpers.detectEmploymentType(title, description),
     location: aiParsed.location,
     validation: useRules ? validation : aiValidation,
     aiUsed: true,
     skipReason: null,
+    confidence: useRules ? validation.confidence : 0.95,
+    hasConflict: useRules ? validation.hasConflict : false,
+    classificationSource: useRules ? (validation.classificationSource || 'rule-engine') : 'ai-arbitrator',
   };
 }
 

@@ -141,6 +141,7 @@ class GenericAdapter extends BaseAdapter {
         return (main || document.body).innerText;
       });
       rawText = rawText.replace(/\s+/g, ' ').trim();
+      if (!rawText) throw new Error('parse_failure: Extracted text is empty');
     } finally {
       await page.close();
       CloudflareResilience.releaseContext(context);

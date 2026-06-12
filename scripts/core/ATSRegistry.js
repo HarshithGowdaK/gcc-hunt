@@ -15,6 +15,7 @@ const API_PATTERNS = {
   successfactors: [/successfactors/i, /jobs\.sap\.com/i],
   icims: [/icims\.com/i],
   taleo: [/taleo\.net/i],
+  ashby: [/api\.ashbyhq\.com/i, /jobs\.ashbyhq\.com/i],
 };
 
 class ATSRegistry {
@@ -35,6 +36,7 @@ class ATSRegistry {
       jobvite: [/\.jobvite\.com/i],
       beamery: [/\.beamery\.com/i],
       sap: [/jobs\.sap\.com/i],
+      ashby: [/\.ashbyhq\.com/i],
     };
 
     this.domSignatures = {
@@ -52,6 +54,7 @@ class ATSRegistry {
       avature: ['script[src*="avature.net"]'],
       jobvite: ['script[src*="jobvite.com"]'],
       beamery: ['script[src*="beamery.com"]'],
+      ashby: ['script[src*="ashbyhq.com"]'],
     };
   }
 

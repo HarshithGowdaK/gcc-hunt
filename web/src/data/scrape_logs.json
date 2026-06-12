@@ -3,6 +3,969 @@
     "companyId": "comp_4",
     "companyName": "AECOM",
     "status": "empty",
+    "jobsDiscovered": 1,
+    "jobsAccepted": 0,
+    "jobsRejected": 1,
+    "duplicatesRemoved": 0,
+    "locationRejected": 0,
+    "aiCalls": 0,
+    "aiSkipped": 0,
+    "atsDetected": "generic",
+    "atsConfidence": 0.5,
+    "quality": {
+      "qualityScore": "0.00",
+      "coverageScore": 0,
+      "extractionScore": "0.00",
+      "classificationScore": "0.00",
+      "baselineJobs": 0,
+      "coverageRegression": false,
+      "warning": null
+    },
+    "reasons": {
+      "rejections": {
+        "detail_fetch_parse_failure": 1
+      },
+      "locationFailures": {},
+      "aiSkipReasons": {},
+      "atsSelection": {
+        "workday": {
+          "confidence": 0.86,
+          "method": "dom"
+        },
+        "generic": {
+          "confidence": 0.5,
+          "method": "fallback"
+        }
+      },
+      "detailFailures": {
+        "parse_failure": 1
+      }
+    },
+    "timestamp": "2026-06-12T15:18:36.165Z"
+  },
+  {
+    "companyId": "comp_3",
+    "companyName": "ADP",
+    "status": "success",
+    "jobsDiscovered": 37,
+    "jobsAccepted": 3,
+    "jobsRejected": 14,
+    "duplicatesRemoved": 20,
+    "locationRejected": 0,
+    "aiCalls": 6,
+    "aiSkipped": 17,
+    "atsDetected": "generic",
+    "atsConfidence": 0.5,
+    "quality": {
+      "qualityScore": "0.38",
+      "coverageScore": 3,
+      "extractionScore": "0.62",
+      "classificationScore": "0.13",
+      "baselineJobs": 51,
+      "coverageRegression": true,
+      "warning": "Coverage dropped from 51 to 3 jobs — investigate ATS adapter"
+    },
+    "reasons": {
+      "rejections": {
+        "invalid_title": 14
+      },
+      "locationFailures": {},
+      "aiSkipReasons": {
+        "ai_unavailable": 17
+      },
+      "atsSelection": {
+        "workday": {
+          "confidence": 0.86,
+          "method": "dom"
+        },
+        "generic": {
+          "confidence": 0.5,
+          "method": "fallback"
+        }
+      },
+      "detailFailures": {}
+    },
+    "timestamp": "2026-06-12T15:18:36.165Z"
+  },
+  {
+    "companyId": "comp_2",
+    "companyName": "ADM",
+    "status": "empty",
+    "jobsDiscovered": 0,
+    "jobsAccepted": 0,
+    "jobsRejected": 0,
+    "duplicatesRemoved": 0,
+    "locationRejected": 0,
+    "aiCalls": 0,
+    "aiSkipped": 0,
+    "atsDetected": "generic",
+    "atsConfidence": 0.5,
+    "quality": {
+      "qualityScore": "0.00",
+      "coverageScore": 0,
+      "extractionScore": "0.00",
+      "classificationScore": "0.00",
+      "baselineJobs": 0,
+      "coverageRegression": false,
+      "warning": null
+    },
+    "reasons": {
+      "rejections": {},
+      "locationFailures": {},
+      "aiSkipReasons": {},
+      "atsSelection": {
+        "successfactors": {
+          "confidence": 0.8,
+          "method": "html"
+        },
+        "generic": {
+          "confidence": 0.5,
+          "method": "fallback"
+        }
+      },
+      "detailFailures": {}
+    },
+    "timestamp": "2026-06-12T15:18:36.165Z"
+  },
+  {
+    "companyId": "comp_1",
+    "companyName": "ABB",
+    "status": "success",
+    "jobsDiscovered": 10,
+    "jobsAccepted": 3,
+    "jobsRejected": 6,
+    "duplicatesRemoved": 1,
+    "locationRejected": 0,
+    "aiCalls": 4,
+    "aiSkipped": 0,
+    "atsDetected": "generic",
+    "atsConfidence": 0.5,
+    "quality": {
+      "qualityScore": "0.57",
+      "coverageScore": 3,
+      "extractionScore": "0.40",
+      "classificationScore": "0.75",
+      "baselineJobs": 2,
+      "coverageRegression": false,
+      "warning": null
+    },
+    "reasons": {
+      "rejections": {
+        "detail_fetch_timeout": 6
+      },
+      "locationFailures": {},
+      "aiSkipReasons": {},
+      "atsSelection": {
+        "workday": {
+          "confidence": 0.88,
+          "method": "html"
+        },
+        "generic": {
+          "confidence": 0.5,
+          "method": "fallback"
+        }
+      },
+      "detailFailures": {
+        "timeout": 6
+      }
+    },
+    "timestamp": "2026-06-12T15:18:36.165Z"
+  },
+  {
+    "companyId": "comp_0",
+    "companyName": "3M",
+    "status": "success",
+    "jobsDiscovered": 668,
+    "jobsAccepted": 31,
+    "jobsRejected": 1,
+    "duplicatesRemoved": 636,
+    "locationRejected": 0,
+    "aiCalls": 72,
+    "aiSkipped": 26,
+    "atsDetected": "workday",
+    "atsConfidence": 0.98,
+    "quality": {
+      "qualityScore": "0.23",
+      "coverageScore": 31,
+      "extractionScore": "0.15",
+      "classificationScore": "0.32",
+      "baselineJobs": 708,
+      "coverageRegression": true,
+      "warning": "Coverage dropped from 708 to 31 jobs — investigate ATS adapter"
+    },
+    "reasons": {
+      "rejections": {
+        "invalid_title": 1
+      },
+      "locationFailures": {},
+      "aiSkipReasons": {
+        "ai_unavailable": 26
+      },
+      "atsSelection": {
+        "workday": {
+          "confidence": 0.98,
+          "method": "url"
+        }
+      },
+      "detailFailures": {}
+    },
+    "timestamp": "2026-06-12T15:18:36.164Z"
+  },
+  {
+    "companyId": "comp_4",
+    "companyName": "AECOM",
+    "status": "empty",
+    "jobsDiscovered": 1,
+    "jobsAccepted": 0,
+    "jobsRejected": 1,
+    "duplicatesRemoved": 0,
+    "locationRejected": 0,
+    "aiCalls": 0,
+    "aiSkipped": 0,
+    "atsDetected": "generic",
+    "atsConfidence": 0.5,
+    "quality": {
+      "qualityScore": "0.00",
+      "coverageScore": 0,
+      "extractionScore": "0.00",
+      "classificationScore": "0.00",
+      "baselineJobs": 0,
+      "coverageRegression": false,
+      "warning": null
+    },
+    "reasons": {
+      "rejections": {
+        "detail_fetch_parse_failure": 1
+      },
+      "locationFailures": {},
+      "aiSkipReasons": {},
+      "atsSelection": {
+        "workday": {
+          "confidence": 0.86,
+          "method": "dom"
+        },
+        "generic": {
+          "confidence": 0.5,
+          "method": "fallback"
+        }
+      },
+      "detailFailures": {
+        "parse_failure": 1
+      }
+    },
+    "timestamp": "2026-06-12T14:51:03.144Z"
+  },
+  {
+    "companyId": "comp_3",
+    "companyName": "ADP",
+    "status": "success",
+    "jobsDiscovered": 37,
+    "jobsAccepted": 1,
+    "jobsRejected": 14,
+    "duplicatesRemoved": 22,
+    "locationRejected": 0,
+    "aiCalls": 0,
+    "aiSkipped": 23,
+    "atsDetected": "generic",
+    "atsConfidence": 0.5,
+    "quality": {
+      "qualityScore": "0.33",
+      "coverageScore": 1,
+      "extractionScore": "0.62",
+      "classificationScore": "0.04",
+      "baselineJobs": 50,
+      "coverageRegression": true,
+      "warning": "Coverage dropped from 50 to 1 jobs — investigate ATS adapter"
+    },
+    "reasons": {
+      "rejections": {
+        "invalid_title": 14
+      },
+      "locationFailures": {},
+      "aiSkipReasons": {
+        "ai_unavailable": 23
+      },
+      "atsSelection": {
+        "workday": {
+          "confidence": 0.86,
+          "method": "dom"
+        },
+        "generic": {
+          "confidence": 0.5,
+          "method": "fallback"
+        }
+      },
+      "detailFailures": {}
+    },
+    "timestamp": "2026-06-12T14:49:37.914Z"
+  },
+  {
+    "companyId": "comp_0",
+    "companyName": "3M",
+    "status": "success",
+    "jobsDiscovered": 668,
+    "jobsAccepted": 543,
+    "jobsRejected": 1,
+    "duplicatesRemoved": 124,
+    "locationRejected": 0,
+    "aiCalls": 0,
+    "aiSkipped": 667,
+    "atsDetected": "workday",
+    "atsConfidence": 0.98,
+    "quality": {
+      "qualityScore": "0.91",
+      "coverageScore": 543,
+      "extractionScore": "1.00",
+      "classificationScore": "0.81",
+      "baselineJobs": 165,
+      "coverageRegression": false,
+      "warning": null
+    },
+    "reasons": {
+      "rejections": {
+        "detail_fetch_parse_failure": 1
+      },
+      "locationFailures": {},
+      "aiSkipReasons": {
+        "ai_unavailable": 667
+      },
+      "atsSelection": {
+        "workday": {
+          "confidence": 0.98,
+          "method": "url"
+        }
+      },
+      "detailFailures": {
+        "parse_failure": 1
+      }
+    },
+    "timestamp": "2026-06-12T14:49:10.115Z"
+  },
+  {
+    "companyId": "comp_4",
+    "companyName": "AECOM",
+    "status": "empty",
+    "jobsDiscovered": 1,
+    "jobsAccepted": 0,
+    "jobsRejected": 0,
+    "duplicatesRemoved": 0,
+    "locationRejected": 1,
+    "aiCalls": 0,
+    "aiSkipped": 0,
+    "atsDetected": "generic",
+    "atsConfidence": 0.5,
+    "quality": {
+      "qualityScore": "0.00",
+      "coverageScore": 0,
+      "extractionScore": "0.00",
+      "classificationScore": "0.00",
+      "baselineJobs": 0,
+      "coverageRegression": false,
+      "warning": null
+    },
+    "reasons": {
+      "rejections": {},
+      "locationFailures": {
+        "discovery_location_filter": 1
+      },
+      "aiSkipReasons": {},
+      "atsSelection": {
+        "workday": {
+          "confidence": 0.86,
+          "method": "dom"
+        },
+        "generic": {
+          "confidence": 0.5,
+          "method": "fallback"
+        }
+      }
+    },
+    "timestamp": "2026-06-12T13:48:07.518Z"
+  },
+  {
+    "companyId": "comp_3",
+    "companyName": "ADP",
+    "status": "success",
+    "jobsDiscovered": 37,
+    "jobsAccepted": 1,
+    "jobsRejected": 14,
+    "duplicatesRemoved": 19,
+    "locationRejected": 3,
+    "aiCalls": 2,
+    "aiSkipped": 0,
+    "atsDetected": "generic",
+    "atsConfidence": 0.5,
+    "quality": {
+      "qualityScore": "0.28",
+      "coverageScore": 1,
+      "extractionScore": "0.05",
+      "classificationScore": "0.50",
+      "baselineJobs": 49,
+      "coverageRegression": true,
+      "warning": "Coverage dropped from 49 to 1 jobs — investigate ATS adapter"
+    },
+    "reasons": {
+      "rejections": {
+        "invalid_title": 14
+      },
+      "locationFailures": {
+        "discovery_location_filter": 3
+      },
+      "aiSkipReasons": {},
+      "atsSelection": {
+        "workday": {
+          "confidence": 0.86,
+          "method": "dom"
+        },
+        "generic": {
+          "confidence": 0.5,
+          "method": "fallback"
+        }
+      }
+    },
+    "timestamp": "2026-06-12T13:48:07.518Z"
+  },
+  {
+    "companyId": "comp_2",
+    "companyName": "ADM",
+    "status": "empty",
+    "jobsDiscovered": 0,
+    "jobsAccepted": 0,
+    "jobsRejected": 0,
+    "duplicatesRemoved": 0,
+    "locationRejected": 0,
+    "aiCalls": 0,
+    "aiSkipped": 0,
+    "atsDetected": "generic",
+    "atsConfidence": 0.5,
+    "quality": {
+      "qualityScore": "0.00",
+      "coverageScore": 0,
+      "extractionScore": "0.00",
+      "classificationScore": "0.00",
+      "baselineJobs": 0,
+      "coverageRegression": false,
+      "warning": null
+    },
+    "reasons": {
+      "rejections": {},
+      "locationFailures": {},
+      "aiSkipReasons": {},
+      "atsSelection": {
+        "successfactors": {
+          "confidence": 0.8,
+          "method": "html"
+        },
+        "generic": {
+          "confidence": 0.5,
+          "method": "fallback"
+        }
+      }
+    },
+    "timestamp": "2026-06-12T13:48:07.518Z"
+  },
+  {
+    "companyId": "comp_1",
+    "companyName": "ABB",
+    "status": "empty",
+    "jobsDiscovered": 10,
+    "jobsAccepted": 0,
+    "jobsRejected": 1,
+    "duplicatesRemoved": 2,
+    "locationRejected": 7,
+    "aiCalls": 0,
+    "aiSkipped": 0,
+    "atsDetected": "generic",
+    "atsConfidence": 0.5,
+    "quality": {
+      "qualityScore": "0.00",
+      "coverageScore": 0,
+      "extractionScore": "0.00",
+      "classificationScore": "0.00",
+      "baselineJobs": 2,
+      "coverageRegression": false,
+      "warning": null
+    },
+    "reasons": {
+      "rejections": {
+        "invalid_title": 1
+      },
+      "locationFailures": {
+        "discovery_location_filter": 7
+      },
+      "aiSkipReasons": {},
+      "atsSelection": {
+        "workday": {
+          "confidence": 0.88,
+          "method": "html"
+        },
+        "generic": {
+          "confidence": 0.5,
+          "method": "fallback"
+        }
+      }
+    },
+    "timestamp": "2026-06-12T13:48:07.518Z"
+  },
+  {
+    "companyId": "comp_0",
+    "companyName": "3M",
+    "status": "success",
+    "jobsDiscovered": 669,
+    "jobsAccepted": 3,
+    "jobsRejected": 32,
+    "duplicatesRemoved": 82,
+    "locationRejected": 552,
+    "aiCalls": 4,
+    "aiSkipped": 0,
+    "atsDetected": "workday",
+    "atsConfidence": 0.98,
+    "quality": {
+      "qualityScore": "0.38",
+      "coverageScore": 3,
+      "extractionScore": "0.01",
+      "classificationScore": "0.75",
+      "baselineJobs": 162,
+      "coverageRegression": true,
+      "warning": "Coverage dropped from 162 to 3 jobs — investigate ATS adapter"
+    },
+    "reasons": {
+      "rejections": {
+        "invalid_title": 32
+      },
+      "locationFailures": {
+        "discovery_location_filter": 552
+      },
+      "aiSkipReasons": {},
+      "atsSelection": {
+        "workday": {
+          "confidence": 0.98,
+          "method": "url"
+        }
+      }
+    },
+    "timestamp": "2026-06-12T13:48:07.517Z"
+  },
+  {
+    "companyId": "comp_4",
+    "companyName": "AECOM",
+    "status": "empty",
+    "jobsDiscovered": 1,
+    "jobsAccepted": 0,
+    "jobsRejected": 0,
+    "duplicatesRemoved": 0,
+    "locationRejected": 1,
+    "aiCalls": 0,
+    "aiSkipped": 0,
+    "atsDetected": "generic",
+    "atsConfidence": 0.5,
+    "quality": {
+      "qualityScore": "0.00",
+      "coverageScore": 0,
+      "extractionScore": "0.00",
+      "classificationScore": "0.00",
+      "baselineJobs": 0,
+      "coverageRegression": false,
+      "warning": null
+    },
+    "reasons": {
+      "rejections": {},
+      "locationFailures": {
+        "discovery_location_filter": 1
+      },
+      "aiSkipReasons": {},
+      "atsSelection": {
+        "workday": {
+          "confidence": 0.86,
+          "method": "dom"
+        },
+        "generic": {
+          "confidence": 0.5,
+          "method": "fallback"
+        }
+      }
+    },
+    "timestamp": "2026-06-12T11:25:39.581Z"
+  },
+  {
+    "companyId": "comp_3",
+    "companyName": "ADP",
+    "status": "success",
+    "jobsDiscovered": 37,
+    "jobsAccepted": 13,
+    "jobsRejected": 11,
+    "duplicatesRemoved": 10,
+    "locationRejected": 3,
+    "aiCalls": 15,
+    "aiSkipped": 0,
+    "atsDetected": "generic",
+    "atsConfidence": 0.5,
+    "quality": {
+      "qualityScore": "0.64",
+      "coverageScore": 13,
+      "extractionScore": "0.41",
+      "classificationScore": "0.87",
+      "baselineJobs": 36,
+      "coverageRegression": false,
+      "warning": null
+    },
+    "reasons": {
+      "rejections": {
+        "invalid_title": 11
+      },
+      "locationFailures": {
+        "discovery_location_filter": 3
+      },
+      "aiSkipReasons": {},
+      "atsSelection": {
+        "workday": {
+          "confidence": 0.86,
+          "method": "dom"
+        },
+        "generic": {
+          "confidence": 0.5,
+          "method": "fallback"
+        }
+      }
+    },
+    "timestamp": "2026-06-12T11:25:39.581Z"
+  },
+  {
+    "companyId": "comp_2",
+    "companyName": "ADM",
+    "status": "empty",
+    "jobsDiscovered": 0,
+    "jobsAccepted": 0,
+    "jobsRejected": 0,
+    "duplicatesRemoved": 0,
+    "locationRejected": 0,
+    "aiCalls": 0,
+    "aiSkipped": 0,
+    "atsDetected": "generic",
+    "atsConfidence": 0.5,
+    "quality": {
+      "qualityScore": "0.00",
+      "coverageScore": 0,
+      "extractionScore": "0.00",
+      "classificationScore": "0.00",
+      "baselineJobs": 0,
+      "coverageRegression": false,
+      "warning": null
+    },
+    "reasons": {
+      "rejections": {},
+      "locationFailures": {},
+      "aiSkipReasons": {},
+      "atsSelection": {
+        "successfactors": {
+          "confidence": 0.8,
+          "method": "html"
+        },
+        "generic": {
+          "confidence": 0.5,
+          "method": "fallback"
+        }
+      }
+    },
+    "timestamp": "2026-06-12T11:25:39.581Z"
+  },
+  {
+    "companyId": "comp_1",
+    "companyName": "ABB",
+    "status": "empty",
+    "jobsDiscovered": 10,
+    "jobsAccepted": 0,
+    "jobsRejected": 1,
+    "duplicatesRemoved": 2,
+    "locationRejected": 7,
+    "aiCalls": 0,
+    "aiSkipped": 0,
+    "atsDetected": "generic",
+    "atsConfidence": 0.5,
+    "quality": {
+      "qualityScore": "0.00",
+      "coverageScore": 0,
+      "extractionScore": "0.00",
+      "classificationScore": "0.00",
+      "baselineJobs": 2,
+      "coverageRegression": false,
+      "warning": null
+    },
+    "reasons": {
+      "rejections": {
+        "invalid_title": 1
+      },
+      "locationFailures": {
+        "discovery_location_filter": 7
+      },
+      "aiSkipReasons": {},
+      "atsSelection": {
+        "workday": {
+          "confidence": 0.88,
+          "method": "html"
+        },
+        "generic": {
+          "confidence": 0.5,
+          "method": "fallback"
+        }
+      }
+    },
+    "timestamp": "2026-06-12T11:25:39.580Z"
+  },
+  {
+    "companyId": "comp_0",
+    "companyName": "3M",
+    "status": "success",
+    "jobsDiscovered": 665,
+    "jobsAccepted": 9,
+    "jobsRejected": 16,
+    "duplicatesRemoved": 78,
+    "locationRejected": 562,
+    "aiCalls": 11,
+    "aiSkipped": 1,
+    "atsDetected": "workday",
+    "atsConfidence": 0.98,
+    "quality": {
+      "qualityScore": "0.38",
+      "coverageScore": 9,
+      "extractionScore": "0.02",
+      "classificationScore": "0.75",
+      "baselineJobs": 153,
+      "coverageRegression": true,
+      "warning": "Coverage dropped from 153 to 9 jobs — investigate ATS adapter"
+    },
+    "reasons": {
+      "rejections": {
+        "invalid_title": 16
+      },
+      "locationFailures": {
+        "discovery_location_filter": 562
+      },
+      "aiSkipReasons": {
+        "ai_unavailable": 1
+      },
+      "atsSelection": {
+        "workday": {
+          "confidence": 0.98,
+          "method": "url"
+        }
+      }
+    },
+    "timestamp": "2026-06-12T11:25:39.580Z"
+  },
+  {
+    "companyId": "comp_4",
+    "companyName": "AECOM",
+    "status": "empty",
+    "jobsDiscovered": 1,
+    "jobsAccepted": 0,
+    "jobsRejected": 0,
+    "duplicatesRemoved": 0,
+    "locationRejected": 1,
+    "aiCalls": 0,
+    "aiSkipped": 0,
+    "atsDetected": "generic",
+    "atsConfidence": 0.5,
+    "quality": {
+      "qualityScore": "0.00",
+      "coverageScore": 0,
+      "extractionScore": "0.00",
+      "classificationScore": "0.00",
+      "baselineJobs": 0,
+      "coverageRegression": false,
+      "warning": null
+    },
+    "reasons": {
+      "rejections": {},
+      "locationFailures": {
+        "discovery_location_filter": 1
+      },
+      "aiSkipReasons": {},
+      "atsSelection": {
+        "workday": {
+          "confidence": 0.86,
+          "method": "dom"
+        },
+        "generic": {
+          "confidence": 0.5,
+          "method": "fallback"
+        }
+      }
+    },
+    "timestamp": "2026-06-12T11:21:06.338Z"
+  },
+  {
+    "companyId": "comp_3",
+    "companyName": "ADP",
+    "status": "empty",
+    "jobsDiscovered": 37,
+    "jobsAccepted": 0,
+    "jobsRejected": 11,
+    "duplicatesRemoved": 23,
+    "locationRejected": 3,
+    "aiCalls": 0,
+    "aiSkipped": 15,
+    "atsDetected": "generic",
+    "atsConfidence": 0.5,
+    "quality": {
+      "qualityScore": "0.20",
+      "coverageScore": 0,
+      "extractionScore": "0.41",
+      "classificationScore": "0.00",
+      "baselineJobs": 36,
+      "coverageRegression": true,
+      "warning": "Coverage dropped from 36 to 0 jobs — investigate ATS adapter"
+    },
+    "reasons": {
+      "rejections": {
+        "invalid_title": 11
+      },
+      "locationFailures": {
+        "discovery_location_filter": 3
+      },
+      "aiSkipReasons": {
+        "ai_unavailable": 15
+      },
+      "atsSelection": {
+        "workday": {
+          "confidence": 0.86,
+          "method": "dom"
+        },
+        "generic": {
+          "confidence": 0.5,
+          "method": "fallback"
+        }
+      }
+    },
+    "timestamp": "2026-06-12T11:21:06.338Z"
+  },
+  {
+    "companyId": "comp_2",
+    "companyName": "ADM",
+    "status": "empty",
+    "jobsDiscovered": 0,
+    "jobsAccepted": 0,
+    "jobsRejected": 0,
+    "duplicatesRemoved": 0,
+    "locationRejected": 0,
+    "aiCalls": 0,
+    "aiSkipped": 0,
+    "atsDetected": "generic",
+    "atsConfidence": 0.5,
+    "quality": {
+      "qualityScore": "0.00",
+      "coverageScore": 0,
+      "extractionScore": "0.00",
+      "classificationScore": "0.00",
+      "baselineJobs": 0,
+      "coverageRegression": false,
+      "warning": null
+    },
+    "reasons": {
+      "rejections": {},
+      "locationFailures": {},
+      "aiSkipReasons": {},
+      "atsSelection": {
+        "successfactors": {
+          "confidence": 0.8,
+          "method": "html"
+        },
+        "generic": {
+          "confidence": 0.5,
+          "method": "fallback"
+        }
+      }
+    },
+    "timestamp": "2026-06-12T11:21:06.338Z"
+  },
+  {
+    "companyId": "comp_1",
+    "companyName": "ABB",
+    "status": "empty",
+    "jobsDiscovered": 10,
+    "jobsAccepted": 0,
+    "jobsRejected": 1,
+    "duplicatesRemoved": 2,
+    "locationRejected": 7,
+    "aiCalls": 0,
+    "aiSkipped": 0,
+    "atsDetected": "generic",
+    "atsConfidence": 0.5,
+    "quality": {
+      "qualityScore": "0.00",
+      "coverageScore": 0,
+      "extractionScore": "0.00",
+      "classificationScore": "0.00",
+      "baselineJobs": 2,
+      "coverageRegression": false,
+      "warning": null
+    },
+    "reasons": {
+      "rejections": {
+        "invalid_title": 1
+      },
+      "locationFailures": {
+        "discovery_location_filter": 7
+      },
+      "aiSkipReasons": {},
+      "atsSelection": {
+        "workday": {
+          "confidence": 0.88,
+          "method": "html"
+        },
+        "generic": {
+          "confidence": 0.5,
+          "method": "fallback"
+        }
+      }
+    },
+    "timestamp": "2026-06-12T11:21:06.338Z"
+  },
+  {
+    "companyId": "comp_0",
+    "companyName": "3M",
+    "status": "empty",
+    "jobsDiscovered": 665,
+    "jobsAccepted": 0,
+    "jobsRejected": 16,
+    "duplicatesRemoved": 87,
+    "locationRejected": 562,
+    "aiCalls": 0,
+    "aiSkipped": 12,
+    "atsDetected": "workday",
+    "atsConfidence": 0.98,
+    "quality": {
+      "qualityScore": "0.01",
+      "coverageScore": 0,
+      "extractionScore": "0.02",
+      "classificationScore": "0.00",
+      "baselineJobs": 153,
+      "coverageRegression": true,
+      "warning": "Coverage dropped from 153 to 0 jobs — investigate ATS adapter"
+    },
+    "reasons": {
+      "rejections": {
+        "invalid_title": 16
+      },
+      "locationFailures": {
+        "discovery_location_filter": 562
+      },
+      "aiSkipReasons": {
+        "ai_unavailable": 12
+      },
+      "atsSelection": {
+        "workday": {
+          "confidence": 0.98,
+          "method": "url"
+        }
+      }
+    },
+    "timestamp": "2026-06-12T11:21:06.337Z"
+  },
+  {
+    "companyId": "comp_4",
+    "companyName": "AECOM",
+    "status": "empty",
     "jobsDiscovered": 0,
     "jobsAccepted": 0,
     "jobsRejected": 0,

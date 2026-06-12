@@ -29,6 +29,24 @@ class WorkdayAdapter extends BaseAdapter {
     else if (pathSegments.length === 1 && pathSegments[0] !== 'en-US') site = pathSegments[0];
 
     const apiUrl = `https://${host}/wday/cxs/${tenant}/${site}/jobs`;
+    
+    // P3 Adapter Verification
+    try {
+      await axios.get(`${apiUrl}?limit=1`, { headers: AXIOS_HEADERS, timeout: 10000 });
+    } catch (err) {
+      const status = err.response?.status;
+      if (status === 404) {
+        console.warn(`[WorkdayAdapter] 404 Verification failed for ${apiUrl}. Definitively falling back.`);
+        throw new Error('ADAPTER_VERIFY_FAILED:404');
+      } else if (status === 403 || status === 429) {
+        console.warn(`[WorkdayAdapter] ${status} during verification for ${apiUrl}. Trying anyway (might be anti-bot).`);
+      } else if (err.code === 'ECONNABORTED') {
+        console.warn(`[WorkdayAdapter] Timeout during verification for ${apiUrl}. Trying anyway.`);
+      } else {
+        console.warn(`[WorkdayAdapter] Verification threw ${err.message}. Trying anyway.`);
+      }
+    }
+
     let offset = 0;
     const limit = 20;
     let hasMore = true;
@@ -61,13 +79,15 @@ class WorkdayAdapter extends BaseAdapter {
   }
 
   async fetchJob(jobUrl, reqId, internalJobRef) {
-    if (!internalJobRef || !internalJobRef._detailApiUrl) return '';
-    const detailRes = await withRetry(() => axios.get(internalJobRef._detailApiUrl, { timeout: 15000 }));
+    if (!internalJobRef || !internalJobRef._detailApiUrl) {
+      throw new Error('missing_detail_url');
+    }
+    const detailRes = await withRetry(() => axios.get(internalJobRef._detailApiUrl, { headers: AXIOS_HEADERS, timeout: 15000 }));
     if (detailRes.data?.jobPostingInfo) {
       const info = detailRes.data.jobPostingInfo;
       return (info.jobDescription || '').replace(/<[^>]*>/g, '\n').replace(/\s+/g, ' ').trim();
     }
-    return '';
+    throw new Error('parse_failure: jobPostingInfo missing');
   }
 
   async normalize(jobData, rawText, locationEngine, experienceEngine, aiArbitrator) {

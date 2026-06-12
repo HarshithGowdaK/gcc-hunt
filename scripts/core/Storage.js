@@ -13,9 +13,9 @@ class Storage {
     this.jobs = [];
     this.logs = [];
     this.companies = [];
-    this.primaryFingerprints = new Set();
-    this.secondaryFingerprints = new Set();
-    this.contentFingerprints = new Set();
+    this.primaryFingerprints = new Map();
+    this.secondaryFingerprints = new Map();
+    this.contentFingerprints = new Map();
     this.baselineCounts = new Map();
   }
 
@@ -46,9 +46,10 @@ class Storage {
 
     for (const job of this.jobs) {
       if (job.fingerprints) {
-        if (job.fingerprints.primary) this.primaryFingerprints.add(job.fingerprints.primary);
-        if (job.fingerprints.secondary) this.secondaryFingerprints.add(job.fingerprints.secondary);
-        if (job.fingerprints.content) this.contentFingerprints.add(job.fingerprints.content);
+        const meta = { id: job.id, title: job.title, companyId: job.companyId };
+        if (job.fingerprints.primary) this.primaryFingerprints.set(job.fingerprints.primary, meta);
+        if (job.fingerprints.secondary) this.secondaryFingerprints.set(job.fingerprints.secondary, meta);
+        if (job.fingerprints.content) this.contentFingerprints.set(job.fingerprints.content, meta);
       }
       const cid = job.companyId;
       this.baselineCounts.set(cid, (this.baselineCounts.get(cid) || 0) + 1);
@@ -61,20 +62,34 @@ class Storage {
     return this.baselineCounts.get(companyId) || 0;
   }
 
-  isDuplicate(fingerprints) {
-    if (!fingerprints) return false;
-    if (fingerprints.primary && this.primaryFingerprints.has(fingerprints.primary)) return true;
-    if (fingerprints.secondary && this.secondaryFingerprints.has(fingerprints.secondary)) return true;
-    if (fingerprints.content && this.contentFingerprints.has(fingerprints.content)) return true;
+  isDuplicate(fps) {
+    if (!fps) return false;
+    if (fps.primary && this.primaryFingerprints.has(fps.primary)) return true;
+    if (fps.secondary && this.secondaryFingerprints.has(fps.secondary)) return true;
+    if (fps.content && this.contentFingerprints.has(fps.content)) return true;
     return false;
+  }
+
+  getMatchedJobMeta(fps) {
+    if (!fps) return null;
+    if (fps.primary && this.primaryFingerprints.has(fps.primary)) return this.primaryFingerprints.get(fps.primary);
+    if (fps.secondary && this.secondaryFingerprints.has(fps.secondary)) return this.secondaryFingerprints.get(fps.secondary);
+    if (fps.content && this.contentFingerprints.has(fps.content)) return this.contentFingerprints.get(fps.content);
+    return null;
+  }
+
+  addFingerprints(fps, jobMeta) {
+    if (!fps) return;
+    if (fps.primary) this.primaryFingerprints.set(fps.primary, jobMeta);
+    if (fps.secondary) this.secondaryFingerprints.set(fps.secondary, jobMeta);
+    if (fps.content) this.contentFingerprints.set(fps.content, jobMeta);
   }
 
   saveJob(job) {
     this.jobs.push(job);
     if (job.fingerprints) {
-      if (job.fingerprints.primary) this.primaryFingerprints.add(job.fingerprints.primary);
-      if (job.fingerprints.secondary) this.secondaryFingerprints.add(job.fingerprints.secondary);
-      if (job.fingerprints.content) this.contentFingerprints.add(job.fingerprints.content);
+      const meta = { id: job.id, title: job.title, companyId: job.companyId };
+      this.addFingerprints(job.fingerprints, meta);
     }
   }
 
