@@ -575,7 +575,14 @@ function JobsContent() {
                 </h4>
                 <div className="flex justify-between border-b border-[#E5E1D8]/60 pb-1.5">
                   <span className="text-[#7A8471] font-semibold">Experience Tier</span>
-                  <span className="text-[#161616]">{activeJobDetails.experienceLevel || 'Mid Level'} ({activeJobDetails.yearsExperience || '0-2'} yrs)</span>
+                  <span className="text-[#161616]">
+                    {activeJobDetails.experienceLevel || 'Mid Level'}
+                    {' ('}
+                    {activeJobDetails.yearsExperienceMax && activeJobDetails.yearsExperienceMax > (activeJobDetails.yearsExperience || 0)
+                      ? `${activeJobDetails.yearsExperience}-${activeJobDetails.yearsExperienceMax}`
+                      : (activeJobDetails.yearsExperience || '0-2')}
+                    {' yrs)'}
+                  </span>
                 </div>
                 <div className="flex justify-between border-b border-[#E5E1D8]/60 pb-1.5">
                   <span className="text-[#7A8471] font-semibold">Deployment model</span>

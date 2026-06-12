@@ -146,7 +146,11 @@ export default function JobDetailPage() {
               <span className="text-[9px] uppercase font-bold text-[#7A8471] tracking-wider">Years Exp</span>
               <span className="mt-1.5 text-xs font-bold text-[#161616] flex items-center gap-1.5 uppercase tracking-wide">
                 <Layers className="h-3.5 w-3.5 text-[#D16A4A]" />
-                {jobDetails.yearsExperience !== undefined && jobDetails.yearsExperience > 0 ? `${jobDetails.yearsExperience}+ Years` : 'Not Specified'}
+                {jobDetails.yearsExperience !== undefined && jobDetails.yearsExperience > 0
+                  ? (jobDetails.yearsExperienceMax && jobDetails.yearsExperienceMax > jobDetails.yearsExperience
+                    ? `${jobDetails.yearsExperience}-${jobDetails.yearsExperienceMax} Years`
+                    : `${jobDetails.yearsExperience}+ Years`)
+                  : 'Not Specified'}
               </span>
             </div>
 

@@ -12,6 +12,7 @@ interface JobCardProps {
     state: string;
     experienceLevel?: string;
     yearsExperience?: number;
+    yearsExperienceMax?: number;
     employmentType?: string;
     skills: string[];
     applyUrl: string;
@@ -108,7 +109,9 @@ export default function JobCard({ job, isActive = false, onClick }: JobCardProps
           {job.yearsExperience !== undefined && job.yearsExperience > 0 && (
             <span className="flex items-center gap-1 shrink-0">
               <Layers className="h-3 w-3 text-[#7A8471]" />
-              {job.yearsExperience}+ Yrs
+              {job.yearsExperienceMax && job.yearsExperienceMax > job.yearsExperience
+                ? `${job.yearsExperience}-${job.yearsExperienceMax} Yrs`
+                : `${job.yearsExperience}+ Yrs`}
             </span>
           )}
           <span className="text-[#7A8471]">•</span>

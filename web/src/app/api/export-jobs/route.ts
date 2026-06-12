@@ -23,14 +23,36 @@ export interface JobRecord {
 
 /** Valid job-type labels accepted by the platform */
 const VALID_JOB_TYPES = new Set([
-  'Internship',
-  'Apprenticeship',
-  'Fresher',
+  'Internship / Apprenticeship',
   'Entry Level',
   'Mid Level',
   'Senior Level',
-  'Lead Level',
+  'Lead / Management',
+  'Executive Leadership',
 ]);
+
+/** Map v2 shorthand labels to canonical export labels */
+const EXPERIENCE_ALIASES: Record<string, string> = {
+  Internship: 'Internship / Apprenticeship',
+  Apprenticeship: 'Internship / Apprenticeship',
+  Graduate: 'Entry Level',
+  Entry: 'Entry Level',
+  Associate: 'Entry Level',
+  Junior: 'Entry Level',
+  Mid: 'Mid Level',
+  Senior: 'Senior Level',
+  Lead: 'Lead / Management',
+  Staff: 'Senior Level',
+  Principal: 'Senior Level',
+  Architect: 'Lead / Management',
+  Manager: 'Lead / Management',
+  Director: 'Executive Leadership',
+};
+
+function normalizeJobType(raw: string): string {
+  if (VALID_JOB_TYPES.has(raw)) return raw;
+  return EXPERIENCE_ALIASES[raw] || raw;
+}
 
 // ─── Validation helpers ───────────────────────────────────────────────────────
 
@@ -125,10 +147,16 @@ export async function POST(request: Request) {
 
     const jobs: JobRecord[] = rawJobs.map((j: any) => ({
       company: j.companyName || j.companyId || 'Unknown',
-      jobType: j.experienceLevel || j.employmentType || 'Unknown',
+      jobType: normalizeJobType(j.experienceLevel || j.employmentType || 'Unknown'),
       jobRole: j.title || 'Unknown',
-      url: j.applyUrl || j.url || '#',
-      datePosted: j.dateScraped ? new Date(j.dateScraped).toLocaleDateString() : 'Unknown'
+      url: j.applyUrl || j.jobUrl || j.url || '#',
+      datePosted: j.dateScraped
+        ? new Date(j.dateScraped).toLocaleDateString()
+        : j.postedDate
+          ? new Date(j.postedDate).toLocaleDateString()
+          : j.createdAt
+            ? new Date(j.createdAt).toLocaleDateString()
+            : 'Unknown',
     }));
 
     // ── 2. Validate each record ─────────────────────────────────────────────

@@ -13,6 +13,7 @@ interface Job {
   state: string;
   experienceLevel?: string;
   yearsExperience?: number;
+  yearsExperienceMax?: number;
   employmentType?: string;
   skills: string[];
   applyUrl: string;
@@ -57,11 +58,26 @@ export async function fetchJobs(filters: {
     list = list.filter(j => j.companyId === filters.company);
   }
   if (filters.city) {
-    list = list.filter(j => j.city.toLowerCase() === filters.city?.toLowerCase());
+    list = list.filter(j => j.city && j.city.toLowerCase() === filters.city?.toLowerCase());
   }
   if (filters.experienceLevel) {
     if (filters.experienceLevel === 'Internships') {
-      list = list.filter(j => j.experienceLevel === 'Internship / Apprenticeship');
+      list = list.filter(j =>
+        j.experienceLevel === 'Internship / Apprenticeship' ||
+        j.experienceLevel === 'Internship' ||
+        j.experienceLevel === 'Apprenticeship'
+      );
+    } else if (filters.experienceLevel === 'Lead / Management') {
+      list = list.filter(j =>
+        j.experienceLevel === 'Lead / Management' ||
+        j.experienceLevel === 'Lead Level' ||
+        j.experienceLevel === 'Lead / Manager'
+      );
+    } else if (filters.experienceLevel === 'Executive Leadership') {
+      list = list.filter(j =>
+        j.experienceLevel === 'Executive Leadership' ||
+        j.experienceLevel === 'Director / Executive'
+      );
     } else {
       list = list.filter(j => j.experienceLevel === filters.experienceLevel);
     }
@@ -86,7 +102,7 @@ export async function fetchJobs(filters: {
       return (
         j.title.toLowerCase().includes(searchWord) ||
         j.companyName.toLowerCase().includes(searchWord) ||
-        j.city.toLowerCase().includes(searchWord) ||
+        (j.city && j.city.toLowerCase().includes(searchWord)) ||
         j.skills.some(s => s.toLowerCase().includes(searchWord)) ||
         (j.department && j.department.toLowerCase().includes(searchWord)) ||
         (j.industry && j.industry.toLowerCase().includes(searchWord))
@@ -162,8 +178,8 @@ export async function fetchFilters() {
     'Entry Level',
     'Mid Level',
     'Senior Level',
-    'Lead / Manager',
-    'Director / Executive'
+    'Lead / Management',
+    'Executive Leadership',
   ]);
   const remoteStatuses = new Set<string>(['Onsite', 'Hybrid', 'Remote']);
   const industries = new Set<string>();

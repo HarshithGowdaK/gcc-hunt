@@ -1,5 +1,257 @@
 [
   {
+    "companyId": "comp_4",
+    "companyName": "AECOM",
+    "status": "empty",
+    "jobsDiscovered": 0,
+    "jobsAccepted": 0,
+    "jobsRejected": 0,
+    "duplicatesRemoved": 0,
+    "locationRejected": 0,
+    "aiCalls": 0,
+    "aiSkipped": 0,
+    "atsDetected": "generic",
+    "atsConfidence": 0.5,
+    "quality": {
+      "qualityScore": "0.00",
+      "coverageScore": 0,
+      "extractionScore": "0.00",
+      "classificationScore": "0.00",
+      "baselineJobs": 0,
+      "coverageRegression": false,
+      "warning": null
+    },
+    "reasons": {
+      "rejections": {},
+      "locationFailures": {},
+      "aiSkipReasons": {},
+      "atsSelection": {
+        "workday": {
+          "confidence": 0.86,
+          "method": "dom"
+        },
+        "generic": {
+          "confidence": 0.5,
+          "method": "fallback"
+        }
+      }
+    },
+    "timestamp": "2026-06-12T07:16:05.361Z"
+  },
+  {
+    "companyId": "comp_3",
+    "companyName": "ADP",
+    "status": "success",
+    "jobsDiscovered": 37,
+    "jobsAccepted": 8,
+    "jobsRejected": 11,
+    "duplicatesRemoved": 15,
+    "locationRejected": 3,
+    "aiCalls": 9,
+    "aiSkipped": 14,
+    "atsDetected": "generic",
+    "atsConfidence": 0.5,
+    "quality": {
+      "qualityScore": "0.48",
+      "coverageScore": 8,
+      "extractionScore": "0.62",
+      "classificationScore": "0.35",
+      "baselineJobs": 28,
+      "coverageRegression": false,
+      "warning": null
+    },
+    "reasons": {
+      "rejections": {
+        "invalid_title": 11
+      },
+      "locationFailures": {
+        "discovery_location_filter": 3
+      },
+      "aiSkipReasons": {
+        "ai_unavailable": 14
+      },
+      "atsSelection": {
+        "workday": {
+          "confidence": 0.86,
+          "method": "dom"
+        },
+        "generic": {
+          "confidence": 0.5,
+          "method": "fallback"
+        }
+      }
+    },
+    "timestamp": "2026-06-12T07:16:05.361Z"
+  },
+  {
+    "companyId": "comp_2",
+    "companyName": "ADM",
+    "status": "empty",
+    "jobsDiscovered": 0,
+    "jobsAccepted": 0,
+    "jobsRejected": 0,
+    "duplicatesRemoved": 0,
+    "locationRejected": 0,
+    "aiCalls": 0,
+    "aiSkipped": 0,
+    "atsDetected": "generic",
+    "atsConfidence": 0.5,
+    "quality": {
+      "qualityScore": "0.00",
+      "coverageScore": 0,
+      "extractionScore": "0.00",
+      "classificationScore": "0.00",
+      "baselineJobs": 0,
+      "coverageRegression": false,
+      "warning": null
+    },
+    "reasons": {
+      "rejections": {},
+      "locationFailures": {},
+      "aiSkipReasons": {},
+      "atsSelection": {
+        "successfactors": {
+          "confidence": 0.8,
+          "method": "html"
+        },
+        "generic": {
+          "confidence": 0.5,
+          "method": "fallback"
+        }
+      }
+    },
+    "timestamp": "2026-06-12T07:16:05.361Z"
+  },
+  {
+    "companyId": "comp_1",
+    "companyName": "ABB",
+    "status": "empty",
+    "jobsDiscovered": 10,
+    "jobsAccepted": 0,
+    "jobsRejected": 1,
+    "duplicatesRemoved": 2,
+    "locationRejected": 7,
+    "aiCalls": 0,
+    "aiSkipped": 0,
+    "atsDetected": "generic",
+    "atsConfidence": 0.5,
+    "quality": {
+      "qualityScore": "0.00",
+      "coverageScore": 0,
+      "extractionScore": "0.00",
+      "classificationScore": "0.00",
+      "baselineJobs": 2,
+      "coverageRegression": false,
+      "warning": null
+    },
+    "reasons": {
+      "rejections": {
+        "invalid_title": 1
+      },
+      "locationFailures": {
+        "discovery_location_filter": 7
+      },
+      "aiSkipReasons": {},
+      "atsSelection": {
+        "workday": {
+          "confidence": 0.88,
+          "method": "html"
+        },
+        "generic": {
+          "confidence": 0.5,
+          "method": "fallback"
+        }
+      }
+    },
+    "timestamp": "2026-06-12T07:16:05.361Z"
+  },
+  {
+    "companyId": "comp_0",
+    "companyName": "3M",
+    "status": "success",
+    "jobsDiscovered": 664,
+    "jobsAccepted": 73,
+    "jobsRejected": 16,
+    "duplicatesRemoved": 15,
+    "locationRejected": 560,
+    "aiCalls": 78,
+    "aiSkipped": 10,
+    "atsDetected": "workday",
+    "atsConfidence": 0.98,
+    "quality": {
+      "qualityScore": "0.48",
+      "coverageScore": 73,
+      "extractionScore": "0.13",
+      "classificationScore": "0.83",
+      "baselineJobs": 80,
+      "coverageRegression": false,
+      "warning": null
+    },
+    "reasons": {
+      "rejections": {
+        "invalid_title": 16
+      },
+      "locationFailures": {
+        "discovery_location_filter": 560
+      },
+      "aiSkipReasons": {
+        "ai_unavailable": 10
+      },
+      "atsSelection": {
+        "workday": {
+          "confidence": 0.98,
+          "method": "url"
+        }
+      }
+    },
+    "timestamp": "2026-06-12T07:16:05.361Z"
+  },
+  {
+    "id": "8a51bad6-1c2f-4ae9-8505-a484fd3ddaeb",
+    "companyId": "cognizant",
+    "companyName": "Cognizant",
+    "status": "success",
+    "jobsFound": 18,
+    "executionTime": 258057,
+    "timestamp": "2026-06-11T15:01:13.596Z"
+  },
+  {
+    "id": "9a7259ea-56bb-40c2-90e8-7e1363f39d00",
+    "companyId": "clarivate",
+    "companyName": "Clarivate",
+    "status": "success",
+    "jobsFound": 4,
+    "executionTime": 239581,
+    "timestamp": "2026-06-11T14:58:10.374Z"
+  },
+  {
+    "id": "14d037d3-638d-452d-a326-eb917c0a9946",
+    "companyId": "extreme-networks",
+    "companyName": "Extreme Networks",
+    "status": "success",
+    "jobsFound": 7,
+    "executionTime": 184089,
+    "timestamp": "2026-06-11T14:57:14.864Z"
+  },
+  {
+    "id": "9ba4d76e-61e6-4b16-9ded-f78d5ac98575",
+    "companyId": "cohesity",
+    "companyName": "Cohesity",
+    "status": "success",
+    "jobsFound": 0,
+    "executionTime": 67702,
+    "timestamp": "2026-06-11T14:56:55.539Z"
+  },
+  {
+    "id": "c230f91a-9652-4e9c-88f9-84e463120ae9",
+    "companyId": "clear",
+    "companyName": "Clear",
+    "status": "success",
+    "jobsFound": 10,
+    "executionTime": 97048,
+    "timestamp": "2026-06-11T14:55:47.836Z"
+  },
+  {
     "id": "aff95261-4b1b-4724-a4d7-6d245fa02aeb",
     "companyId": "encora",
     "companyName": "Encora",
