@@ -18,6 +18,24 @@ const Deduplicator = require('./core/Deduplicator');
 const JobHelpers = require('./core/JobHelpers');
 const { buildJobRecord } = require('./core/JobNormalizer');
 
+function loadEnv() {
+  const envPath = path.join(__dirname, '../.env');
+  if (fs.existsSync(envPath)) {
+    const content = fs.readFileSync(envPath, 'utf8');
+    content.split('\n').forEach(line => {
+      const parts = line.split('=');
+      if (parts.length >= 2) {
+        const key = parts[0].trim();
+        const value = parts.slice(1).join('=').trim().replace(/^['"]|['"]$/g, '');
+        if (key && !process.env[key]) {
+          process.env[key] = value;
+        }
+      }
+    });
+  }
+}
+loadEnv();
+
 function loadCompaniesFromExcel() {
   const excelPath = path.join(__dirname, '../companies.xlsx');
   if (!fs.existsSync(excelPath)) return null;
@@ -243,6 +261,18 @@ async function start() {
     classification: async ({ company, adapter, job, rawText }) => {
       const fullText = rawText || job._rawText || '';
 
+      if (!JobHelpers.isValidJobPosting(fullText)) {
+        Observability.recordRejected(company.id, 'invalid_job_posting_page', 'page_validation');
+        console.warn(JSON.stringify({ 
+          rejected: true, 
+          reason: "invalid_job_posting_page", 
+          stage: "classification_page_validation", 
+          title: job.title,
+          url: job.url 
+        }));
+        return;
+      }
+
       const locScore = EngineLocation.evaluate(
         job.title,
         job.location,
@@ -264,6 +294,23 @@ async function start() {
 
       const expResult = EngineExperience.evaluate(job.title, fullText, '');
       const arbitrated = await ArbitrationAI.arbitrate(job, locScore, expResult, company.id, fullText);
+
+      // Post-arbitration location check
+      const finalLoc = arbitrated.location || job.location || locScore.resolvedLocation;
+      const finalLocScore = EngineLocation.evaluate(
+        job.title,
+        finalLoc,
+        fullText,
+        job.atsMetadata || '',
+        job.url
+      );
+
+      if (!finalLocScore.isIndia) {
+        Observability.recordLocationRejected(company.id, finalLocScore.country || 'Unknown', 'classification_post_arbitration_rejected');
+        Observability.recordRejected(company.id, `classification_location_rejected_${finalLocScore.country}`, 'classification_location_post_arbitration');
+        console.warn(JSON.stringify({ rejected: true, reason: `classification_location_rejected_${finalLocScore.country}`, stage: "classification_location_post_arbitration", title: job.title, location: finalLoc }));
+        return;
+      }
 
       if (!arbitrated.aiUsed) {
         Observability.recordAISkipped(company.id, arbitrated.arbitrationReason || arbitrated.skipReason || 'rules_sufficient');

@@ -143,6 +143,56 @@ function isObviousNonIndiaRole(title) {
   return /\b(europe|emea|germany|france|italy|poland|australia|new zealand|canada|united states|usa|uk|saudi|japan|china|singapore|korea|argentina|chile|brazil|mexico)\b/i.test(String(title || ''));
 }
 
+function isValidJobPosting(text) {
+  if (!text) return false;
+  const t = String(text).toLowerCase();
+
+  const rejectKeywords = [
+    'saved jobs',
+    'all locations',
+    'country list',
+    'clear filters',
+    'search jobs',
+    'job alerts',
+    'find my next job',
+    'browse by location',
+  ];
+  
+  let rejectScore = 0;
+  for (const kw of rejectKeywords) {
+    if (t.includes(kw)) {
+      rejectScore++;
+    }
+  }
+  if (rejectScore >= 2) return false;
+
+  const positiveKeywords = [
+    'job description',
+    'responsibilities',
+    'requirements',
+    'apply',
+    'requisition id',
+    'req id',
+    'job id',
+    'ref number',
+    'qualifications',
+    'key responsibilities',
+    'what you will do',
+    'what you will need',
+  ];
+
+  let positiveScore = 0;
+  for (const kw of positiveKeywords) {
+    if (t.includes(kw)) {
+      positiveScore++;
+    }
+  }
+
+  if (positiveScore < 2) return false;
+
+  return true;
+}
+
 module.exports = {
   INDIAN_CITIES_MAP,
   normalizeLocation,
@@ -152,4 +202,5 @@ module.exports = {
   classifyIndustry,
   isValidJobCandidate,
   isObviousNonIndiaRole,
+  isValidJobPosting,
 };

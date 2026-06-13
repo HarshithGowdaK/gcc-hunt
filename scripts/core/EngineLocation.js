@@ -6,7 +6,7 @@ class EngineLocation {
   constructor() {
     this.INDIA_REGEX = /\b(india|pan\s*india|remote\s*india|india\s*remote|india\s*preferred|bangalore\s*urban|bangalore|bengaluru|hyderabad|chennai|pune|mumbai|gurugram|gurgaon|noida|ahmedabad|kolkata|kochi|coimbatore|in-ka|in-tg|blr|hyd)\b/i;
     this.INDIA_REMOTE_REGEX = /\b(remote\s*india|india\s*remote|india\s*preferred|pan\s*india|work\s*from\s*home.*india)\b/i;
-    this.FOREIGN_REGEX = /\b(europe|emea|germany|france|italy|poland|australia|new zealand|canada|united states|usa|uk|saudi|japan|china|singapore|korea|argentina|chile|brazil|mexico|netherlands|sweden|norway|denmark|belgium|switzerland|austria|ireland|israel|hong kong|taiwan|thailand|vietnam)\b/i;
+    this.FOREIGN_REGEX = /\b(europe|emea|germany|france|italy|poland|australia|new\s*zealand|canada|united\s*states|usa|us\b|uk\b|saudi|japan|china|singapore|korea|argentina|chile|brazil|mexico|netherlands|sweden|norway|denmark|belgium|switzerland|austria|ireland|israel|hong\s*kong|taiwan|thailand|vietnam|hungary|peru)\b/i;
     this.FOREIGN_SHIFT_REGEX = /\b(uk\s*shift|us\s*shift|europe\s*shift|night\s*shift\s*uk)\b/i;
     this.MIN_CONFIDENCE = 0.45;
   }
@@ -28,9 +28,12 @@ class EngineLocation {
     const evidence = [];
     let confidence = 0;
 
+    const isUnknownLoc = !locationField || locationField === 'Unknown' || locationField === 'India';
+    const descWeight = isUnknownLoc ? 50 : 10;
+
     confidence += this._scoreField(locationField, 60, 'Location field', evidence, true);
     confidence += this._scoreField(atsMetadata, 20, 'ATS metadata', evidence, true);
-    confidence += this._scoreField(description, 10, 'Description', evidence, true);
+    confidence += this._scoreField(description, descWeight, 'Description', evidence, true);
     confidence += this._scoreField(title, 5, 'Title', evidence, true);
     confidence += this._scoreField(url, 5, 'URL', evidence, true);
 
@@ -62,8 +65,26 @@ class EngineLocation {
       resolvedLocation = 'India';
     }
 
+    let country = isIndia ? 'India' : 'Unknown';
+    if (!isIndia) {
+      const combinedForForeign = `${locationField || ''} ${title || ''} ${atsMetadata || ''}`.toLowerCase();
+      const match = this.FOREIGN_REGEX.exec(combinedForForeign);
+      if (match) {
+        const rawMatch = match[1].toLowerCase();
+        const COUNTRY_MAP = {
+          usa: 'United States',
+          'united states': 'United States',
+          uk: 'United Kingdom',
+          'united kingdom': 'United Kingdom',
+          emea: 'EMEA',
+          europe: 'Europe',
+        };
+        country = COUNTRY_MAP[rawMatch] || rawMatch.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      }
+    }
+
     return {
-      country: isIndia ? 'India' : 'Unknown',
+      country,
       confidence: normalizedConfidence,
       evidence,
       isIndia,

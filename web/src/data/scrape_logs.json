@@ -1,5 +1,49 @@
 [
   {
+    "companyId": "comp_0",
+    "companyName": "3M",
+    "status": "empty",
+    "jobsDiscovered": 668,
+    "jobsAccepted": 0,
+    "jobsRejected": 12,
+    "duplicatesRemoved": 360,
+    "locationRejected": 306,
+    "aiCalls": 0,
+    "aiSkipped": 56,
+    "atsDetected": "workday",
+    "atsConfidence": 0.98,
+    "quality": {
+      "qualityScore": "0.05",
+      "coverageScore": 0,
+      "extractionScore": "0.10",
+      "classificationScore": "0.00",
+      "baselineJobs": 739,
+      "coverageRegression": true,
+      "warning": "Coverage dropped from 739 to 0 jobs — investigate ATS adapter"
+    },
+    "reasons": {
+      "rejections": {
+        "invalid_title": 2,
+        "classification_location_rejected_Unknown": 10
+      },
+      "locationFailures": {
+        "discovery_location_filter": 296,
+        "classification_post_arbitration_rejected": 10
+      },
+      "aiSkipReasons": {
+        "ai_unavailable": 56
+      },
+      "atsSelection": {
+        "workday": {
+          "confidence": 0.98,
+          "method": "url"
+        }
+      },
+      "detailFailures": {}
+    },
+    "timestamp": "2026-06-12T15:53:21.849Z"
+  },
+  {
     "companyId": "comp_4",
     "companyName": "AECOM",
     "status": "empty",

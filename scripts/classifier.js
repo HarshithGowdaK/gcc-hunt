@@ -14,45 +14,21 @@
  */
 
 const SENIORITY_LEVELS = {
-  INTERN      : 'Intern',
-  APPRENTICE  : 'Apprenticeship',
-  TRAINEE     : 'Trainee',
-  GRADUATE    : 'Graduate',
+  INTERNSHIP  : 'Internship / Apprenticeship',
   ENTRY       : 'Entry Level',
-  ASSOCIATE   : 'Associate',
-  JUNIOR      : 'Junior',
   MID         : 'Mid Level',
-  SENIOR      : 'Senior',
-  LEAD        : 'Lead',
-  PRINCIPAL   : 'Principal',
-  STAFF       : 'Staff',
-  SENIOR_STAFF: 'Senior Staff',
-  ARCHITECT   : 'Architect',
-  MANAGER     : 'Manager',
-  SENIOR_MGR  : 'Senior Manager',
-  DIRECTOR    : 'Director',
-  VP          : 'VP',
+  SENIOR      : 'Senior Level',
+  LEAD        : 'Lead / Management',
+  EXECUTIVE   : 'Executive Leadership',
 };
 
 const LEVEL_KEYS = {
-  [SENIORITY_LEVELS.INTERN]      : 'entry',
-  [SENIORITY_LEVELS.APPRENTICE]  : 'entry',
-  [SENIORITY_LEVELS.TRAINEE]     : 'entry',
-  [SENIORITY_LEVELS.GRADUATE]    : 'entry',
+  [SENIORITY_LEVELS.INTERNSHIP]  : 'entry',
   [SENIORITY_LEVELS.ENTRY]       : 'entry',
-  [SENIORITY_LEVELS.ASSOCIATE]   : 'entry',
-  [SENIORITY_LEVELS.JUNIOR]      : 'entry',
   [SENIORITY_LEVELS.MID]         : 'mid',
   [SENIORITY_LEVELS.SENIOR]      : 'senior',
   [SENIORITY_LEVELS.LEAD]        : 'lead',
-  [SENIORITY_LEVELS.PRINCIPAL]   : 'executive',
-  [SENIORITY_LEVELS.STAFF]       : 'lead',
-  [SENIORITY_LEVELS.SENIOR_STAFF]: 'lead',
-  [SENIORITY_LEVELS.ARCHITECT]   : 'lead',
-  [SENIORITY_LEVELS.MANAGER]     : 'lead',
-  [SENIORITY_LEVELS.SENIOR_MGR]  : 'executive',
-  [SENIORITY_LEVELS.DIRECTOR]    : 'executive',
-  [SENIORITY_LEVELS.VP]          : 'executive',
+  [SENIORITY_LEVELS.EXECUTIVE]   : 'executive',
 };
 
 const EMPTY_RESULT = Object.freeze({
@@ -68,7 +44,7 @@ const KEY_TO_LEVEL = {
   mid      : SENIORITY_LEVELS.MID,
   senior   : SENIORITY_LEVELS.SENIOR,
   lead     : SENIORITY_LEVELS.LEAD,
-  executive: SENIORITY_LEVELS.PRINCIPAL,
+  executive: SENIORITY_LEVELS.EXECUTIVE,
 };
 
 // ─── STEP 1: Internship / Apprenticeship ─────────────────────────────────────
@@ -400,24 +376,22 @@ function classifyWithValidation(description, title) {
       : minYears;
 
     let finalLevel = SENIORITY_LEVELS.MID;
-    if (effectiveYears <= 1) {
+    if (effectiveYears <= 2) {
       finalLevel = SENIORITY_LEVELS.ENTRY;
-    } else if (effectiveYears <= 3) {
-      finalLevel = SENIORITY_LEVELS.JUNIOR;
-    } else if (effectiveYears <= 5) {
+    } else if (effectiveYears <= 7) {
       finalLevel = SENIORITY_LEVELS.MID;
-    } else if (effectiveYears <= 8) {
+    } else if (effectiveYears <= 11) {
       finalLevel = SENIORITY_LEVELS.SENIOR;
-    } else if (effectiveYears < 12) {
+    } else if (effectiveYears <= 14) {
       finalLevel = SENIORITY_LEVELS.LEAD;
     } else {
-      finalLevel = SENIORITY_LEVELS.PRINCIPAL;
+      finalLevel = SENIORITY_LEVELS.EXECUTIVE;
     }
 
     // CONFLICT DETECTION
     let titleLevel = null;
     if (EXECUTIVE_SIGNALS.some(re => re.test(titleText))) {
-      titleLevel = SENIORITY_LEVELS.PRINCIPAL;
+      titleLevel = SENIORITY_LEVELS.EXECUTIVE;
     } else if (LEAD_SIGNALS.some(re => re.test(titleText))) {
       titleLevel = SENIORITY_LEVELS.LEAD;
     } else if (SENIOR_SIGNALS.some(re => re.test(titleText))) {
