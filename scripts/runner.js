@@ -18,17 +18,30 @@ const Deduplicator = require('./core/Deduplicator');
 const JobHelpers = require('./core/JobHelpers');
 const { buildJobRecord } = require('./core/JobNormalizer');
 
+function slugifyCompanyId(name, fallback) {
+  const slug = String(name || '')
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+  return slug || fallback;
+}
+
 function loadCompaniesFromExcel() {
   const excelPath = path.join(__dirname, '../companies.xlsx');
   if (!fs.existsSync(excelPath)) return null;
   const workbook = xlsx.readFile(excelPath);
   const sheet = workbook.Sheets[workbook.SheetNames[0]];
   const data = xlsx.utils.sheet_to_json(sheet);
-  return data.map((row, index) => ({
-    id: row.id || `comp_${index}`,
-    name: row.name || row.Company || 'Unknown',
-    careersUrl: row.careers_url || row['Careers URL'] || row['Actual Job Listing'] || '',
-  })).filter(c => c.careersUrl);
+  return data.map((row, index) => {
+    const name = row.name || row.Company || 'Unknown';
+    return {
+      id: row.id || slugifyCompanyId(name, `excel_${index}`),
+      name,
+      careersUrl: row.careers_url || row['Careers URL'] || row['Actual Job Listing'] || '',
+      source: 'excel',
+    };
+  }).filter(c => c.careersUrl);
 }
 
 function loadCompaniesFromJson() {
@@ -37,13 +50,40 @@ function loadCompaniesFromJson() {
   const data = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
   return data
     .filter(c => c.careersUrl)
-    .map(c => ({ id: c.id, name: c.name, careersUrl: c.careersUrl }));
+    .map((c, index) => ({
+      id: c.id || slugifyCompanyId(c.name, `json_${index}`),
+      name: c.name,
+      careersUrl: c.careersUrl,
+      source: 'json',
+    }));
 }
 
 async function loadCompanies() {
-  const fromExcel = loadCompaniesFromExcel();
-  if (fromExcel && fromExcel.length > 0) return fromExcel;
+  const source = String(process.env.COMPANIES_SOURCE || 'merged').toLowerCase();
+  const fromExcel = loadCompaniesFromExcel() || [];
   const fromJson = loadCompaniesFromJson();
+
+  if (source === 'excel') {
+    console.log(`[Orchestrator] Loaded ${fromExcel.length} companies from companies.xlsx`);
+    return fromExcel;
+  }
+  if (source === 'json') {
+    console.log(`[Orchestrator] Loaded ${fromJson.length} companies from companies.json`);
+    return fromJson;
+  }
+
+  const merged = [];
+  const seen = new Set();
+  for (const company of [...fromExcel, ...fromJson]) {
+    const key = `${company.name || ''}|${company.careersUrl || ''}`.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    merged.push(company);
+  }
+  if (merged.length > 0) {
+    console.log(`[Orchestrator] Loaded ${merged.length} merged companies (${fromExcel.length} Excel, ${fromJson.length} JSON)`);
+    return merged;
+  }
   if (fromJson.length > 0) {
     console.log(`[Orchestrator] Loaded ${fromJson.length} companies from companies.json`);
     return fromJson;
@@ -51,17 +91,43 @@ async function loadCompanies() {
   throw new Error('No companies found. Provide companies.xlsx or web/src/data/companies.json');
 }
 
-async function tryGenericFallback(company, atsName) {
-  const fallback = AdapterRegistry.createAdapter('generic', company.id, company.name, company.careersUrl);
-  try {
-    const jobs = await fallback.discoverJobs();
-    fallback.recordSuccess(jobs.length);
-    return { adapter: fallback, jobs, ats: 'generic', fromFallback: true };
-  } catch (err) {
-    fallback.recordFailure();
-    CircuitBreakers.recordATSFailure(atsName || 'generic');
-    throw err;
+async function discoverWithAdapter(company, atsName) {
+  const adapter = AdapterRegistry.createAdapter(atsName, company.id, company.name, company.careersUrl);
+  const jobs = await adapter.discoverJobs();
+  adapter.recordSuccess(jobs.length);
+  return { adapter, jobs, ats: atsName };
+}
+
+async function tryFallbackAdapters(company, primaryAtsName) {
+  const fallbackNames = [];
+  if (primaryAtsName && primaryAtsName !== 'generic') fallbackNames.push('generic');
+  if (!fallbackNames.includes('generic')) fallbackNames.push('generic');
+
+  let lastErr = null;
+  for (const fallbackName of fallbackNames) {
+    const fallback = AdapterRegistry.createAdapter(fallbackName, company.id, company.name, company.careersUrl);
+    try {
+      const jobs = await fallback.discoverJobs();
+      fallback.recordSuccess(jobs.length);
+      return { adapter: fallback, jobs, ats: fallbackName, fromFallback: true };
+    } catch (err) {
+      lastErr = err;
+      fallback.recordFailure();
+      CircuitBreakers.recordATSFailure(primaryAtsName || fallbackName);
+    }
   }
+
+  if (lastErr) throw lastErr;
+  throw new Error('No fallback adapters available');
+}
+
+function getListingLocationHint(company) {
+  const extracted = JobHelpers.extractIndianLocation(company.careersUrl);
+  if (extracted?.location) return extracted.location;
+  if (/\b(india|ind|locationcountry|country=india|ccode=in|location=india|keywords=india|mylocation=india)\b/i.test(company.careersUrl)) {
+    return 'India';
+  }
+  return '';
 }
 
 async function start() {
@@ -70,12 +136,17 @@ async function start() {
 
   const companies = await loadCompanies();
   const LIMIT = process.env.LIMIT ? parseInt(process.env.LIMIT, 10) : companies.length;
-  const targetCompanies = companies.slice(0, LIMIT);
+  let targetCompanies = companies.slice(0, LIMIT);
+  if (process.env.COMPANY_ID) {
+    targetCompanies = companies.filter(c => c.id === process.env.COMPANY_ID);
+  }
   console.log(`Loaded ${targetCompanies.length} companies to crawl.`);
 
   for (const comp of targetCompanies) {
     Observability.setBaseline(comp.id, Storage.getBaselineCount(comp.id));
   }
+
+  const runDiagnostics = new Map();
 
   Queues.init({
     discovery: async (company) => {
@@ -92,26 +163,44 @@ async function start() {
 
       console.log(`[Discovery] ${company.name} → ATS: ${atsDetection.ats} (${atsDetection.confidence}, ${atsDetection.method})`);
 
+      const listingLocationHint = getListingLocationHint(company);
       let adapter = AdapterRegistry.createAdapter(atsName, company.id, company.name, company.careersUrl);
       let jobs = [];
       let discoveryFailed = false;
+      let failureReason = null;
+      let responseStatus = 200;
 
       try {
-        jobs = await adapter.discoverJobs();
-        adapter.recordSuccess(jobs.length);
+        const discovered = await discoverWithAdapter(company, atsName);
+        adapter = discovered.adapter;
+        jobs = discovered.jobs;
         CircuitBreakers.recordATSSuccess(atsName);
+        if ((adapter.constructor.atsName || adapter.atsType) === 'generic' && jobs.length === 0) {
+          Observability.recordGenericFailure(company.id, adapter.lastFailureReason || 'noCards');
+        }
+        if ((adapter.constructor.atsName || adapter.atsType) === 'generic') {
+          Observability.recordGenericDiagnostics(company.id, adapter.diagnostics);
+        }
       } catch (err) {
         discoveryFailed = true;
+        failureReason = err.message;
+        responseStatus = err.response?.status || 500;
         adapter.recordFailure();
         CircuitBreakers.recordATSFailure(atsName);
         console.warn(`[Discovery] Adapter ${atsName} failed for ${company.name}: ${err.message}`);
       }
 
+      let fallbackUsed = false;
       if (discoveryFailed || (jobs.length === 0 && atsName !== 'generic')) {
         try {
-          const fallback = await tryGenericFallback(company, atsName);
+          fallbackUsed = true;
+          const fallback = await tryFallbackAdapters(company, atsName);
           adapter = fallback.adapter;
           jobs = fallback.jobs;
+          if (jobs.length === 0) {
+            Observability.recordGenericFailure(company.id, adapter.lastFailureReason || 'noCards');
+          }
+          Observability.recordGenericDiagnostics(company.id, adapter.diagnostics);
           discoveryFailed = false;
           Observability.recordATS(company.id, 'generic', 0.5, 'fallback');
           console.log(`[Discovery] Generic fallback found ${jobs.length} jobs for ${company.name}`);
@@ -120,7 +209,19 @@ async function start() {
         }
       }
 
-      if (discoveryFailed) {
+      const diag = {
+        company: company.name,
+        source: company.source || null,
+        careersUrl: company.careersUrl,
+        ats: atsDetection.ats,
+        status: discoveryFailed ? (responseStatus || 500) : 200,
+        fallbackUsed,
+        failureReason: discoveryFailed ? failureReason : null,
+        listingLocationHint: listingLocationHint || null,
+      };
+      runDiagnostics.set(company.id, diag);
+
+      if (discoveryFailed && jobs.length === 0) {
         CircuitBreakers.recordCompanyFailure(company.id);
         Storage.saveLog({
           companyId: company.id,
@@ -128,6 +229,7 @@ async function start() {
           status: 'failed',
           reason: 'discovery_failed',
           timestamp: new Date().toISOString(),
+          atsDiagnostics: diag
         });
         return;
       }
@@ -139,8 +241,19 @@ async function start() {
       let skipped = 0;
 
       for (const job of jobs) {
-        if (!JobHelpers.isValidJobCandidate(job.title)) {
-          Observability.recordRejected(company.id, 'invalid_title');
+        if (listingLocationHint && !String(job.location || '').trim()) {
+          job.location = listingLocationHint;
+          job.locationSource = 'listing_filter';
+        }
+        if (listingLocationHint) {
+          job.atsMetadata = [job.atsMetadata, company.careersUrl, listingLocationHint].filter(Boolean).join(' ');
+        }
+
+        const candidateRejection = JobHelpers.getJobCandidateRejectionReason(job) ||
+          (!JobHelpers.isLikelyJobUrl(job.url) ? 'not_job_url' : null);
+        if (candidateRejection) {
+          job.rejectionReason = candidateRejection;
+          Observability.recordRejected(company.id, candidateRejection);
           skipped++;
           continue;
         }
@@ -153,13 +266,16 @@ async function start() {
           job.url
         );
 
-        if (!locPreview.isIndia) {
+        const hasListingLocation = !!String(job.location || '').trim();
+        if ((hasListingLocation && !locPreview.isIndia) || locPreview.country !== 'India' && locPreview.country !== 'Unknown') {
+          job.rejectionReason = 'non_india_location';
           Observability.recordLocationRejected(company.id, locPreview.country, 'discovery_location_filter');
           skipped++;
           continue;
         }
 
         if (Deduplicator.isEarlyDuplicate(company.id, job.title, job.location || locPreview.resolvedLocation, job.reqId)) {
+          job.rejectionReason = 'duplicate';
           Observability.recordDuplicate(company.id);
           skipped++;
           continue;
@@ -185,13 +301,12 @@ async function start() {
           console.error(`[Orchestrator] Classification enqueue error: ${err.message}`);
         });
       } catch (err) {
-        CircuitBreakers.recordCompanyFailure(company.id);
         Observability.recordRejected(company.id, `detail_fetch: ${err.message}`);
       }
     },
 
     classification: async ({ company, adapter, job, rawText }) => {
-      const fullText = rawText || job._rawText || '';
+      const fullText = JobHelpers.stripBoilerplateSections(rawText || job._rawText || '');
 
       const locScore = EngineLocation.evaluate(
         job.title,
@@ -202,6 +317,7 @@ async function start() {
       );
 
       if (!locScore.isIndia) {
+        job.rejectionReason = 'classification_location_rejected';
         Observability.recordLocationRejected(company.id, locScore.country, 'classification_location_rejected');
         return;
       }
@@ -213,7 +329,9 @@ async function start() {
       const expResult = EngineExperience.evaluate(job.title, fullText, '');
       const arbitrated = await ArbitrationAI.arbitrate(job, locScore, expResult, company.id, fullText);
 
-      if (!arbitrated.aiUsed) {
+      if (arbitrated.aiUsed) {
+        Observability.recordAICall(company.id, true);
+      } else {
         Observability.recordAISkipped(company.id, arbitrated.arbitrationReason || arbitrated.skipReason || 'rules_sufficient');
       }
 
@@ -226,6 +344,7 @@ async function start() {
       );
 
       if (!fingerprints) {
+        job.rejectionReason = 'duplicate';
         Observability.recordDuplicate(company.id);
         return;
       }
@@ -234,19 +353,38 @@ async function start() {
         ? await adapter.normalize(job, arbitrated.description || fullText)
         : job;
 
+      const atsNameForLog = adapter.constructor.atsName || adapter.atsType || 'generic';
+      const finalExpResult = {
+        level: arbitrated.career_level || arbitrated.level || expResult.level,
+        career_level: arbitrated.career_level || arbitrated.level || expResult.level,
+        years: arbitrated.years ?? expResult.years,
+        minYears: arbitrated.minYears ?? expResult.minYears,
+        maxYears: arbitrated.maxYears ?? expResult.maxYears,
+        midpoint: arbitrated.midpoint ?? expResult.midpoint,
+        experience_text: arbitrated.experience_text || expResult.experience_text,
+        classification_confidence: arbitrated.classification_confidence ?? expResult.classification_confidence,
+        classification_source: arbitrated.classification_source || expResult.classification_source,
+        experience_source: arbitrated.experience_source || expResult.experience_source,
+        experience_extracted_by: arbitrated.experience_extracted_by || expResult.experience_extracted_by,
+        classification_reason: arbitrated.classification_reason || expResult.classification_reason,
+        warning: arbitrated.warning || expResult.warning,
+        needs_review: arbitrated.needs_review !== undefined ? arbitrated.needs_review : expResult.needs_review,
+        validation: arbitrated.validation || expResult.validation,
+      };
+
+      console.log(`[Experience] Found range ${finalExpResult.experience_text || 'None'}`);
+      console.log(`[Classification] ${finalExpResult.career_level}`);
+      console.log(`[Confidence] ${finalExpResult.classification_confidence}`);
+      console.log(`[ATS] ${atsNameForLog}`);
+      console.log(`[Source] ${finalExpResult.classification_source}`);
+
       const record = buildJobRecord({
         company,
         job: { ...normalized, ...job },
         rawText: fullText,
         description: arbitrated.description,
         locScore,
-        expResult: {
-          level: arbitrated.level || expResult.level,
-          years: arbitrated.years ?? expResult.years,
-          minYears: arbitrated.minYears ?? expResult.minYears,
-          maxYears: arbitrated.maxYears ?? expResult.maxYears,
-          validation: arbitrated.validation || expResult.validation,
-        },
+        expResult: finalExpResult,
         skills: arbitrated.skills,
         remoteStatus: arbitrated.remoteStatus,
         employmentType: arbitrated.employmentType,
@@ -287,7 +425,8 @@ async function start() {
   for (const comp of targetCompanies) {
     const metrics = Observability.getCompanyMetrics(comp.id);
     const quality = Observability.generateQualityReport(comp.id);
-    Storage.updateCompanyStatus(comp.id, metrics.jobsAccepted > 0 ? 'success' : 'empty', metrics.jobsAccepted, quality);
+    const atsDiag = runDiagnostics.get(comp.id) || null;
+    Storage.updateCompanyStatus(comp.id, metrics.jobsAccepted > 0 ? 'success' : 'empty', metrics.jobsAccepted, quality, atsDiag);
 
     if (quality.coverageRegression) {
       console.warn(`[Quality] REGRESSION: ${comp.name} — ${quality.warning}`);
@@ -309,6 +448,7 @@ async function start() {
       quality,
       reasons: metrics.reasons,
       timestamp: new Date().toISOString(),
+      atsDiagnostics: atsDiag
     });
   }
 
@@ -321,7 +461,14 @@ async function start() {
   console.log('Queue Stats:', JSON.stringify(Queues.getAllStats(), null, 2));
 }
 
-start().catch(err => {
-  console.error('[Fatal]', err);
-  process.exit(1);
-});
+if (require.main === module) {
+  start().catch(err => {
+    console.error('[Fatal]', err);
+    process.exit(1);
+  });
+}
+
+module.exports = {
+  start,
+  loadCompanies,
+};

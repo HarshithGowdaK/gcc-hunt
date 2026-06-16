@@ -6,13 +6,14 @@ const LeverAdapter = require('../adapters/LeverAdapter');
 const SmartRecruitersAdapter = require('../adapters/SmartRecruitersAdapter');
 const EightfoldAdapter = require('../adapters/EightfoldAdapter');
 const OracleAdapter = require('../adapters/OracleAdapter');
-const PhenomAdapter = require('../adapters/PhenomAdapter');
 const GenericAdapter = require('../adapters/GenericAdapter');
 const BrowserATSAdapter = require('../adapters/BrowserATSAdapter');
+const SuccessFactorsAdapter = require('../adapters/SuccessFactorsAdapter');
+const BrassringAdapter = require('../adapters/BrassringAdapter');
 
 const BROWSER_ATS = [
-  'successfactors', 'cornerstone', 'icims', 'taleo', 'avature',
-  'jobvite', 'beamery', 'sap', 'custom',
+  'cornerstone', 'icims', 'taleo', 'avature',
+  'jobvite', 'beamery', 'custom', 'phenom',
 ];
 
 const registry = {
@@ -22,7 +23,9 @@ const registry = {
   smartrecruiters: SmartRecruitersAdapter,
   eightfold: EightfoldAdapter,
   oracle: OracleAdapter,
-  phenom: PhenomAdapter,
+  successfactors: SuccessFactorsAdapter,
+  brassring: BrassringAdapter,
+  sap: SuccessFactorsAdapter,
   generic: GenericAdapter,
 };
 

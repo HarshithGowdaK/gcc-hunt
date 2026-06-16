@@ -147,7 +147,7 @@ export async function POST(request: Request) {
 
     const jobs: JobRecord[] = rawJobs.map((j: any) => ({
       company: j.companyName || j.companyId || 'Unknown',
-      jobType: normalizeJobType(j.experienceLevel || j.employmentType || 'Unknown'),
+      jobType: normalizeJobType(j.career_level || j.experienceLevel || j.employmentType || 'Unknown'),
       jobRole: j.title || 'Unknown',
       url: j.applyUrl || j.jobUrl || j.url || '#',
       datePosted: j.dateScraped

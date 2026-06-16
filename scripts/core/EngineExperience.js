@@ -14,29 +14,29 @@ class EngineExperience {
   evaluate(title, responsibilities, qualifications = '') {
     const fullText = `${responsibilities || ''}\n${qualifications || ''}`.trim();
     const validation = classifyWithValidation(fullText, title);
-    const expDetails = extractExperienceDetails(fullText);
 
     const evidence = [
-      ...(validation.signals || []),
       ...(validation.reason ? [validation.reason] : []),
     ];
 
-    const hasMultipleRanges = (expDetails.allFound || []).length > 2;
-    const hasConflict =
-      validation.confidence < 0.75 ||
-      (validation.minYears !== null && validation.matchedKeywords?.length > 3);
-
     return {
-      level: validation.experienceLevel,
+      level: validation.career_level,
+      career_level: validation.career_level,
       years: validation.years,
       minYears: validation.minYears,
       maxYears: validation.maxYears,
-      confidence: validation.confidence,
+      midpoint: validation.experience_midpoint,
+      experience_text: validation.experience_text,
+      confidence: validation.classification_confidence,
+      classification_confidence: validation.classification_confidence,
+      classification_source: validation.classification_source,
+      warning: validation.warning,
+      needs_review: validation.needs_review,
       evidence,
       validation,
-      hasConflict,
-      hasMultipleRanges,
-      experienceFound: validation.experienceFound,
+      hasConflict: !!validation.needs_review,
+      hasMultipleRanges: false,
+      experienceFound: validation.experience_text || null,
     };
   }
 }

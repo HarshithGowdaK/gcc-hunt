@@ -20,12 +20,19 @@ class Storage {
   }
 
   async load() {
+    let previousJobs = [];
     try {
       if (fs.existsSync(this.jobsFile)) {
-        this.jobs = JSON.parse(fs.readFileSync(this.jobsFile, 'utf8'));
+        previousJobs = JSON.parse(fs.readFileSync(this.jobsFile, 'utf8'));
       }
+      this.jobs = [];
+      this.primaryFingerprints.clear();
+      this.secondaryFingerprints.clear();
+      this.contentFingerprints.clear();
+      this.baselineCounts.clear();
+      console.log('[Storage] Starting fresh in memory; existing jobs.json will be replaced only after successful persist.');
     } catch (e) {
-      console.warn('[Storage] Failed to load jobs.json:', e.message);
+      console.warn('[Storage] Failed to read existing jobs.json baseline:', e.message);
     }
 
     try {
@@ -44,17 +51,12 @@ class Storage {
       console.warn('[Storage] Failed to load companies.json:', e.message);
     }
 
-    for (const job of this.jobs) {
-      if (job.fingerprints) {
-        if (job.fingerprints.primary) this.primaryFingerprints.add(job.fingerprints.primary);
-        if (job.fingerprints.secondary) this.secondaryFingerprints.add(job.fingerprints.secondary);
-        if (job.fingerprints.content) this.contentFingerprints.add(job.fingerprints.content);
-      }
+    for (const job of previousJobs) {
       const cid = job.companyId;
       this.baselineCounts.set(cid, (this.baselineCounts.get(cid) || 0) + 1);
     }
 
-    console.log(`[Storage] Loaded ${this.jobs.length} existing jobs.`);
+    console.log(`[Storage] Loaded ${previousJobs.length} existing jobs for baseline; current scrape starts empty.`);
   }
 
   getBaselineCount(companyId) {
@@ -82,7 +84,7 @@ class Storage {
     this.logs.unshift(log);
   }
 
-  updateCompanyStatus(companyId, status, jobCount, qualityReport) {
+  updateCompanyStatus(companyId, status, jobCount, qualityReport, atsDiagnostics = null) {
     const idx = this.companies.findIndex(c => c.id === companyId);
     const entry = {
       id: companyId,
@@ -90,6 +92,7 @@ class Storage {
       lastScraped: new Date().toISOString(),
       jobsFound: jobCount,
       quality: qualityReport,
+      atsDiagnostics
     };
     if (idx >= 0) {
       this.companies[idx] = { ...this.companies[idx], ...entry };

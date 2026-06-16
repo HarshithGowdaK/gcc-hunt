@@ -1,189 +1,152 @@
 'use strict';
 
-const axios = require('axios');
-const CircuitBreakers = require('./CircuitBreakers');
-const Queues = require('./Queues');
-const Observability = require('./Observability');
-const {
-  classifyWithValidation,
-  normaliseAILevel,
-  extractExperienceDetails,
-} = require('../classifier');
+const OpenAI = require('openai');
+const { classifyWithValidation } = require('../classifier');
 const JobHelpers = require('./JobHelpers');
 
-let aiQuotaExceeded = false;
+const openai = new OpenAI({
+  apiKey: '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',
+  baseURL: 'https://integrate.api.nvidia.com/v1',
+});
 
-function needsArbitration(job, locScore, expResult) {
-  if (locScore.confidence < 0.95) return { needed: true, reason: 'location_confidence_low' };
-  if (expResult.confidence < 0.95) return { needed: true, reason: 'experience_confidence_low' };
-  if (expResult.hasConflict) return { needed: true, reason: 'experience_signals_conflict' };
-  if (expResult.hasMultipleRanges) return { needed: true, reason: 'multiple_experience_ranges' };
-  if (!job.description && !job._rawText) return { needed: true, reason: 'missing_description' };
-  return { needed: false, reason: 'high_confidence_rules' };
-}
+const MAX_AI_CLASSIFICATIONS_PER_RUN = 100;
+let aiCallCount = 0;
 
-async function parseJobWithAI(text, jobTitle, jobLocation, companyId) {
-  if (aiQuotaExceeded || !process.env.NVIDIA_API_KEY) return null;
+async function runLLMExtraction(description, title) {
+  if (aiCallCount >= MAX_AI_CLASSIFICATIONS_PER_RUN) {
+    console.log(`[LLM Fallback] Cap reached (${MAX_AI_CLASSIFICATIONS_PER_RUN}). Skipping LLM call.`);
+    return null;
+  }
 
-  const cleanText = String(text || '').substring(0, 15000);
-  const promptContent = `Analyze this GCC job posting and extract structured details.
-Title: ${jobTitle}
-Location: ${jobLocation}
+  aiCallCount++;
+  console.log(`[LLM Fallback] Call ${aiCallCount}/${MAX_AI_CLASSIFICATIONS_PER_RUN} for: "${title}"`);
 
+  const cleanText = String(description || '').substring(0, 10000);
+  const promptContent = `Analyze this job posting and extract the required years of experience.
+Title: ${title}
 Job Description:
 ${cleanText}
 
-Output strictly as JSON (no markdown):
+Determine the minimum and maximum years of experience required for this role.
+If the description contains general phrases like "several years of experience" or "early career", estimate the years (e.g. several years -> 5 years, early career -> 2 years).
+Output strictly valid JSON with no extra text or markdown formatting:
 {
-  "description": "Complete job description",
-  "skills": ["skill1"],
-  "minYearsExperience": 3,
-  "maxYearsExperience": 5,
-  "experienceLevel": "Mid Level",
-  "remoteStatus": "Unknown",
-  "employmentType": "Full-time",
-  "location": "Bangalore, India"
+  "experience_min": 3,
+  "experience_max": 5,
+  "experience_text": "3-5 years",
+  "reason": "Extracted '3-5 years' from..."
 }
+If no experience requirement is mentioned or can be estimated, return null for the values.`;
 
-experienceLevel — EXACTLY one of:
-"Internship / Apprenticeship", "Entry Level", "Mid Level", "Senior Level", "Lead / Management", "Executive Leadership"
+  try {
+    const completion = await openai.chat.completions.create({
+      model: "meta/llama-3.1-70b-instruct",
+      messages: [{ role: "user", content: promptContent }],
+      temperature: 0.2,
+      top_p: 0.7,
+      max_tokens: 512,
+    });
 
-Experience years OVERRIDE misleading titles.
-remoteStatus: Remote | Hybrid | Onsite | Unknown`;
-
-  for (let attempt = 0; attempt < 2; attempt++) {
-    try {
-      const response = await axios.post(
-        'https://integrate.api.nvidia.com/v1/chat/completions',
-        {
-          model: 'meta/llama-3.3-70b-instruct',
-          messages: [{ role: 'user', content: promptContent }],
-          max_tokens: 1024,
-          temperature: 0.2,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.NVIDIA_API_KEY}`,
-          },
-          timeout: 20000,
-        }
-      );
-
-      const content = response.data?.choices?.[0]?.message?.content || '';
-      const jsonMatch = content.replace(/```json/gi, '').replace(/```/g, '').match(/\{[\s\S]*\}/);
-      if (!jsonMatch) return null;
-
-      const parsed = JSON.parse(jsonMatch[0]);
-      parsed.experienceLevel = normaliseAILevel(parsed.experienceLevel);
-      Observability.recordAICall(companyId, true);
-      return parsed;
-    } catch (err) {
-      const status = err.response?.status;
-      const msg = err.response?.data?.error?.message || err.message || '';
-      if (status === 401 || status === 402 || /quota|billing/i.test(msg)) {
-        aiQuotaExceeded = true;
-        return null;
-      }
-      if (attempt === 1) break;
-      await new Promise(r => setTimeout(r, 3000));
+    const content = completion.choices[0]?.message?.content || '';
+    const jsonMatch = content.replace(/```json/gi, '').replace(/```/g, '').match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      console.warn(`[LLM Fallback] Failed to parse JSON match from content: "${content}"`);
+      return null;
     }
+
+    const parsed = JSON.parse(jsonMatch[0].trim());
+    return parsed;
+  } catch (err) {
+    console.error(`[LLM Fallback] API error: ${err.message}`);
+    return null;
   }
-  return null;
-}
-
-function mergeAIWithRules(aiParsed, rawText, title) {
-  const validation = classifyWithValidation(rawText, title);
-
-  if (!aiParsed) {
-    return {
-      description: rawText,
-      skills: JobHelpers.extractSkills(title, rawText),
-      level: validation.experienceLevel,
-      years: validation.years,
-      minYears: validation.minYears,
-      maxYears: validation.maxYears,
-      remoteStatus: JobHelpers.parseRemoteStatus(title, '', rawText),
-      employmentType: JobHelpers.detectEmploymentType(title, rawText),
-      validation,
-      aiUsed: false,
-      skipReason: CircuitBreakers.isAIDisabled() ? 'ai_circuit_breaker' : 'ai_unavailable',
-    };
-  }
-
-  const description = aiParsed.description || rawText;
-  const aiValidation = classifyWithValidation(description, title);
-  const useRules = validation.confidence >= 0.85 || validation.experienceFound;
-
-  return {
-    description,
-    skills: aiParsed.skills || JobHelpers.extractSkills(title, description),
-    level: useRules ? validation.experienceLevel : (aiParsed.experienceLevel || aiValidation.experienceLevel),
-    years: useRules ? validation.years : (aiParsed.minYearsExperience ?? aiValidation.years),
-    minYears: useRules ? validation.minYears : (aiParsed.minYearsExperience ?? aiValidation.minYears),
-    maxYears: useRules ? validation.maxYears : (aiParsed.maxYearsExperience ?? aiValidation.maxYears),
-    remoteStatus: aiParsed.remoteStatus || JobHelpers.parseRemoteStatus(title, aiParsed.location, description),
-    employmentType: aiParsed.employmentType || JobHelpers.detectEmploymentType(title, description),
-    location: aiParsed.location,
-    validation: useRules ? validation : aiValidation,
-    aiUsed: true,
-    skipReason: null,
-  };
 }
 
 class ArbitrationAI {
   async arbitrate(job, locScore, expResult, companyId, rawText) {
-    const arbitrationCheck = needsArbitration(job, locScore, expResult);
+    const title = job.title || 'Unknown';
+    const description = rawText || job.description || '';
 
-    if (!arbitrationCheck.needed) {
-      Observability.recordAISkipped(companyId, arbitrationCheck.reason);
-      return {
-        ...mergeAIWithRules(null, rawText, job.title),
-        arbitrationReason: arbitrationCheck.reason,
-      };
-    }
+    const regexFailed = expResult.minYears === null;
+    const titleConfidenceLow = (expResult.classification_confidence || expResult.confidence || 0) < 0.50;
+    const descriptionAvailable = description.length > 500;
+    const lowerDesc = description.toLowerCase();
+    const hasReqKeywords = lowerDesc.includes('requirement') ||
+                           lowerDesc.includes('qualification') ||
+                           lowerDesc.includes('experience') ||
+                           lowerDesc.includes('skills') ||
+                           lowerDesc.includes('year') ||
+                           lowerDesc.includes('eligible');
+    const hasAmbiguousExperienceHint = /\b(several|multiple|extensive|progressive|relevant|prior|professional)\s+years?\b|\byears?\s+of\s+(?:relevant|professional|related)\s+experience\b/i.test(lowerDesc);
+    const seniorTitleNeedsReview = /\b(senior|staff|principal|lead|architect|manager|director)\b/i.test(title) &&
+      descriptionAvailable &&
+      hasReqKeywords;
 
-    if (CircuitBreakers.isAIDisabled()) {
-      return {
-        ...mergeAIWithRules(null, rawText, job.title),
-        arbitrationReason: 'ai_circuit_breaker_active',
-      };
-    }
+    const shouldUseAI = (
+      (regexFailed && titleConfidenceLow && descriptionAvailable && hasReqKeywords && hasAmbiguousExperienceHint) ||
+      seniorTitleNeedsReview
+    ) && aiCallCount < MAX_AI_CLASSIFICATIONS_PER_RUN;
 
-    try {
-      const aiJob = { ...job, description: rawText };
-      const aiResult = await Queues.aiQueue.enqueue({
-        job: aiJob,
-        rawText,
-        locScore,
-        expResult,
-        companyId,
-      });
+    if (shouldUseAI) {
+      const llmParsed = await runLLMExtraction(description, title);
+      if (llmParsed && llmParsed.experience_min !== undefined && llmParsed.experience_min !== null) {
+        const min = llmParsed.experience_min;
+        const max = llmParsed.experience_max !== undefined ? llmParsed.experience_max : null;
+        const text = llmParsed.experience_text || `${min}${max ? '-' + max : '+'} years`;
 
-      if (aiResult) {
-        CircuitBreakers.recordAISuccess();
-        return aiResult;
+        // Re-run classification using LLM-extracted values
+        const regexRes = classifyWithValidation(text + '\n' + description, title);
+
+        return {
+          description,
+          skills: JobHelpers.extractSkills(title, description),
+          level: regexRes.career_level,
+          years: min,
+          minYears: min,
+          maxYears: max,
+          midpoint: min !== null && max !== null ? (min + max) / 2 : min,
+          experience_text: text,
+          career_level: regexRes.career_level,
+          classification_confidence: 0.85,
+          classification_source: 'experience_llm',
+          experience_source: 'job_description',
+          experience_extracted_by: 'llm',
+          classification_reason: llmParsed.reason || `LLM extracted '${text}'`,
+          warning: regexRes.warning || null,
+          needs_review: !!regexRes.needs_review,
+          aiUsed: true
+        };
       }
-
-      CircuitBreakers.recordAIFailure();
-      return {
-        ...mergeAIWithRules(null, rawText, job.title),
-        arbitrationReason: 'ai_returned_empty',
-      };
-    } catch (err) {
-      console.warn(`[ArbitrationAI] Failed for "${job.title}": ${err.message}`);
-      CircuitBreakers.recordAIFailure();
-      return {
-        ...mergeAIWithRules(null, rawText, job.title),
-        arbitrationReason: `ai_error: ${err.message}`,
-      };
     }
+
+    // Default return with standard regex results (which fallback to title_fallback if minYears is null)
+    return {
+      description,
+      skills: JobHelpers.extractSkills(title, description),
+      level: expResult.career_level || expResult.level,
+      years: expResult.years,
+      minYears: expResult.minYears,
+      maxYears: expResult.maxYears,
+      midpoint: expResult.midpoint,
+      experience_text: expResult.experience_text,
+      career_level: expResult.career_level || expResult.level,
+      classification_confidence: expResult.classification_confidence || expResult.confidence || 0.40,
+      classification_source: expResult.classification_source || 'experience_regex',
+      experience_source: 'job_description',
+      experience_extracted_by: 'regex',
+      classification_reason: expResult.classification_reason || expResult.validation?.reason || '',
+      warning: expResult.warning || null,
+      needs_review: !!expResult.needs_review,
+      aiUsed: false,
+      skipReason: seniorTitleNeedsReview
+        ? 'ai_skipped_budget_or_no_extraction'
+        : (regexFailed ? 'ai_skipped_no_ambiguous_experience_hint' : 'regex_years_found')
+    };
   }
 
   async runAIWorker(payload) {
-    const { job, rawText, companyId } = payload;
-    const aiParsed = await parseJobWithAI(rawText, job.title, job.location, companyId);
-    return mergeAIWithRules(aiParsed, rawText, job.title);
+    // Kept to satisfy worker routing if needed
+    return null;
   }
 }
 

@@ -15,11 +15,10 @@ function JobsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Search & Filter state
   const [search, setSearch] = useState(searchParams.get('search') || '');
   const [selectedCompany, setSelectedCompany] = useState(searchParams.get('company') || '');
   const [selectedCity, setSelectedCity] = useState(searchParams.get('city') || '');
-  const [selectedExp, setSelectedExp] = useState(searchParams.get('experienceLevel') || '');
+  const [selectedExp, setSelectedExp] = useState(searchParams.get('experienceLevel') || searchParams.get('experience') || '');
   const [selectedType, setSelectedType] = useState(searchParams.get('employmentType') || '');
   const [selectedRemote, setSelectedRemote] = useState(searchParams.get('remoteStatus') || '');
   const [selectedIndustry, setSelectedIndustry] = useState(searchParams.get('industry') || '');
@@ -85,6 +84,50 @@ function JobsContent() {
       }
     }
   }, []);
+
+  // Sync URL search parameters back to React states
+  useEffect(() => {
+    const urlSearch = searchParams.get('search') || '';
+    if (urlSearch !== search) {
+      setSearch(urlSearch);
+    }
+    const urlCompany = searchParams.get('company') || '';
+    if (urlCompany !== selectedCompany) {
+      setSelectedCompany(urlCompany);
+    }
+    const urlCity = searchParams.get('city') || '';
+    if (urlCity !== selectedCity) {
+      setSelectedCity(urlCity);
+    }
+    const urlExp = searchParams.get('experienceLevel') || searchParams.get('experience') || '';
+    if (urlExp !== selectedExp) {
+      setSelectedExp(urlExp);
+    }
+    const urlType = searchParams.get('employmentType') || '';
+    if (urlType !== selectedType) {
+      setSelectedType(urlType);
+    }
+    const urlRemote = searchParams.get('remoteStatus') || '';
+    if (urlRemote !== selectedRemote) {
+      setSelectedRemote(urlRemote);
+    }
+    const urlIndustry = searchParams.get('industry') || '';
+    if (urlIndustry !== selectedIndustry) {
+      setSelectedIndustry(urlIndustry);
+    }
+    const urlSort = searchParams.get('sortBy') || 'recent';
+    if (urlSort !== sortBy) {
+      setSortBy(urlSort);
+    }
+    const urlPage = parseInt(searchParams.get('page') || '1');
+    if (urlPage !== page) {
+      setPage(urlPage);
+    }
+    const urlActiveId = searchParams.get('activeId') || null;
+    if (urlActiveId !== activeJobId) {
+      setActiveJobId(urlActiveId);
+    }
+  }, [searchParams]);
 
   // Fetch jobs when query changes
   useEffect(() => {
@@ -339,23 +382,37 @@ function JobsContent() {
               </select>
             </div>
 
-            {/* Experience Level Select */}
+            {/* Experience Level Checklist (Multi-select) */}
             <div>
-              <label className="text-[8.5px] font-bold text-[#7A8471] uppercase tracking-widest block mb-1">Experience Bracket</label>
-              <select
-                className="w-full border border-[#E5E1D8] bg-[#FCFAF7] text-[#161616] px-2 py-1.5 text-xs outline-none focus:border-[#D16A4A] font-bold uppercase tracking-wider"
-                value={selectedExp}
-                onChange={(e) => {
-                  setSelectedExp(e.target.value);
-                  setPage(1);
-                  updateUrl({ experienceLevel: e.target.value, page: 1 });
-                }}
-              >
-                <option value="">All Brackets</option>
-                {filterOptions.experienceLevels.map((exp) => (
-                  <option key={exp} value={exp}>{exp}</option>
-                ))}
-              </select>
+              <label className="text-[8.5px] font-bold text-[#7A8471] uppercase tracking-widest block mb-2">Experience Brackets</label>
+              <div className="space-y-1.5 border border-[#E5E1D8] bg-[#FCFAF7] p-2.5 max-h-48 overflow-y-auto custom-scrollbar">
+                {filterOptions.experienceLevels.map((exp) => {
+                  const selectedList = selectedExp ? selectedExp.split(',').filter(Boolean) : [];
+                  const isChecked = selectedList.includes(exp);
+                  return (
+                    <label key={exp} className="flex items-center gap-2 cursor-pointer text-xs font-bold uppercase tracking-wider text-[#161616] hover:text-[#D16A4A] transition-colors">
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        className="accent-[#D16A4A] h-3.5 w-3.5 border-[#E5E1D8]"
+                        onChange={(e) => {
+                          let newList;
+                          if (e.target.checked) {
+                            newList = [...selectedList, exp];
+                          } else {
+                            newList = selectedList.filter(x => x !== exp);
+                          }
+                          const newExpString = newList.join(',');
+                          setSelectedExp(newExpString);
+                          setPage(1);
+                          updateUrl({ experienceLevel: newExpString, page: 1 });
+                        }}
+                      />
+                      <span>{exp}</span>
+                    </label>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Employment Type Select */}
@@ -576,12 +633,12 @@ function JobsContent() {
                 <div className="flex justify-between border-b border-[#E5E1D8]/60 pb-1.5">
                   <span className="text-[#7A8471] font-semibold">Experience Tier</span>
                   <span className="text-[#161616]">
-                    {activeJobDetails.experienceLevel || 'Mid Level'}
-                    {' ('}
-                    {activeJobDetails.yearsExperienceMax && activeJobDetails.yearsExperienceMax > (activeJobDetails.yearsExperience || 0)
-                      ? `${activeJobDetails.yearsExperience}-${activeJobDetails.yearsExperienceMax}`
-                      : (activeJobDetails.yearsExperience || '0-2')}
-                    {' yrs)'}
+                    {activeJobDetails.career_level || 'Not Specified'}
+                    {activeJobDetails.experience_min !== undefined && activeJobDetails.experience_min !== null ? (
+                      ` (${activeJobDetails.experience_max !== undefined && activeJobDetails.experience_max !== null && activeJobDetails.experience_max > activeJobDetails.experience_min
+                        ? `${activeJobDetails.experience_min}-${activeJobDetails.experience_max}`
+                        : `${activeJobDetails.experience_min}+`} yrs)`
+                    ) : ''}
                   </span>
                 </div>
                 <div className="flex justify-between border-b border-[#E5E1D8]/60 pb-1.5">
@@ -776,23 +833,37 @@ function JobsContent() {
                   </select>
                 </div>
 
-                {/* Experience Tier */}
+                {/* Experience Tier Checklist (Multi-select) */}
                 <div>
-                  <label className="text-[9px] font-bold text-[#161616] uppercase tracking-widest block mb-1.5">Experience Bracket</label>
-                  <select
-                    className="w-full border border-[#E5E1D8] bg-[#FCFAF7] text-black px-2.5 py-1.5 text-xs outline-none"
-                    value={selectedExp}
-                    onChange={(e) => {
-                      setSelectedExp(e.target.value);
-                      setPage(1);
-                      updateUrl({ experienceLevel: e.target.value, page: 1 });
-                    }}
-                  >
-                    <option value="">All Brackets</option>
-                    {filterOptions.experienceLevels.map((exp) => (
-                      <option key={exp} value={exp}>{exp}</option>
-                    ))}
-                  </select>
+                  <label className="text-[9px] font-bold text-[#161616] uppercase tracking-widest block mb-2">Experience Brackets</label>
+                  <div className="space-y-1.5 border border-[#E5E1D8] bg-[#FCFAF7] p-2.5 max-h-40 overflow-y-auto custom-scrollbar">
+                    {filterOptions.experienceLevels.map((exp) => {
+                      const selectedList = selectedExp ? selectedExp.split(',').filter(Boolean) : [];
+                      const isChecked = selectedList.includes(exp);
+                      return (
+                        <label key={exp} className="flex items-center gap-2 cursor-pointer text-xs font-bold uppercase tracking-wider text-[#161616] hover:text-[#D16A4A] transition-colors">
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            className="accent-[#D16A4A] h-3.5 w-3.5 border-[#E5E1D8]"
+                            onChange={(e) => {
+                              let newList;
+                              if (e.target.checked) {
+                                newList = [...selectedList, exp];
+                              } else {
+                                newList = selectedList.filter(x => x !== exp);
+                              }
+                              const newExpString = newList.join(',');
+                              setSelectedExp(newExpString);
+                              setPage(1);
+                              updateUrl({ experienceLevel: newExpString, page: 1 });
+                            }}
+                          />
+                          <span>{exp}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 {/* Employment Type */}

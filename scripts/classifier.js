@@ -1,51 +1,109 @@
 'use strict';
 
-/**
- * GCC Job Classification Engine — Weighted Evidence Model
- *
- * Pipeline:
- *   1. Internship / Apprenticeship detection (hard stop)
- *   2. Extract experience years (min + max from ranges)
- *   3. Score seniority signals from title + full description
- *   4. Apply experience weighting (dominates title keywords)
- *   5. GCC override rules for misleading titles
- *   6. Description-based seniority phrases
- *   7. Resolve winner + confidence
- */
-
 const SENIORITY_LEVELS = {
-  INTERNSHIP : 'Internship / Apprenticeship',
-  ENTRY      : 'Entry Level',
-  MID        : 'Mid Level',
-  SENIOR     : 'Senior Level',
-  LEAD       : 'Lead / Management',
-  EXECUTIVE  : 'Executive Leadership',
+  INTERNSHIP: 'Internship',
+  FRESHER: 'Fresher',
+  ENTRY: 'Entry Level',
+  ASSOCIATE: 'Associate',
+  MID: 'Mid',
+  MID_SENIOR: 'Mid',
+  SENIOR: 'Senior',
+  LEAD: 'Lead',
+  PRINCIPAL: 'Principal',
 };
 
-const LEVEL_KEYS = {
-  [SENIORITY_LEVELS.ENTRY]     : 'entry',
-  [SENIORITY_LEVELS.MID]       : 'mid',
-  [SENIORITY_LEVELS.SENIOR]    : 'senior',
-  [SENIORITY_LEVELS.LEAD]     : 'lead',
-  [SENIORITY_LEVELS.EXECUTIVE] : 'executive',
+const WORD_TO_NUM = {
+  zero: 0, one: 1, two: 2, three: 3, four: 4, five: 5,
+  six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12,
+  thirteen: 13, fourteen: 14, fifteen: 15, sixteen: 16, seventeen: 17,
+  eighteen: 18, nineteen: 19, twenty: 20
 };
 
-const EMPTY_RESULT = Object.freeze({
-  minYears: null,
-  maxYears: null,
-  allFound: [],
-  rawMatches: [],
-});
+function parseWordOrNum(s) {
+  if (!s) return null;
+  const clean = s.trim().toLowerCase();
+  if (WORD_TO_NUM[clean] !== undefined) return WORD_TO_NUM[clean];
+  const parsed = parseInt(clean, 10);
+  return isNaN(parsed) ? null : parsed;
+}
 
-const KEY_TO_LEVEL = {
-  entry    : SENIORITY_LEVELS.ENTRY,
-  mid      : SENIORITY_LEVELS.MID,
-  senior   : SENIORITY_LEVELS.SENIOR,
-  lead     : SENIORITY_LEVELS.LEAD,
-  executive: SENIORITY_LEVELS.EXECUTIVE,
-};
+function normalizeYearsCandidate(candidate) {
+  if (!candidate || candidate.min === null || candidate.min === undefined || candidate.max !== null) {
+    return candidate;
+  }
 
-// ─── STEP 1: Internship / Apprenticeship ─────────────────────────────────────
+  // Some scraped pages collapse "3-8 years" into "38 years"; repair obvious two-digit ranges.
+  if (candidate.min >= 30 && candidate.min <= 99) {
+    const digits = String(candidate.min);
+    const low = Number(digits[0]);
+    const high = Number(digits[1]);
+    if (low > 0 && high > low) {
+      return {
+        ...candidate,
+        min: low,
+        max: high,
+        text: candidate.text.replace(String(candidate.min), `${low}-${high}`),
+      };
+    }
+  }
+
+  return candidate;
+}
+
+function extractExperienceDetails(text) {
+  if (!text) return { minYears: null, maxYears: null, experience_text: null };
+  const lowerText = String(text)
+    .toLowerCase()
+    .replace(/\b(zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty)\s*\(\s*(\d+)\s*\)/gi, '$2')
+    .replace(/\b(\d+)\s*\(\s*(zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty)\s*\)/gi, '$1');
+
+  const subRoleRe = /\d+\s*(?:year|yr)s?\s*(?:of\s*)?(?:experience|exp)?\s*as\b[^,.\n;]*/gi;
+  const cleanedText = lowerText.replace(subRoleRe, match => ' '.repeat(match.length));
+
+  const patterns = [
+    {
+      re: /\b(\d+|zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\s*(?:-|to)\s*(\d+|zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\s*(?:years?|yrs?)\b/gi,
+      parse: (m) => ({ min: parseWordOrNum(m[1]), max: parseWordOrNum(m[2]), text: m[0] })
+    },
+    {
+      re: /\b(\d+|zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\+\s*(?:years?|yrs?)\b/gi,
+      parse: (m) => ({ min: parseWordOrNum(m[1]), max: null, text: m[0] })
+    },
+    {
+      re: /\b(?:minimum|at\s*least|requires?|min)\s*(?:of\s+)?(\d+|zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\s*(?:years?|yrs?)\b/gi,
+      parse: (m) => ({ min: parseWordOrNum(m[1]), max: null, text: m[0] })
+    },
+    {
+      re: /\b(\d+|zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\s*(?:years?|yrs?)\s*(?:of\s*)?experience\b/gi,
+      parse: (m) => ({ min: parseWordOrNum(m[1]), max: null, text: m[0] })
+    }
+  ];
+
+  const candidates = [];
+  for (const pat of patterns) {
+    let match;
+    const re = new RegExp(pat.re);
+    while ((match = re.exec(cleanedText)) !== null) {
+      const parsedMatch = pat.parse(match);
+      if (parsedMatch.min !== null) {
+        candidates.push(normalizeYearsCandidate(parsedMatch));
+      }
+    }
+  }
+
+  if (candidates.length === 0) {
+    return { minYears: null, maxYears: null, experience_text: null };
+  }
+
+  const rangeCandidate = candidates.find(c => c.max !== null);
+  const selected = rangeCandidate || candidates[0];
+
+  return {
+    minYears: selected.min,
+    maxYears: selected.max,
+    experience_text: selected.text
+  };
+}
 
 const INTERNSHIP_PATTERNS = [
   /\bintern\b/i,
@@ -71,397 +129,149 @@ function detectInternship(fullText) {
   return false;
 }
 
-// ─── STEP 2: Experience extraction ───────────────────────────────────────────
+function mapYearsToLevel(min, max, isInternshipMatch) {
+  if (isInternshipMatch) return SENIORITY_LEVELS.INTERNSHIP;
 
-function isValidYears(n) {
-  return !isNaN(n) && n >= 0 && n <= 40;
+  if (min === null || min === undefined) return SENIORITY_LEVELS.MID;
+
+  // Recommended mapping
+  // 0-1   -> Fresher
+  // 1-2   -> Entry
+  // 2-5   -> Associate
+  // 5-8   -> Mid
+  // 8-12  -> Senior
+  // 12+   -> Lead / Principal
+  if (min === 0) return SENIORITY_LEVELS.FRESHER;
+  if (min === 1) return SENIORITY_LEVELS.ENTRY;
+  if (min <= 4) return SENIORITY_LEVELS.ASSOCIATE;
+  if (min <= 7) return SENIORITY_LEVELS.MID;
+  if (min <= 11) return SENIORITY_LEVELS.SENIOR;
+  if (min <= 14) return SENIORITY_LEVELS.LEAD;
+  return SENIORITY_LEVELS.PRINCIPAL;
 }
 
-/**
- * Extracts primary experience requirement from job text.
- * Returns { minYears, maxYears, allFound, rawMatches }
- */
-function extractExperienceDetails(description) {
-  if (!description) return EMPTY_RESULT;
-  const text = String(description).toLowerCase();
+function checkTitleConflict(title, career_level) {
+  const t = String(title || '').toLowerCase();
+  const isSeniorTitle = /\b(senior|lead|staff|principal|architect|manager|director)\b/i.test(t);
+  const isJuniorTitle = /\b(junior|trainee|graduate|apprentice)\b/i.test(t);
+  const isInternTitle = /\bintern\b/i.test(t);
 
-  const subRoleRe = /\d+\s*(?:year|yr)s?\s*(?:of\s*)?(?:experience|exp)?\s*as\b[^,.\n;]*/gi;
-  const cleanedText = text.replace(subRoleRe, match => ' '.repeat(match.length));
-
-  const candidates = [];
-  const ranges = [];
-  let m;
-
-  const rangeRe = /(\d+)\s*(?:-|to)\s*(\d+)\s*years?/gi;
-  while ((m = rangeRe.exec(cleanedText)) !== null) {
-    const low = parseInt(m[1], 10);
-    const high = parseInt(m[2], 10);
-    if (isValidYears(low) && isValidYears(high)) {
-      ranges.push({ min: low, max: high, raw: m[0] });
-      candidates.push({ value: low, raw: m[0] });
-      candidates.push({ value: high, raw: m[0] });
-    }
+  if (isSeniorTitle && [SENIORITY_LEVELS.INTERNSHIP, SENIORITY_LEVELS.FRESHER, SENIORITY_LEVELS.ENTRY, SENIORITY_LEVELS.ASSOCIATE].includes(career_level)) {
+    return true;
   }
-
-  const plusRe = /(\d+)\+\s*years?/gi;
-  while ((m = plusRe.exec(cleanedText)) !== null) {
-    const v = parseInt(m[1], 10);
-    if (isValidYears(v)) candidates.push({ value: v, raw: m[0] });
+  if (isInternTitle && career_level !== SENIORITY_LEVELS.INTERNSHIP) {
+    return true;
   }
-
-  const minRe = /(?:minimum|at\s*least|requires?)\s*(?:of\s+)?(\d+)\s*years?/gi;
-  while ((m = minRe.exec(cleanedText)) !== null) {
-    const v = parseInt(m[1], 10);
-    if (isValidYears(v)) candidates.push({ value: v, raw: m[0] });
+  if (isJuniorTitle && ![SENIORITY_LEVELS.INTERNSHIP, SENIORITY_LEVELS.FRESHER, SENIORITY_LEVELS.ENTRY].includes(career_level)) {
+    return true;
   }
-
-  const yrsExpRe = /(\d+)\s*years?\s*(?:of\s*)?experience/gi;
-  while ((m = yrsExpRe.exec(cleanedText)) !== null) {
-    const v = parseInt(m[1], 10);
-    if (isValidYears(v)) candidates.push({ value: v, raw: m[0] });
-  }
-
-  const yrsWordsExpRe = /(\d+)\s*years?(?:\s+(?!experience\b)\w+){1,4}\s+experience\b/gi;
-  while ((m = yrsWordsExpRe.exec(cleanedText)) !== null) {
-    const v = parseInt(m[1], 10);
-    if (isValidYears(v)) candidates.push({ value: v, raw: m[0] });
-  }
-
-  const expOfRe = /experience\s*(?:of\s*)?(\d+)\+?\s*years?/gi;
-  while ((m = expOfRe.exec(cleanedText)) !== null) {
-    const v = parseInt(m[1], 10);
-    if (isValidYears(v)) candidates.push({ value: v, raw: m[0] });
-  }
-
-  if (candidates.length === 0) {
-    return EMPTY_RESULT;
-  }
-
-  const allValues = candidates.map(c => c.value);
-  let primaryMin;
-  let primaryMax;
-
-  if (ranges.length > 0) {
-    primaryMin = Math.min(...ranges.map(r => r.min));
-    primaryMax = Math.max(...ranges.map(r => r.max));
-  } else {
-    const peak = Math.max(...allValues);
-    primaryMin = peak;
-    primaryMax = peak;
-  }
-
-  return {
-    minYears  : primaryMin,
-    maxYears  : primaryMax,
-    allFound  : allValues,
-    rawMatches: [...new Set(candidates.map(c => c.raw))],
-  };
+  return false;
 }
 
-// ─── Signal scanners ───────────────────────────────────────────────────────────
-
-const ENTRY_SIGNALS = [
-  /\bgraduate\b/i, /\bcampus\b/i, /\bfresher\b/i, /\brecent graduate\b/i,
-  /\bentry[\s-]?level\b/i, /\bearly career\b/i, /\bjunior\b/i, /\bassociate\b/i,
-  /\btrainee\b/i,
-];
-
-const MID_SIGNALS = [
-  /\bengineer\b/i, /\bdeveloper\b/i, /\banalyst\b/i, /\bconsultant\b/i,
-  /\bspecialist\b/i, /\badministrator\b/i,
-];
-
-const SENIOR_SIGNALS = [
-  /\bsenior\b/i, /\bstaff\b/i, /\bprincipal\b/i, /\bexpert\b/i,
-  /\badvanced\b/i, /\btechnical lead\b/i,
-];
-
-const LEAD_SIGNALS = [
-  /\blead\b/i, /\bmanager\b/i, /\bdirector\b/i, /\barchitect\b/i,
-  /\bhead\b/i, /\bvp\b/i, /\bvice president\b/i, /\bchief\b/i,
-];
-
-const EXECUTIVE_SIGNALS = [
-  /\bceo\b/i, /\bcto\b/i, /\bcfo\b/i, /\bcmo\b/i, /\bcio\b/i,
-  /\bpresident\b/i, /\bexecutive director\b/i, /\bmanaging director\b/i,
-  /\bsvp\b/i, /\bevp\b/i,
-];
-
-const DESC_SENIORITY_PHRASES = [
-  { re: /\blead cross[\s-]?functional teams?\b/i, key: 'lead', pts: 15, label: 'lead cross-functional teams' },
-  { re: /\bmentor(?:ing)? junior engineers?\b/i, key: 'senior', pts: 10, label: 'mentor junior engineers' },
-  { re: /\bwork under supervision\b/i, key: 'entry', pts: 10, label: 'work under supervision' },
-  { re: /\bindependently design systems?\b/i, key: 'senior', pts: 10, label: 'independent ownership' },
-  { re: /\bteam leadership\b/i, key: 'lead', pts: 15, label: 'team leadership' },
-  { re: /\barchitecture ownership\b/i, key: 'lead', pts: 15, label: 'architecture ownership' },
-];
-
-function hasMatch(text, patterns) {
-  for (let i = 0; i < patterns.length; i++) {
-    if (patterns[i].test(text)) return patterns[i];
-  }
-  return null;
-}
-
-function applySignalMatches(text, patterns, key, points, score, signals) {
-  const match = hasMatch(text, patterns);
-  if (!match) return;
-
-  score[key] += points;
-  signals.push(match.source.replace(/\\b/g, '').replace(/\\/g, ''));
-}
-
-function applyExperienceWeighting(minYears, maxYears, score, signals) {
-  if (minYears === null) return;
-
-  const yearsLabel = maxYears !== null && maxYears !== minYears
-    ? `${minYears}-${maxYears} years`
-    : `${minYears}+ years`;
-
-  if (minYears <= 2) {
-    score.entry += 100;
-    signals.push(`required experience ${yearsLabel}`);
-  } else if (minYears <= 7) {
-    score.mid += 100;
-    signals.push(`required experience ${yearsLabel}`);
-  } else if (minYears <= 11) {
-    score.senior += 100;
-    signals.push(`required experience ${yearsLabel}`);
-  } else if (minYears >= 12) {
-    score.lead += 100;
-    signals.push(`required experience ${yearsLabel}`);
-  }
-}
-
-function applyGccOverrides(titleText, minYears, maxYears) {
-  if (!titleText) return null;
-  const title = titleText;
-
-  if (/associate\s+software\s+engineer/i.test(title) && minYears !== null && minYears >= 5) {
-    return { level: SENIORITY_LEVELS.MID, reason: 'GCC override: Associate Software Engineer with 5+ years → Mid Level', signals: ['associate title + 5+ years experience'] };
-  }
-
-  if (/senior\s+software\s+engineer/i.test(title) && minYears !== null && minYears >= 3 && minYears <= 6) {
-    return { level: SENIORITY_LEVELS.MID, reason: 'GCC override: Senior Software Engineer with 3-6 years → Mid Level', signals: ['senior title + mid-range experience'] };
-  }
-
-  if (/\blead\s+engineer\b/i.test(title) && minYears !== null && minYears <= 6) {
-    return { level: SENIORITY_LEVELS.MID, reason: 'GCC override: Lead Engineer with ≤6 years → Mid Level', signals: ['lead title + experience requirement wins'] };
-  }
-
-  if (/principal\s+engineer/i.test(title) && minYears !== null && minYears >= 8 && minYears <= 10) {
-    return { level: SENIORITY_LEVELS.SENIOR, reason: 'GCC override: Principal Engineer with 8-10 years → Senior Level', signals: ['principal title + senior-range experience'] };
-  }
-
-  if (EXECUTIVE_SIGNALS.some(re => re.test(title)) && minYears !== null && minYears >= 15) {
-    return { level: SENIORITY_LEVELS.EXECUTIVE, reason: 'Executive title with 15+ years → Executive Leadership', signals: ['executive title + senior experience'] };
-  }
-
-  return null;
-}
-
-function scoreToLevel(score) {
-  const entries = Object.entries(score).sort((a, b) => b[1] - a[1]);
-  const [winnerKey, winnerScore] = entries[0];
-  const runnerUpScore = entries[1]?.[1] ?? 0;
-  const total = entries.reduce((s, [, v]) => s + v, 0);
-
-  let confidence;
-  if (total === 0 || winnerScore < 20) {
-    confidence = winnerScore >= 100 ? 85 : 40;
-  } else {
-    const margin = winnerScore - runnerUpScore;
-    confidence = Math.round(Math.min(99, 50 + (margin / Math.max(total, 1)) * 50));
-    if (winnerScore >= 100) confidence = Math.max(confidence, 85);
-  }
-
-  return {
-    level      : KEY_TO_LEVEL[winnerKey] || SENIORITY_LEVELS.MID,
-    confidence,
-    score,
-    winnerKey,
-  };
-}
-
-function levelToDefaultYears(level) {
-  const map = {
-    [SENIORITY_LEVELS.INTERNSHIP] : 0,
-    [SENIORITY_LEVELS.ENTRY]      : 1,
-    [SENIORITY_LEVELS.MID]        : 4,
-    [SENIORITY_LEVELS.SENIOR]     : 9,
-    [SENIORITY_LEVELS.LEAD]       : 12,
-    [SENIORITY_LEVELS.EXECUTIVE]  : 18,
-  };
-  return map[level] ?? 4;
-}
-
-/**
- * Primary classification — weighted evidence model.
- * Scans title + full description together.
- */
 function classifyWithValidation(description, title) {
-  const descText  = String(description || '').toLowerCase();
+  const descText = String(description || '').toLowerCase();
   const titleText = String(title || '').toLowerCase();
 
-  if (!descText && !titleText) {
-    return {
-      classification: SENIORITY_LEVELS.MID,
-      experienceLevel: SENIORITY_LEVELS.MID,
-      confidence: 0.4,
-      confidencePercent: 40,
-      experienceFound: null,
-      minYears: null,
-      maxYears: null,
-      allExperienceFound: [],
-      matchedKeywords: [],
-      signals: [],
-      reason: 'No text supplied.',
-      years: 4,
-      score: null,
-    };
-  }
+  const isInternTitle = detectInternship(titleText);
+  let isIntern = isInternTitle;
 
-  const fullText = titleText + '\n' + descText;
+  const priorInternshipPatterns = [
+    /\b(?:prior|previous|past|completed)?\s*(?:internship|intern|co-?op|apprentice|apprenticeship)s?\s*(?:experience|exp)?s?\s*(?:is|will\s+be|would\s+be)?\s*(?:also\s+)?(?:preferred|plus|a\s+plus|required|valued|taken\s+in(?:to)?\s+consideration|counts?|considered|acceptable|desirable|beneficial)\b/gi,
+    /\b(?:experience|exp)\s*(?:including|gained\s*during|from|in)?\s*(?:internships?|co-?ops?|apprenticeships?)\b/gi,
+    /\b(?:or|\/)\s*(?:internship|co-?op|apprentice|apprenticeship)\s*(?:experience|exp)?\b/gi,
+    /\b(?:internship|intern|co-?op|apprentice|apprenticeship)s?\s*(?:experience|exp)?s?\s*(?:are|will\s+be|can\s+be)?\s*(?:also\s+)?(?:eligible|considered|valued|preferred)\b/gi,
+    /\b(?:candidates|applicants|students)\s*(?:with|having|who\s+have)\s*(?:prior|previous|past|completed)?\s*(?:internship|intern|co-?op|apprentice|apprenticeship)s?\s*(?:experience|exp)?s?\b/gi
+  ];
 
-  const signals = [];
-
-  // STEP 1: Internship / Apprenticeship — highest priority, hard stop
-  if (detectInternship(fullText)) {
-    const matched = [];
-    for (let i = 0; i < INTERNSHIP_PATTERNS.length; i++) {
-      if (INTERNSHIP_PATTERNS[i].test(fullText)) {
-        matched.push(INTERNSHIP_PATTERNS[i].source);
-      }
-    }
-    return {
-      classification    : SENIORITY_LEVELS.INTERNSHIP,
-      experienceLevel   : SENIORITY_LEVELS.INTERNSHIP,
-      confidence        : 1.0,
-      confidencePercent : 100,
-      experienceFound   : '0 years',
-      minYears          : 0,
-      maxYears          : 0,
-      allExperienceFound: [],
-      matchedKeywords   : matched,
-      signals           : ['internship/apprenticeship detected'],
-      reason            : 'Internship or apprenticeship indicators found — classification stopped.',
-      years             : 0,
-      score             : null,
-    };
-  }
-
-  // STEP 2: Extract experience from full page text
-  const { minYears, maxYears, allFound, rawMatches } = extractExperienceDetails(fullText);
-  const experienceFound = minYears !== null
-    ? (maxYears !== null && maxYears !== minYears
-      ? `${minYears}-${maxYears} years`
-      : `${minYears} year${minYears !== 1 ? 's' : ''}`)
-    : null;
-
-  // STEP 3–4: Build score object
-  const score = { entry: 0, mid: 0, senior: 0, lead: 0, executive: 0 };
-
-  applySignalMatches(fullText, ENTRY_SIGNALS, 'entry', 10, score, signals);
-  applySignalMatches(fullText, MID_SIGNALS, 'mid', 5, score, signals);
-  applySignalMatches(fullText, SENIOR_SIGNALS, 'senior', 15, score, signals);
-  applySignalMatches(fullText, LEAD_SIGNALS, 'lead', 20, score, signals);
-  applySignalMatches(fullText, EXECUTIVE_SIGNALS, 'executive', 25, score, signals);
-
-  // STEP 4: Experience weighting (dominates title)
-  applyExperienceWeighting(minYears, maxYears, score, signals);
-
-  // STEP 6: Description-based seniority phrases
-  for (let i = 0; i < DESC_SENIORITY_PHRASES.length; i++) {
-    const phrase = DESC_SENIORITY_PHRASES[i];
-    if (phrase.re.test(fullText)) {
-      score[phrase.key] += phrase.pts;
-      signals.push(phrase.label);
+  let priorInternshipConsidered = false;
+  for (const pattern of priorInternshipPatterns) {
+    if (pattern.test(descText)) {
+      priorInternshipConsidered = true;
     }
   }
 
-  // STEP 5: GCC override rules
-  const override = applyGccOverrides(titleText, minYears, maxYears);
-  if (override) {
-    return {
-      classification    : override.level,
-      experienceLevel   : override.level,
-      confidence        : 0.92,
-      confidencePercent : 92,
-      experienceFound,
-      minYears,
-      maxYears,
-      allExperienceFound: rawMatches,
-      matchedKeywords   : override.signals,
-      signals           : [...signals, ...override.signals],
-      reason            : override.reason,
-      years             : minYears ?? levelToDefaultYears(override.level),
-      score,
-    };
+  if (!isIntern) {
+    // Clean out references to prior internship/apprentice experience in description before checking
+    let cleanedDesc = descText;
+    for (const pattern of priorInternshipPatterns) {
+      cleanedDesc = cleanedDesc.replace(pattern, '');
+    }
+
+    if (detectInternship(cleanedDesc)) {
+      isIntern = true;
+    }
   }
 
-  // STEP 7: Final decision
-  const { level, confidence, score: finalScore } = scoreToLevel(score);
-  const yearsNumeric = minYears !== null ? minYears : levelToDefaultYears(level);
+  const descExperience = extractExperienceDetails(descText);
+  const titleExperience = descExperience.minYears === null ? extractExperienceDetails(titleText) : { minYears: null, maxYears: null, experience_text: null };
+  const { minYears, maxYears, experience_text } = descExperience.minYears !== null ? descExperience : titleExperience;
 
-  let reason;
-  if (minYears !== null) {
-    reason = `Experience requirement (${experienceFound}) weighted over title signals → ${level}.`;
-  } else if (finalScore[LEVEL_KEYS[level]] > 0) {
-    reason = `Seniority signals in title/description → ${level}.`;
-  } else {
-    reason = 'No strong signal found. Defaulting to Mid Level.';
+  // Safeguard: if minYears >= 1 and title is not internship-related, it is not an internship
+  if (isIntern && !isInternTitle && minYears !== null && minYears >= 1) {
+    isIntern = false;
   }
+
+  let career_level = mapYearsToLevel(minYears, maxYears, isIntern);
+  let confidence = 0.95;
+  let warning = null;
+  let needs_review = false;
+  let classification_source = 'experience_regex';
+
+  // If no experience was found from text, fall back to title heuristics
+  if (minYears === null) {
+    classification_source = 'title_fallback';
+    confidence = 0.40;
+    if (isIntern) {
+      career_level = SENIORITY_LEVELS.INTERNSHIP;
+      confidence = 0.95;
+    } else if (/\b(senior|lead|staff|principal)\b/i.test(titleText)) {
+      career_level = SENIORITY_LEVELS.SENIOR;
+    } else if (priorInternshipConsidered) {
+      career_level = SENIORITY_LEVELS.FRESHER;
+      confidence = 0.85;
+      classification_source = 'prior_internship_heuristic';
+    } else if (/\b(fresher|graduate)\b/i.test(titleText)) {
+      career_level = SENIORITY_LEVELS.FRESHER;
+    } else if (/\b(junior|trainee|entry)\b/i.test(titleText)) {
+      career_level = SENIORITY_LEVELS.ENTRY;
+    } else {
+      career_level = SENIORITY_LEVELS.MID;
+    }
+  }
+
+  // Validate title conflict
+  if (minYears !== null && checkTitleConflict(titleText, career_level)) {
+    warning = 'Title conflicts with extracted experience';
+    needs_review = true;
+    confidence = 0.45;
+  }
+
+  const midpoint = minYears !== null && maxYears !== null ? (minYears + maxYears) / 2 : minYears;
 
   return {
-    classification    : level,
-    experienceLevel   : level,
-    confidence        : Math.round(confidence) / 100,
-    confidencePercent : confidence,
-    experienceFound,
+    classification: career_level,
+    career_level,
+    confidence,
+    classification_confidence: confidence,
+    experience_min: minYears,
+    experience_max: maxYears,
+    experience_midpoint: midpoint,
+    experience_text,
+    warning,
+    needs_review,
+    classification_source,
+    reason: warning ? `${warning}. Derived '${career_level}' from years.` : `Derived '${career_level}' from experience requirement.`,
     minYears,
     maxYears,
-    allExperienceFound: rawMatches,
-    matchedKeywords   : [...new Set(signals)],
-    signals,
-    reason,
-    years             : yearsNumeric,
-    score             : finalScore,
+    midpoint,
+    years: minYears !== null ? minYears : (career_level === SENIORITY_LEVELS.SENIOR ? 7 : (career_level === SENIORITY_LEVELS.LEAD ? 10 : (career_level === SENIORITY_LEVELS.PRINCIPAL ? 15 : 4)))
   };
-}
-
-function extractExperience(description, title) {
-  const v = classifyWithValidation(description, title);
-  return { years: v.years, level: v.classification };
-}
-
-function normaliseAILevel(raw) {
-  if (!raw) return SENIORITY_LEVELS.MID;
-  const s = String(raw).trim().toLowerCase();
-
-  if (s.includes('intern') || s.includes('apprentice') || s.includes('co-op') || s.includes('coop')) {
-    return SENIORITY_LEVELS.INTERNSHIP;
-  }
-  if (s.includes('executive') || s.includes('director') && s.includes('chief')) {
-    return SENIORITY_LEVELS.EXECUTIVE;
-  }
-  if (s.includes('entry') || s.includes('fresher') || s.includes('fresh') || s.includes('junior')) {
-    return SENIORITY_LEVELS.ENTRY;
-  }
-  if (s.includes('mid')) return SENIORITY_LEVELS.MID;
-  if (s.includes('senior') || s.includes('principal') || s.includes('staff')) {
-    return SENIORITY_LEVELS.SENIOR;
-  }
-  if (s.includes('lead') || s.includes('manager') || s.includes('head of')) {
-    return SENIORITY_LEVELS.LEAD;
-  }
-  return SENIORITY_LEVELS.MID;
 }
 
 module.exports = {
   SENIORITY_LEVELS,
   extractExperienceDetails,
-  extractExperience,
   classifyWithValidation,
-  normaliseAILevel,
   detectInternship,
+  mapYearsToLevel
 };

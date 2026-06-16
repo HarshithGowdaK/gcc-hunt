@@ -26,6 +26,18 @@ interface Job {
   description: string;
   dateScraped?: string;
   industry?: string;
+
+  // New fields persisted
+  experience_min?: number | null;
+  experience_max?: number | null;
+  experience_midpoint?: number | null;
+  experience_text?: string | null;
+  career_level?: string;
+  classification_confidence?: number;
+  classification_version?: string;
+  warning?: string | null;
+  needs_review?: boolean;
+  classification_source?: string;
 }
 
 // Convert untyped static data imports to typed arrays
@@ -39,6 +51,7 @@ export async function fetchJobs(filters: {
   company?: string;
   city?: string;
   experienceLevel?: string;
+  experience?: string;
   employmentType?: string;
   remoteStatus?: string;
   search?: string;
@@ -53,6 +66,18 @@ export async function fetchJobs(filters: {
 
   let list = [...typedJobs];
 
+  // Deduplicate by company, title, and city/location to prevent duplicate listings
+  const seenKeys = new Set<string>();
+  list = list.filter(j => {
+    const comp = (j.companyId || j.companyName || '').toLowerCase().trim();
+    const title = (j.title || '').toLowerCase().trim();
+    const city = (j.city || j.location || '').toLowerCase().trim();
+    const key = `${comp}:${title}:${city}`;
+    if (seenKeys.has(key)) return false;
+    seenKeys.add(key);
+    return true;
+  });
+
   // Apply filters
   if (filters.company) {
     list = list.filter(j => j.companyId === filters.company);
@@ -60,26 +85,14 @@ export async function fetchJobs(filters: {
   if (filters.city) {
     list = list.filter(j => j.city && j.city.toLowerCase() === filters.city?.toLowerCase());
   }
-  if (filters.experienceLevel) {
-    if (filters.experienceLevel === 'Internships') {
-      list = list.filter(j =>
-        j.experienceLevel === 'Internship / Apprenticeship' ||
-        j.experienceLevel === 'Internship' ||
-        j.experienceLevel === 'Apprenticeship'
+  const expLevel = filters.experienceLevel || filters.experience;
+  if (expLevel) {
+    const levels = expLevel.split(',').filter(Boolean);
+    if (levels.length > 0) {
+      list = list.filter(j => 
+        (j.career_level && levels.includes(j.career_level)) ||
+        (j.experienceLevel && levels.includes(j.experienceLevel))
       );
-    } else if (filters.experienceLevel === 'Lead / Management') {
-      list = list.filter(j =>
-        j.experienceLevel === 'Lead / Management' ||
-        j.experienceLevel === 'Lead Level' ||
-        j.experienceLevel === 'Lead / Manager'
-      );
-    } else if (filters.experienceLevel === 'Executive Leadership') {
-      list = list.filter(j =>
-        j.experienceLevel === 'Executive Leadership' ||
-        j.experienceLevel === 'Director / Executive'
-      );
-    } else {
-      list = list.filter(j => j.experienceLevel === filters.experienceLevel);
     }
   }
   if (filters.employmentType) {
@@ -174,12 +187,14 @@ export async function fetchFilters() {
   const departments = new Set<string>();
   const employmentTypes = new Set<string>(['Full-time', 'Part-time', 'Contract', 'Internship', 'Apprenticeship']);
   const experienceLevels = new Set<string>([
-    'Internships',
+    'Internship',
+    'Fresher',
     'Entry Level',
-    'Mid Level',
-    'Senior Level',
-    'Lead / Management',
-    'Executive Leadership',
+    'Associate',
+    'Mid',
+    'Senior',
+    'Lead',
+    'Principal',
   ]);
   const remoteStatuses = new Set<string>(['Onsite', 'Hybrid', 'Remote']);
   const industries = new Set<string>();

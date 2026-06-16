@@ -15,11 +15,15 @@ class Deduplicator {
     return crypto.createHash('sha1').update(normalizedText).digest('hex');
   }
 
+  _hashKey(parts) {
+    return crypto.createHash('sha1').update(parts.join(':')).digest('hex');
+  }
+
   buildFingerprints(companyId, title, location, reqId, description) {
-    const primary = reqId ? `${companyId}:${reqId}` : null;
     const normTitle = this._normalizeString(title);
     const normLoc = this._normalizeString(location);
-    const secondary = `${companyId}:${normTitle}:${normLoc}`;
+    const primary = this._hashKey([companyId || 'unknown', normTitle || 'unknown', normLoc || 'unknown']);
+    const secondary = reqId ? `${companyId}:${reqId}` : `${companyId}:${normTitle}:${normLoc}`;
     const content = description && description.length > 50 ? this._hashContent(description) : null;
     return { primary, secondary, content };
   }

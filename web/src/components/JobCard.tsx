@@ -21,6 +21,9 @@ interface JobCardProps {
     remoteStatus?: 'Remote' | 'Hybrid' | 'Onsite' | 'Unknown';
     createdAt: string;
     industry?: string;
+    career_level?: string;
+    experience_min?: number | null;
+    experience_max?: number | null;
   };
   isActive?: boolean;
   onClick?: () => void;
@@ -104,16 +107,13 @@ export default function JobCard({ job, isActive = false, onClick }: JobCardProps
         <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[9px] font-bold uppercase tracking-wider text-[#7A8471] text-left">
           <span className="flex items-center gap-1 shrink-0">
             <Briefcase className="h-3 w-3 text-[#7A8471]" />
-            {job.experienceLevel || 'Not Specified'}
+            {job.career_level || 'Not Specified'}
+            {job.experience_min !== undefined && job.experience_min !== null ? (
+              ` • ${job.experience_max !== undefined && job.experience_max !== null && job.experience_max > job.experience_min
+                ? `${job.experience_min}-${job.experience_max}`
+                : `${job.experience_min}+`} Years`
+            ) : ''}
           </span>
-          {job.yearsExperience !== undefined && job.yearsExperience > 0 && (
-            <span className="flex items-center gap-1 shrink-0">
-              <Layers className="h-3 w-3 text-[#7A8471]" />
-              {job.yearsExperienceMax && job.yearsExperienceMax > job.yearsExperience
-                ? `${job.yearsExperience}-${job.yearsExperienceMax} Yrs`
-                : `${job.yearsExperience}+ Yrs`}
-            </span>
-          )}
           <span className="text-[#7A8471]">•</span>
           <span className="text-[#7A8471] lowercase font-bold tracking-normal italic">verified direct portal</span>
         </div>

@@ -1,6 +1,6 @@
 const axios = require('axios');
 const BaseAdapter = require('./BaseAdapter');
-const { withRetry } = require('../core/utils');
+const { withRetry, getScrapeLimit } = require('../core/utils');
 
 const AXIOS_HEADERS = {
   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
@@ -23,18 +23,35 @@ class EightfoldAdapter extends BaseAdapter {
     const parsed = new URL(this.careersUrl);
     const host = parsed.hostname;
     
-    const apiUrl = `https://${host}/api/apply/v2/jobs`;
-    const response = await withRetry(() => axios.get(apiUrl, { headers: AXIOS_HEADERS, timeout: 15000 }));
-    const postings = response.data.positions || [];
+    const limit = 100;
+    const seen = new Set();
 
-    for (const posting of postings) {
-      jobs.push({
-        title: posting.name,
-        location: posting.location || (posting.locations && posting.locations[0]) || '',
-        url: this.careersUrl + '?pid=' + posting.id,
-        reqId: posting.id?.toString(),
-        _rawText: (posting.job_description || '').replace(/<[^>]*>/g, '\n').replace(/\s+/g, ' ').trim()
-      });
+    const maxOffset = getScrapeLimit('SCRAPE_MAX_OFFSET', 5000);
+    for (let offset = 0; offset <= maxOffset; offset += limit) {
+      const apiUrl = `https://${host}/api/apply/v2/jobs?limit=${limit}&offset=${offset}`;
+      const response = await withRetry(() => axios.get(apiUrl, { headers: AXIOS_HEADERS, timeout: 15000 }));
+      const postings = response.data.positions || response.data.jobs || [];
+      console.log(`[Eightfold] ${this.companyName}: offset=${offset}, postings=${postings.length}`);
+
+      let newJobs = 0;
+      for (const posting of postings) {
+        const key = posting.id?.toString() || posting.job_id?.toString() || posting.name;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        newJobs++;
+        jobs.push({
+          title: posting.name || posting.title,
+          location: posting.location || (posting.locations && posting.locations[0]) || '',
+          url: this.careersUrl + '?pid=' + (posting.id || posting.job_id),
+          reqId: (posting.id || posting.job_id)?.toString(),
+          _rawText: (posting.job_description || posting.description || '').replace(/<[^>]*>/g, '\n').replace(/\s+/g, ' ').trim()
+        });
+      }
+
+      const total = response.data.total || response.data.count || response.data.totalCount;
+      if (postings.length < limit) break;
+      if (newJobs === 0 && offset > 0) break;
+      if (total && jobs.length >= total) break;
     }
     return jobs;
   }

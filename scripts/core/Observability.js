@@ -26,6 +26,19 @@ class Observability {
         atsConfidence: null,
         atsMethod: null,
         paginationFailures: 0,
+        genericFailures: {
+          noCards: 0,
+          selectorMiss: 0,
+          blocked: 0,
+          timeout: 0,
+          other: 0,
+        },
+        genericDiagnostics: {
+          jobCardCounts: [],
+          paginationCount: 0,
+          extractedUrlCounts: [],
+          indiaFilter: [],
+        },
         adapterCapability: null,
         reasons: {
           rejections: {},
@@ -62,6 +75,7 @@ class Observability {
 
   recordLocationRejected(companyId, locationName, reason) {
     const m = this.getCompanyMetrics(companyId);
+    m.jobsRejected += 1;
     m.locationRejected += 1;
     const key = reason || locationName || 'unknown';
     m.reasons.locationFailures[key] = (m.reasons.locationFailures[key] || 0) + 1;
@@ -91,6 +105,20 @@ class Observability {
     this.getCompanyMetrics(companyId).paginationFailures += 1;
   }
 
+  recordGenericFailure(companyId, reason) {
+    const m = this.getCompanyMetrics(companyId);
+    const key = m.genericFailures[reason] !== undefined ? reason : 'other';
+    m.genericFailures[key] += 1;
+  }
+
+  recordGenericDiagnostics(companyId, diagnostics = {}) {
+    const m = this.getCompanyMetrics(companyId);
+    m.genericDiagnostics.jobCardCounts.push(...(diagnostics.jobCardCounts || []));
+    m.genericDiagnostics.extractedUrlCounts.push(...(diagnostics.extractedUrlCounts || []));
+    m.genericDiagnostics.paginationCount += diagnostics.paginationCount || 0;
+    if (diagnostics.indiaFilter) m.genericDiagnostics.indiaFilter.push(diagnostics.indiaFilter);
+  }
+
   recordAdapterCapability(companyId, capability) {
     this.getCompanyMetrics(companyId).adapterCapability = capability;
   }
@@ -99,12 +127,14 @@ class Observability {
     const m = this.getCompanyMetrics(companyId);
     const extractionScore = m.jobsDiscovered > 0 ? m.jobsParsed / m.jobsDiscovered : 0;
     const classificationScore = m.jobsParsed > 0 ? m.jobsAccepted / m.jobsParsed : 0;
+    const coverageScore = m.jobsDiscovered > 0 ? m.jobsAccepted / m.jobsDiscovered : 0;
     const baseline = this.baselineJobCounts.get(companyId) || 0;
     const coverageRegression = baseline > 20 && m.jobsAccepted < baseline * 0.1;
 
     return {
-      qualityScore: ((extractionScore + classificationScore) / 2).toFixed(2),
-      coverageScore: m.jobsAccepted,
+      qualityScore: ((0.5 * coverageScore) + (0.3 * extractionScore) + (0.2 * classificationScore)).toFixed(2),
+      coverageScore: coverageScore.toFixed(2),
+      jobsAccepted: m.jobsAccepted,
       extractionScore: extractionScore.toFixed(2),
       classificationScore: classificationScore.toFixed(2),
       baselineJobs: baseline,
@@ -124,6 +154,9 @@ class Observability {
         accepted: m.jobsAccepted,
         rejected: m.jobsRejected,
         duplicates: m.duplicatesRemoved,
+        genericFailures: m.genericFailures,
+        genericDiagnostics: m.genericDiagnostics,
+        reasons: m.reasons,
         quality: this.generateQualityReport(id),
       };
     }
@@ -135,9 +168,17 @@ class Observability {
     for (const [, m] of this.metrics) {
       const ats = m.atsDetected || 'unknown';
       if (!atsStats[ats]) atsStats[ats] = { companies: 0, jobsAccepted: 0, failures: 0 };
+      if (!atsStats[ats].genericFailures) {
+        atsStats[ats].genericFailures = { noCards: 0, selectorMiss: 0, blocked: 0, timeout: 0, other: 0 };
+      }
       atsStats[ats].companies += 1;
       atsStats[ats].jobsAccepted += m.jobsAccepted;
       atsStats[ats].failures += m.jobsRejected;
+      if (ats === 'generic') {
+        for (const [reason, count] of Object.entries(m.genericFailures)) {
+          atsStats[ats].genericFailures[reason] = (atsStats[ats].genericFailures[reason] || 0) + count;
+        }
+      }
     }
     return atsStats;
   }

@@ -1,6 +1,6 @@
 const axios = require('axios');
 const BaseAdapter = require('./BaseAdapter');
-const { withRetry } = require('../core/utils');
+const { withRetry, getScrapeLimit } = require('../core/utils');
 
 const AXIOS_HEADERS = {
   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
@@ -23,18 +23,32 @@ class SmartRecruitersAdapter extends BaseAdapter {
     const parsed = new URL(this.careersUrl);
     const companySlug = parsed.pathname.split('/').filter(Boolean).pop();
     
-    const apiUrl = `https://api.smartrecruiters.com/v1/companies/${companySlug}/postings`;
-    const response = await withRetry(() => axios.get(apiUrl, { headers: AXIOS_HEADERS, timeout: 15000 }));
-    const postings = response.data.content || [];
+    const seen = new Set();
+    const limit = 100;
 
-    for (const posting of postings) {
-      jobs.push({
-        title: posting.name,
-        location: posting.location?.city || posting.location?.country || '',
-        url: `https://jobs.smartrecruiters.com/${companySlug}/${posting.id}`,
-        reqId: posting.refNumber || posting.id,
-        _detailApiUrl: `https://api.smartrecruiters.com/v1/companies/${companySlug}/postings/${posting.id}`
-      });
+    const maxOffset = getScrapeLimit('SCRAPE_MAX_OFFSET', 5000);
+    for (let offset = 0; offset <= maxOffset; offset += limit) {
+      const apiUrl = `https://api.smartrecruiters.com/v1/companies/${companySlug}/postings?limit=${limit}&offset=${offset}`;
+      const response = await withRetry(() => axios.get(apiUrl, { headers: AXIOS_HEADERS, timeout: 15000 }));
+      const postings = response.data.content || [];
+      console.log(`[SmartRecruiters] ${this.companyName}: offset=${offset}, postings=${postings.length}`);
+
+      for (const posting of postings) {
+        const key = posting.id || posting.refNumber;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        jobs.push({
+          title: posting.name,
+          location: posting.location?.city || posting.location?.country || '',
+          url: `https://jobs.smartrecruiters.com/${companySlug}/${posting.id}`,
+          reqId: posting.refNumber || posting.id,
+          _detailApiUrl: `https://api.smartrecruiters.com/v1/companies/${companySlug}/postings/${posting.id}`
+        });
+      }
+
+      const total = response.data.totalFound || response.data.total || response.data.totalElements;
+      if (postings.length < limit) break;
+      if (total && jobs.length >= total) break;
     }
     return jobs;
   }
