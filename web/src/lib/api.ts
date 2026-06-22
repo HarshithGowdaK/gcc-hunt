@@ -38,6 +38,8 @@ interface Job {
   warning?: string | null;
   needs_review?: boolean;
   classification_source?: string;
+  isNew?: boolean;
+  hrLinkedin?: string;
 }
 
 // Convert untyped static data imports to typed arrays
@@ -57,6 +59,7 @@ export async function fetchJobs(filters: {
   search?: string;
   sortBy?: string;
   industry?: string;
+  isNew?: string;
 } = {}) {
   await new Promise(resolve => setTimeout(resolve, 50));
 
@@ -79,6 +82,9 @@ export async function fetchJobs(filters: {
   });
 
   // Apply filters
+  if (filters.isNew === 'true') {
+    list = list.filter(j => j.isNew === true);
+  }
   if (filters.company) {
     list = list.filter(j => j.companyId === filters.company);
   }

@@ -134,6 +134,8 @@ async function start() {
   console.log('=== GCC Hunt v2 Orchestrator ===');
   await Storage.load();
 
+  const successfulCompanyIds = new Set();
+
   const companies = await loadCompanies();
   const LIMIT = process.env.LIMIT ? parseInt(process.env.LIMIT, 10) : companies.length;
   let targetCompanies = companies.slice(0, LIMIT);
@@ -236,9 +238,11 @@ async function start() {
 
       Observability.recordDiscovery(company.id, jobs.length);
       Observability.recordAdapterCapability(company.id, adapter.getCapability());
+      successfulCompanyIds.add(company.id);
 
       let enqueued = 0;
       let skipped = 0;
+      let reused = 0;
 
       for (const job of jobs) {
         if (listingLocationHint && !String(job.location || '').trim()) {
@@ -274,10 +278,24 @@ async function start() {
           continue;
         }
 
-        if (Deduplicator.isEarlyDuplicate(company.id, job.title, job.location || locPreview.resolvedLocation, job.reqId)) {
+        const resolvedLoc = locPreview.resolvedLocation || job.location || '';
+
+        if (Deduplicator.isEarlyDuplicate(company.id, job.title, resolvedLoc, job.reqId)) {
           job.rejectionReason = 'duplicate';
           Observability.recordDuplicate(company.id);
           skipped++;
+          continue;
+        }
+
+        // Check if job exists in previous scrape
+        const previousJob = Deduplicator.findPreviousJob(company.id, job.title, resolvedLoc, job.reqId);
+        if (previousJob) {
+          console.log(`[Discovery] Reusing previously scraped job: ${job.title} (${company.name})`);
+          previousJob.isNew = false;
+          previousJob.dateScraped = new Date().toISOString();
+          Storage.saveJob(previousJob);
+          Observability.recordAccepted(company.id);
+          reused++;
           continue;
         }
 
@@ -287,7 +305,7 @@ async function start() {
         });
       }
 
-      console.log(`[Discovery] ${company.name} — enqueued ${enqueued}, skipped ${skipped} of ${jobs.length}`);
+      console.log(`[Discovery] ${company.name} — reused ${reused}, enqueued ${enqueued}, skipped ${skipped} of ${jobs.length}`);
       CircuitBreakers.recordCompanySuccess(company.id);
     },
 
@@ -452,7 +470,7 @@ async function start() {
     });
   }
 
-  await Storage.persist();
+  await Storage.persist(successfulCompanyIds);
   await CloudflareResilience.closeAll();
 
   console.log('=== Crawl Complete ===');

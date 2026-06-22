@@ -166,6 +166,7 @@ function buildJobRecord({
     dateScraped: now,
     createdAt: now,
     keywords: [],
+    isNew: true,
   };
 }
 

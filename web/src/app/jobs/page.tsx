@@ -24,6 +24,7 @@ function JobsContent() {
   const [selectedIndustry, setSelectedIndustry] = useState(searchParams.get('industry') || '');
   const [sortBy, setSortBy] = useState(searchParams.get('sortBy') || 'recent');
   const [page, setPage] = useState(parseInt(searchParams.get('page') || '1'));
+  const [showOnlyNew, setShowOnlyNew] = useState(searchParams.get('isNew') === 'true');
 
   // Lists populated from API
   const [companies, setCompanies] = useState<any[]>([]);
@@ -123,6 +124,10 @@ function JobsContent() {
     if (urlPage !== page) {
       setPage(urlPage);
     }
+    const urlIsNew = searchParams.get('isNew') === 'true';
+    if (urlIsNew !== showOnlyNew) {
+      setShowOnlyNew(urlIsNew);
+    }
     const urlActiveId = searchParams.get('activeId') || null;
     if (urlActiveId !== activeJobId) {
       setActiveJobId(urlActiveId);
@@ -144,7 +149,8 @@ function JobsContent() {
           remoteStatus: selectedRemote,
           industry: selectedIndustry,
           search,
-          sortBy
+          sortBy,
+          isNew: showOnlyNew ? 'true' : undefined
         });
 
         setJobs(res.jobs || []);
@@ -162,7 +168,7 @@ function JobsContent() {
     }
 
     loadJobs();
-  }, [page, selectedCompany, selectedCity, selectedExp, selectedType, selectedRemote, selectedIndustry, sortBy, search]);
+  }, [page, selectedCompany, selectedCity, selectedExp, selectedType, selectedRemote, selectedIndustry, sortBy, search, showOnlyNew]);
 
   // Fetch individual job details when activeJobId changes
   useEffect(() => {
@@ -209,6 +215,7 @@ function JobsContent() {
     setSelectedIndustry('');
     setSortBy('recent');
     setPage(1);
+    setShowOnlyNew(false);
     updateUrl({
       search: '',
       company: '',
@@ -218,6 +225,7 @@ function JobsContent() {
       remoteStatus: '',
       industry: '',
       sortBy: 'recent',
+      isNew: null,
       page: 1
     });
   };
@@ -287,6 +295,24 @@ function JobsContent() {
           </div>
 
           <div className="space-y-4">
+            {/* Newly Scraped Only */}
+            <div className="flex items-center justify-between py-1.5 border-b border-[#E5E1D8] pb-3">
+              <label htmlFor="isNewToggle" className="text-[8.5px] font-bold text-[#7A8471] uppercase tracking-widest cursor-pointer">
+                New Scraped Jobs Only
+              </label>
+              <input
+                id="isNewToggle"
+                type="checkbox"
+                checked={showOnlyNew}
+                className="accent-[#D16A4A] h-3.5 w-3.5 border-[#E5E1D8] cursor-pointer"
+                onChange={(e) => {
+                  setShowOnlyNew(e.target.checked);
+                  setPage(1);
+                  updateUrl({ isNew: e.target.checked ? 'true' : null, page: 1 });
+                }}
+              />
+            </div>
+
             {/* Search keywords */}
             <div>
               <label className="text-[8.5px] font-bold text-[#7A8471] uppercase tracking-widest block mb-1">Keywords</label>
@@ -738,6 +764,24 @@ function JobsContent() {
               </div>
 
               <div className="space-y-4">
+                {/* Newly Scraped Only */}
+                <div className="flex items-center justify-between py-1.5 border-b border-[#E5E1D8] pb-3">
+                  <label htmlFor="isNewToggleMobile" className="text-[9px] font-bold text-[#161616] uppercase tracking-widest cursor-pointer">
+                    New Scraped Jobs Only
+                  </label>
+                  <input
+                    id="isNewToggleMobile"
+                    type="checkbox"
+                    checked={showOnlyNew}
+                    className="accent-[#D16A4A] h-4 w-4 border-[#E5E1D8] cursor-pointer"
+                    onChange={(e) => {
+                      setShowOnlyNew(e.target.checked);
+                      setPage(1);
+                      updateUrl({ isNew: e.target.checked ? 'true' : null, page: 1 });
+                    }}
+                  />
+                </div>
+
                 {/* Search keywords */}
                 <div>
                   <label className="text-[9px] font-bold text-[#161616] uppercase tracking-widest block mb-1.5">Keywords</label>

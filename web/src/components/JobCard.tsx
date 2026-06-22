@@ -24,6 +24,8 @@ interface JobCardProps {
     career_level?: string;
     experience_min?: number | null;
     experience_max?: number | null;
+    isNew?: boolean;
+    hrLinkedin?: string;
   };
   isActive?: boolean;
   onClick?: () => void;
@@ -93,9 +95,16 @@ export default function JobCard({ job, isActive = false, onClick }: JobCardProps
             </div>
           </div>
 
-          <span className="text-[8px] font-black tracking-widest border border-[#161616] px-1.5 py-0.5 text-[#161616] shrink-0">
-            {momentum}
-          </span>
+          <div className="flex items-center gap-1.5 shrink-0">
+            {job.isNew && (
+              <span className="text-[8px] font-black tracking-widest bg-[#D16A4A] px-1.5 py-0.5 text-[#F7F4EE] animate-pulse shrink-0">
+                NEW
+              </span>
+            )}
+            <span className="text-[8px] font-black tracking-widest border border-[#161616] px-1.5 py-0.5 text-[#161616] shrink-0">
+              {momentum}
+            </span>
+          </div>
         </div>
 
         {/* Job Title */}
@@ -151,6 +160,18 @@ export default function JobCard({ job, isActive = false, onClick }: JobCardProps
           >
             <Share2 className="h-3.5 w-3.5" />
           </button>
+
+          {job.hrLinkedin && (
+            <a
+              href={job.hrLinkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="text-[#7A8471] hover:text-[#D16A4A] transition-colors font-black tracking-widest uppercase text-[9px]"
+            >
+              [ HR LinkedIn ]
+            </a>
+          )}
           
           <a
             href={job.applyUrl}

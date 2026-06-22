@@ -43,6 +43,18 @@ class Deduplicator {
     if (Storage.isDuplicate(fingerprints)) return null;
     return fingerprints;
   }
+
+  findPreviousJob(companyId, title, location, reqId) {
+    const fps = this.buildFingerprints(companyId, title, location || '', reqId, '');
+    const cleanSec = fps.secondary ? String(fps.secondary).replace(/&amp;/g, '&') : null;
+    if (cleanSec && Storage.previousJobsMap && Storage.previousJobsMap.has(cleanSec)) {
+      return Storage.previousJobsMap.get(cleanSec);
+    }
+    if (fps.primary && Storage.previousJobsMap && Storage.previousJobsMap.has(fps.primary)) {
+      return Storage.previousJobsMap.get(fps.primary);
+    }
+    return null;
+  }
 }
 
 module.exports = new Deduplicator();

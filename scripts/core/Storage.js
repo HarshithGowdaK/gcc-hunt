@@ -11,6 +11,8 @@ class Storage {
     this.companiesFile = path.join(this.dataDir, 'companies.json');
 
     this.jobs = [];
+    this.previousJobs = [];
+    this.previousJobsMap = new Map();
     this.logs = [];
     this.companies = [];
     this.primaryFingerprints = new Set();
@@ -26,6 +28,8 @@ class Storage {
         previousJobs = JSON.parse(fs.readFileSync(this.jobsFile, 'utf8'));
       }
       this.jobs = [];
+      this.previousJobs = previousJobs;
+      this.previousJobsMap = new Map();
       this.primaryFingerprints.clear();
       this.secondaryFingerprints.clear();
       this.contentFingerprints.clear();
@@ -54,6 +58,16 @@ class Storage {
     for (const job of previousJobs) {
       const cid = job.companyId;
       this.baselineCounts.set(cid, (this.baselineCounts.get(cid) || 0) + 1);
+      
+      if (job.fingerprints) {
+        if (job.fingerprints.secondary) {
+          const cleanSec = String(job.fingerprints.secondary).replace(/&amp;/g, '&');
+          this.previousJobsMap.set(cleanSec, job);
+        }
+        if (job.fingerprints.primary) {
+          this.previousJobsMap.set(job.fingerprints.primary, job);
+        }
+      }
     }
 
     console.log(`[Storage] Loaded ${previousJobs.length} existing jobs for baseline; current scrape starts empty.`);
@@ -72,6 +86,12 @@ class Storage {
   }
 
   saveJob(job) {
+    if (job.city && job.city.toLowerCase() === 'bangalore') {
+      const comp = this.companies.find(c => c.id === job.companyId);
+      if (comp && comp.hrLinkedin) {
+        job.hrLinkedin = comp.hrLinkedin;
+      }
+    }
     this.jobs.push(job);
     if (job.fingerprints) {
       if (job.fingerprints.primary) this.primaryFingerprints.add(job.fingerprints.primary);
@@ -99,14 +119,22 @@ class Storage {
     }
   }
 
-  async persist() {
+  async persist(scrapedCompanyIds = new Set()) {
     if (!fs.existsSync(this.dataDir)) fs.mkdirSync(this.dataDir, { recursive: true });
+
+    // Find previous jobs of companies that were NOT successfully scraped in this run
+    const nonScrapedCompanyJobs = this.previousJobs.filter(
+      job => !scrapedCompanyIds.has(job.companyId)
+    ).map(job => ({ ...job, isNew: false })); // Make sure they are not marked as new
+
+    // Merge current run's jobs with nonScrapedCompanyJobs
+    const finalJobs = [...this.jobs, ...nonScrapedCompanyJobs];
 
     const tempJobs = this.jobsFile + '.tmp';
     const tempLogs = this.logsFile + '.tmp';
     const tempCompanies = this.companiesFile + '.tmp';
 
-    fs.writeFileSync(tempJobs, JSON.stringify(this.jobs, null, 2), 'utf8');
+    fs.writeFileSync(tempJobs, JSON.stringify(finalJobs, null, 2), 'utf8');
     fs.renameSync(tempJobs, this.jobsFile);
 
     fs.writeFileSync(tempLogs, JSON.stringify(this.logs, null, 2), 'utf8');
@@ -117,7 +145,7 @@ class Storage {
       fs.renameSync(tempCompanies, this.companiesFile);
     }
 
-    console.log(`[Storage] Persisted ${this.jobs.length} jobs, ${this.logs.length} logs.`);
+    console.log(`[Storage] Persisted ${finalJobs.length} jobs (${this.jobs.length} from current scrape, ${nonScrapedCompanyJobs.length} preserved), ${this.logs.length} logs.`);
   }
 }
 
