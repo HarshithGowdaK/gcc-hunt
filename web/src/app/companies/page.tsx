@@ -16,7 +16,7 @@ export default function CompaniesDirectory() {
     async function loadDirectoryData() {
       try {
         const compData = await fetchCompanies();
-        const jobsRes = await fetchJobs({ limit: 10000 });
+        const jobsRes = await fetchJobs({ limit: 100000 });
         
         // Count positions per company
         const counts: Record<string, number> = {};

@@ -217,25 +217,60 @@ function classifyWithValidation(description, title) {
   let needs_review = false;
   let classification_source = 'experience_regex';
 
-  // If no experience was found from text, fall back to title heuristics
   if (minYears === null) {
     classification_source = 'title_fallback';
     confidence = 0.40;
-    if (isIntern) {
+    
+    let score = 0;
+    if (/\bintern(ship)?|apprentice(ship)?|co-?op\b/i.test(titleText)) score += 100;
+    if (/\blead\b/i.test(titleText)) score += 90;
+    if (/\bprincipal\b/i.test(titleText)) score += 80;
+    if (/\bmanager\b/i.test(titleText)) score += 50;
+    if (/\bsenior\b/i.test(titleText)) score += 40;
+    if (/\bassociate\b/i.test(titleText)) score += 20;
+    if (/\b(fresher|graduate|trainee|junior|entry)\b/i.test(titleText)) score += 10;
+
+    if (score >= 100 || isIntern) {
       career_level = SENIORITY_LEVELS.INTERNSHIP;
       confidence = 0.95;
-    } else if (/\b(senior|lead|staff|principal)\b/i.test(titleText)) {
+    } else if (score >= 80) {
+      career_level = SENIORITY_LEVELS.PRINCIPAL;
+      confidence = 0.65;
+    } else if (score >= 50) {
+      career_level = SENIORITY_LEVELS.LEAD;
+      confidence = 0.65;
+    } else if (score >= 40) {
       career_level = SENIORITY_LEVELS.SENIOR;
+      confidence = 0.60;
+    } else if (score >= 20) {
+      career_level = SENIORITY_LEVELS.ASSOCIATE;
+      confidence = 0.50;
+    } else if (score >= 10) {
+      career_level = /\b(fresher|graduate)\b/i.test(titleText) ? SENIORITY_LEVELS.FRESHER : SENIORITY_LEVELS.ENTRY;
+      confidence = 0.60;
     } else if (priorInternshipConsidered) {
       career_level = SENIORITY_LEVELS.FRESHER;
       confidence = 0.85;
       classification_source = 'prior_internship_heuristic';
-    } else if (/\b(fresher|graduate)\b/i.test(titleText)) {
-      career_level = SENIORITY_LEVELS.FRESHER;
-    } else if (/\b(junior|trainee|entry)\b/i.test(titleText)) {
-      career_level = SENIORITY_LEVELS.ENTRY;
     } else {
       career_level = SENIORITY_LEVELS.MID;
+    }
+  } else {
+    // If minYears was found but title strongly implies higher level, bump the level (combine title + regex)
+    let score = 0;
+    if (/\blead\b/i.test(titleText)) score += 90;
+    if (/\bprincipal\b/i.test(titleText)) score += 80;
+    if (/\bsenior\b/i.test(titleText)) score += 40;
+    
+    // Penalize modifier titles that shouldn't auto-bump to Senior
+    if (/\b(associate|analyst)\b/i.test(titleText)) score -= 40;
+
+    if (score >= 80 && minYears >= 5) {
+      career_level = SENIORITY_LEVELS.PRINCIPAL;
+    } else if (score >= 90 && minYears >= 4) {
+      career_level = SENIORITY_LEVELS.LEAD;
+    } else if (score >= 40 && minYears >= 3 && career_level !== SENIORITY_LEVELS.LEAD && career_level !== SENIORITY_LEVELS.PRINCIPAL) {
+      career_level = SENIORITY_LEVELS.SENIOR;
     }
   }
 

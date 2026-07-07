@@ -211,13 +211,12 @@ class ATSRegistry {
         if ([401, 403, 429].includes(apiResponse.status)) return 0.78;
       }
 
-      if (/myworkdayjobs|wday\/cxs|windowData|__WD_CONFIG__/i.test(html)) {
-        return 0.75;
-      }
+      // If we got here on a custom domain, we couldn't find/validate the CXS API.
+      // Do NOT blindly trust generic HTML hints like application-name="Workday" because they lead to false positives (e.g. Accenture).
+      return 0.35;
     } catch (e) {
-      return 0.72;
+      return 0.35;
     }
-    return 0.35;
   }
 
   async _validateSuccessFactors(url) {

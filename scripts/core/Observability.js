@@ -129,7 +129,13 @@ class Observability {
     const classificationScore = m.jobsParsed > 0 ? m.jobsAccepted / m.jobsParsed : 0;
     const coverageScore = m.jobsDiscovered > 0 ? m.jobsAccepted / m.jobsDiscovered : 0;
     const baseline = this.baselineJobCounts.get(companyId) || 0;
-    const coverageRegression = baseline > 20 && m.jobsAccepted < baseline * 0.1;
+    
+    let allowedDrop = 1.0; // 100% drop allowed by default
+    if (baseline >= 10 && baseline < 50) allowedDrop = 0.50; // 50% max drop allowed
+    else if (baseline >= 50 && baseline < 200) allowedDrop = 0.30; // 30% max drop allowed
+    else if (baseline >= 200) allowedDrop = 0.20; // 20% max drop allowed
+
+    const coverageRegression = baseline >= 10 && m.jobsAccepted < Math.ceil(baseline * (1 - allowedDrop));
 
     return {
       qualityScore: ((0.5 * coverageScore) + (0.3 * extractionScore) + (0.2 * classificationScore)).toFixed(2),
@@ -167,19 +173,36 @@ class Observability {
     const atsStats = {};
     for (const [, m] of this.metrics) {
       const ats = m.atsDetected || 'unknown';
-      if (!atsStats[ats]) atsStats[ats] = { companies: 0, jobsAccepted: 0, failures: 0 };
-      if (!atsStats[ats].genericFailures) {
-        atsStats[ats].genericFailures = { noCards: 0, selectorMiss: 0, blocked: 0, timeout: 0, other: 0 };
+      if (!atsStats[ats]) {
+        atsStats[ats] = { 
+          companies: 0, 
+          jobsAccepted: 0, 
+          failures: 0, 
+          timeoutFailures: 0,
+          genericFailures: { noCards: 0, selectorMiss: 0, blocked: 0, timeout: 0, other: 0 }
+        };
       }
-      atsStats[ats].companies += 1;
-      atsStats[ats].jobsAccepted += m.jobsAccepted;
-      atsStats[ats].failures += m.jobsRejected;
+      
+      const stat = atsStats[ats];
+      stat.companies += 1;
+      stat.jobsAccepted += m.jobsAccepted;
+      stat.failures += m.jobsRejected;
+      stat.timeoutFailures += (m.genericFailures?.timeout || 0);
+
       if (ats === 'generic') {
         for (const [reason, count] of Object.entries(m.genericFailures)) {
-          atsStats[ats].genericFailures[reason] = (atsStats[ats].genericFailures[reason] || 0) + count;
+          stat.genericFailures[reason] = (stat.genericFailures[reason] || 0) + count;
         }
       }
     }
+
+    for (const ats of Object.keys(atsStats)) {
+      const stat = atsStats[ats];
+      const totalAttempts = stat.jobsAccepted + stat.failures;
+      stat.successRate = totalAttempts > 0 ? (stat.jobsAccepted / totalAttempts * 100).toFixed(1) + '%' : '0.0%';
+      stat.timeoutRate = totalAttempts > 0 ? (stat.timeoutFailures / totalAttempts * 100).toFixed(1) + '%' : '0.0%';
+    }
+
     return atsStats;
   }
 

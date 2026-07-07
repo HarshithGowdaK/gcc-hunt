@@ -9,17 +9,18 @@ const openai = new OpenAI({
   baseURL: 'https://integrate.api.nvidia.com/v1',
 });
 
-const MAX_AI_CLASSIFICATIONS_PER_RUN = 100;
-let aiCallCount = 0;
+const Observability = require('./Observability');
 
-async function runLLMExtraction(description, title) {
-  if (aiCallCount >= MAX_AI_CLASSIFICATIONS_PER_RUN) {
-    console.log(`[LLM Fallback] Cap reached (${MAX_AI_CLASSIFICATIONS_PER_RUN}). Skipping LLM call.`);
+async function runLLMExtraction(description, title, companyId, maxCalls) {
+  const metrics = Observability.getCompanyMetrics(companyId);
+  const currentCalls = metrics.aiCalls || 0;
+
+  if (currentCalls >= maxCalls) {
+    console.log(`[LLM Fallback] Cap reached (${maxCalls}) for company ${companyId}. Skipping LLM call.`);
     return null;
   }
 
-  aiCallCount++;
-  console.log(`[LLM Fallback] Call ${aiCallCount}/${MAX_AI_CLASSIFICATIONS_PER_RUN} for: "${title}"`);
+  console.log(`[LLM Fallback] Call ${currentCalls + 1}/${maxCalls} for: "${title}"`);
 
   const cleanText = String(description || '').substring(0, 10000);
   const promptContent = `Analyze this job posting and extract the required years of experience.
@@ -82,13 +83,18 @@ class ArbitrationAI {
       descriptionAvailable &&
       hasReqKeywords;
 
+    const metrics = Observability.getCompanyMetrics(companyId);
+    const jobsDiscovered = metrics.jobsDiscovered || 0;
+    const maxCalls = Math.min(100, Math.max(1, Math.ceil(jobsDiscovered * 0.05)));
+    const currentCalls = metrics.aiCalls || 0;
+
     const shouldUseAI = (
       (regexFailed && titleConfidenceLow && descriptionAvailable && hasReqKeywords && hasAmbiguousExperienceHint) ||
       seniorTitleNeedsReview
-    ) && aiCallCount < MAX_AI_CLASSIFICATIONS_PER_RUN;
+    ) && currentCalls < maxCalls;
 
     if (shouldUseAI) {
-      const llmParsed = await runLLMExtraction(description, title);
+      const llmParsed = await runLLMExtraction(description, title, companyId, maxCalls);
       if (llmParsed && llmParsed.experience_min !== undefined && llmParsed.experience_min !== null) {
         const min = llmParsed.experience_min;
         const max = llmParsed.experience_max !== undefined ? llmParsed.experience_max : null;

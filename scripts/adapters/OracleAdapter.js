@@ -22,6 +22,21 @@ class OracleAdapter extends BaseAdapter {
     const jobs = [];
     const parsed = new URL(this.careersUrl);
     const host = parsed.hostname;
+    
+    let siteNumber = 'CX_1';
+    const siteMatch = this.careersUrl.match(/\/sites\/([^/]+)/i);
+    if (siteMatch) {
+      siteNumber = siteMatch[1].split('?')[0]; // clean up query params
+    } else {
+      // Stage 1 Dynamic Discovery
+      try {
+        const htmlRes = await axios.get(this.careersUrl, { headers: AXIOS_HEADERS, timeout: 15000, validateStatus: () => true });
+        const html = typeof htmlRes.data === 'string' ? htmlRes.data : '';
+        const htmlSiteMatch = html.match(/siteNumber(?:["']?\s*:\s*["']?|[\s=]+["']?)(CX_[a-zA-Z0-9_-]+)/i) || 
+                              html.match(/\/sites\/([^/"']+)/i);
+        if (htmlSiteMatch) siteNumber = htmlSiteMatch[1].split('?')[0];
+      } catch(e) {}
+    }
 
     try {
       const limit = 100;
@@ -29,7 +44,7 @@ class OracleAdapter extends BaseAdapter {
 
       const maxOffset = getScrapeLimit('SCRAPE_MAX_OFFSET', 5000);
       for (let offset = 0; offset <= maxOffset; offset += limit) {
-        const apiUrl = `https://${host}/hcmRestApi/resources/latest/recruitingCEJobRequisitions?onlyData=true&expand=all&finder=findReqs;siteNumber=CX_1,limit=${limit},offset=${offset}`;
+        const apiUrl = `https://${host}/hcmRestApi/resources/latest/recruitingCEJobRequisitions?onlyData=true&expand=all&finder=findReqs;siteNumber=${siteNumber},limit=${limit},offset=${offset}`;
         const response = await withRetry(() => axios.get(apiUrl, { headers: AXIOS_HEADERS, timeout: 15000 }));
         const postings = response.data.items || [];
         console.log(`[OracleAdapter] ${this.companyName}: offset=${offset}, postings=${postings.length}`);

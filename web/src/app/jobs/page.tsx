@@ -25,9 +25,11 @@ function JobsContent() {
   const [sortBy, setSortBy] = useState(searchParams.get('sortBy') || 'recent');
   const [page, setPage] = useState(parseInt(searchParams.get('page') || '1'));
   const [showOnlyNew, setShowOnlyNew] = useState(searchParams.get('isNew') === 'true');
+  const [hasHrLinkedin, setHasHrLinkedin] = useState(searchParams.get('hasHrLinkedin') === 'true');
 
   // Lists populated from API
-  const [companies, setCompanies] = useState<any[]>([]);
+  const [allCompanies, setAllCompanies] = useState<any[]>([]);
+  const [activeCompanies, setActiveCompanies] = useState<any[]>([]);
   const [filterOptions, setFilterOptions] = useState<{
     cities: string[];
     departments: string[];
@@ -67,7 +69,8 @@ function JobsContent() {
       try {
         const compData = await fetchCompanies();
         const filtData = await fetchFilters();
-        setCompanies(compData);
+        setAllCompanies(compData);
+        setActiveCompanies(compData);
         setFilterOptions(filtData);
       } catch (e) {
         console.error('Failed to load filter options:', e);
@@ -132,6 +135,10 @@ function JobsContent() {
     if (urlActiveId !== activeJobId) {
       setActiveJobId(urlActiveId);
     }
+    const urlHasHrLinkedin = searchParams.get('hasHrLinkedin') === 'true';
+    if (urlHasHrLinkedin !== hasHrLinkedin) {
+      setHasHrLinkedin(urlHasHrLinkedin);
+    }
   }, [searchParams]);
 
   // Fetch jobs when query changes
@@ -139,6 +146,28 @@ function JobsContent() {
     async function loadJobs() {
       setLoading(true);
       try {
+        // Load companies if not already loaded to prevent race condition on mount
+        let comps = allCompanies;
+        if (comps.length === 0) {
+          comps = await fetchCompanies();
+          setAllCompanies(comps);
+        }
+
+        // Dynamically get companies that have jobs under other active filters
+        const activeCompRes = await fetchJobs({
+          city: selectedCity,
+          experienceLevel: selectedExp,
+          employmentType: selectedType,
+          remoteStatus: selectedRemote,
+          industry: selectedIndustry,
+          search,
+          isNew: showOnlyNew ? 'true' : undefined,
+          hasHrLinkedin: hasHrLinkedin ? 'true' : undefined,
+          limit: 100000
+        });
+        const activeIds = new Set(activeCompRes.jobs.map((j: any) => j.companyId));
+        setActiveCompanies(comps.filter(c => activeIds.has(c.id)));
+
         const res = await fetchJobs({
           page,
           limit: 10,
@@ -150,7 +179,8 @@ function JobsContent() {
           industry: selectedIndustry,
           search,
           sortBy,
-          isNew: showOnlyNew ? 'true' : undefined
+          isNew: showOnlyNew ? 'true' : undefined,
+          hasHrLinkedin: hasHrLinkedin ? 'true' : undefined
         });
 
         setJobs(res.jobs || []);
@@ -168,7 +198,7 @@ function JobsContent() {
     }
 
     loadJobs();
-  }, [page, selectedCompany, selectedCity, selectedExp, selectedType, selectedRemote, selectedIndustry, sortBy, search, showOnlyNew]);
+  }, [page, selectedCompany, selectedCity, selectedExp, selectedType, selectedRemote, selectedIndustry, sortBy, search, showOnlyNew, hasHrLinkedin, allCompanies]);
 
   // Fetch individual job details when activeJobId changes
   useEffect(() => {
@@ -216,6 +246,7 @@ function JobsContent() {
     setSortBy('recent');
     setPage(1);
     setShowOnlyNew(false);
+    setHasHrLinkedin(false);
     updateUrl({
       search: '',
       company: '',
@@ -226,6 +257,7 @@ function JobsContent() {
       industry: '',
       sortBy: 'recent',
       isNew: null,
+      hasHrLinkedin: null,
       page: 1
     });
   };
@@ -312,7 +344,22 @@ function JobsContent() {
                 }}
               />
             </div>
-
+            <div className="flex items-center justify-between py-1.5 border-b border-[#E5E1D8] pb-3">
+              <label htmlFor="hasHrLinkedinToggle" className="text-[8.5px] font-bold text-[#7A8471] uppercase tracking-widest cursor-pointer">
+                Has HR LinkedIn Only
+              </label>
+              <input
+                id="hasHrLinkedinToggle"
+                type="checkbox"
+                checked={hasHrLinkedin}
+                className="accent-[#D16A4A] h-3.5 w-3.5 border-[#E5E1D8] cursor-pointer"
+                onChange={(e) => {
+                  setHasHrLinkedin(e.target.checked);
+                  setPage(1);
+                  updateUrl({ hasHrLinkedin: e.target.checked ? 'true' : null, page: 1 });
+                }}
+              />
+            </div>
             {/* Search keywords */}
             <div>
               <label className="text-[8.5px] font-bold text-[#7A8471] uppercase tracking-widest block mb-1">Keywords</label>
@@ -345,7 +392,7 @@ function JobsContent() {
                 }}
               >
                 <option value="">All Corporations</option>
-                {companies.map((c) => (
+                 {activeCompanies.map((c) => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>
@@ -781,6 +828,23 @@ function JobsContent() {
                     }}
                   />
                 </div>
+                
+                <div className="flex items-center justify-between py-1.5 border-b border-[#E5E1D8] pb-3">
+                  <label htmlFor="hasHrLinkedinToggleMobile" className="text-[9px] font-bold text-[#161616] uppercase tracking-widest cursor-pointer">
+                    Has HR LinkedIn Only
+                  </label>
+                  <input
+                    id="hasHrLinkedinToggleMobile"
+                    type="checkbox"
+                    checked={hasHrLinkedin}
+                    className="accent-[#D16A4A] h-4 w-4 border-[#E5E1D8] cursor-pointer"
+                    onChange={(e) => {
+                      setHasHrLinkedin(e.target.checked);
+                      setPage(1);
+                      updateUrl({ hasHrLinkedin: e.target.checked ? 'true' : null, page: 1 });
+                    }}
+                  />
+                </div>
 
                 {/* Search keywords */}
                 <div>
@@ -814,7 +878,7 @@ function JobsContent() {
                     }}
                   >
                     <option value="">All GCCs</option>
-                    {companies.map((c) => (
+                    {activeCompanies.map((c) => (
                       <option key={c.id} value={c.id}>{c.name}</option>
                     ))}
                   </select>

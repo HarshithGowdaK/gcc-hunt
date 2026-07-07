@@ -25,8 +25,34 @@ class GreenhouseAdapter extends BaseAdapter {
     let token = parsed.pathname.includes('/embed/job_board')
       ? parsed.searchParams.get('token')
       : pathSegments[0];
-    
-    if (!token) throw new Error('Could not parse Greenhouse company token.');
+      
+    // Stage 1 Dynamic Discovery
+    if (!token || ['jobs', 'careers', 'openings', 'search'].includes(token.toLowerCase()) || parsed.hostname !== 'boards.greenhouse.io') {
+      try {
+        const htmlRes = await axios.get(this.careersUrl, { headers: AXIOS_HEADERS, timeout: 15000, validateStatus: () => true });
+        const html = typeof htmlRes.data === 'string' ? htmlRes.data : '';
+        
+        let discoveredToken = null;
+        const scriptMatch = html.match(/boards\.greenhouse\.io\/embed\/job_board\/js\?for=([^"&'\s]+)/i);
+        if (scriptMatch) discoveredToken = scriptMatch[1];
+        
+        if (!discoveredToken) {
+          const apiMatch = html.match(/boards-api\.greenhouse\.io\/v1\/boards\/([a-zA-Z0-9_-]+)\//i);
+          if (apiMatch) discoveredToken = apiMatch[1];
+        }
+
+        if (!discoveredToken) {
+          const iframeMatch = html.match(/src=["'][^"']*boards\.greenhouse\.io\/([a-zA-Z0-9_-]+)\/?["']/i);
+          if (iframeMatch) discoveredToken = iframeMatch[1];
+        }
+
+        if (discoveredToken) token = discoveredToken;
+      } catch (e) {}
+    }
+
+    if (!token || ['jobs', 'careers', 'openings', 'search'].includes(token.toLowerCase())) {
+      throw new Error('Could not parse Greenhouse company token from URL or HTML.');
+    }
 
     const apiUrl = `https://boards-api.greenhouse.io/v1/boards/${token}/jobs?content=true`;
     const response = await withRetry(() => axios.get(apiUrl, { headers: AXIOS_HEADERS, timeout: 60000 }));

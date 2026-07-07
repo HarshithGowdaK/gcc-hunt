@@ -444,11 +444,29 @@ async function start() {
     const metrics = Observability.getCompanyMetrics(comp.id);
     const quality = Observability.generateQualityReport(comp.id);
     const atsDiag = runDiagnostics.get(comp.id) || null;
-    Storage.updateCompanyStatus(comp.id, metrics.jobsAccepted > 0 ? 'success' : 'empty', metrics.jobsAccepted, quality, atsDiag);
+    Storage.updateCompanyStatus(comp, metrics.jobsAccepted > 0 ? 'success' : 'empty', metrics.jobsAccepted, quality, atsDiag);
 
     if (quality.coverageRegression) {
       console.warn(`[Quality] REGRESSION: ${comp.name} — ${quality.warning}`);
+      
+      const prevAts = 'unknown'; // Note: Without historical ATS per company in baseline, we store 'unknown'
+      const currentAts = metrics.atsDetected || 'unknown';
+      
+      Storage.quarantineFailedScrape(
+        comp.id, 
+        comp.name, 
+        quality, 
+        Storage.previousJobs, 
+        metrics.jobsAccepted, 
+        prevAts, 
+        currentAts
+      );
+      
+      Storage.revertCompanyJobs(comp.id);
+      successfulCompanyIds.delete(comp.id);
     }
+
+    console.log(`[ATS Detection] ${comp.name}: Detected=${metrics.atsDetected || 'none'}, Confidence=${metrics.atsConfidence || 0}, Validated=${String(metrics.atsMethod).includes('validated')}`);
 
     Storage.saveLog({
       companyId: comp.id,
@@ -463,6 +481,7 @@ async function start() {
       aiSkipped: metrics.aiSkipped,
       atsDetected: metrics.atsDetected,
       atsConfidence: metrics.atsConfidence,
+      atsValidated: String(metrics.atsMethod).includes('validated'),
       quality,
       reasons: metrics.reasons,
       timestamp: new Date().toISOString(),
@@ -474,9 +493,44 @@ async function start() {
   await CloudflareResilience.closeAll();
 
   console.log('=== Crawl Complete ===');
+  
+  let totalSucceeded = 0;
+  let totalRegressions = 0;
+  let totalTimeouts = 0;
+  let totalFallbacks = 0;
+  let totalLlmCalls = 0;
+  
+  for (const comp of targetCompanies) {
+    const metrics = Observability.getCompanyMetrics(comp.id);
+    const quality = Observability.generateQualityReport(comp.id);
+    
+    if (metrics.jobsAccepted > 0 && !quality.coverageRegression) totalSucceeded++;
+    if (quality.coverageRegression) totalRegressions++;
+    if (metrics.genericFailures && metrics.genericFailures.timeout) totalTimeouts += metrics.genericFailures.timeout;
+    if (metrics.atsMethod && String(metrics.atsMethod).includes('fallback')) totalFallbacks++;
+    totalLlmCalls += metrics.aiCalls || 0;
+  }
+  
+  const fallbackRate = targetCompanies.length > 0 ? (totalFallbacks / targetCompanies.length * 100).toFixed(1) + '%' : '0%';
+
+  console.log('\n==================');
+  console.log('     SUMMARY      ');
+  console.log('==================');
+  console.log(`Companies:          ${targetCompanies.length}`);
+  console.log(`Succeeded:          ${totalSucceeded}`);
+  console.log(`Regressions:        ${totalRegressions}`);
+  console.log(`Timeouts:           ${totalTimeouts}`);
+  console.log(`Fallbacks:          ${fallbackRate} (${totalFallbacks})`);
+  console.log(`LLM Calls:          ${totalLlmCalls}`);
+  console.log(`Coverage Preserved: ${totalRegressions}`); // Each regression preserves previous jobs
+  console.log('==================\n');
+
   console.log('Coverage:', JSON.stringify(Observability.generateCoverageReport(), null, 2));
   console.log('ATS Report:', JSON.stringify(Observability.generateATSReport(), null, 2));
   console.log('Queue Stats:', JSON.stringify(Queues.getAllStats(), null, 2));
+  
+  // Persist ATS Health
+  Storage.persistAtsHealth(Observability.generateATSReport());
 }
 
 if (require.main === module) {

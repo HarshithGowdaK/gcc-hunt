@@ -37,7 +37,6 @@ class GenericAdapter extends BaseAdapter {
       });
 
       await page.goto(this.careersUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
-      await this._ensureIndiaFilterSelected(page);
       let pageNum = 1;
       let hasMore = true;
       let consecutiveNoNewPages = 0;
@@ -45,7 +44,22 @@ class GenericAdapter extends BaseAdapter {
 
       const maxPages = getScrapeLimit('SCRAPE_MAX_PAGES', 100);
       while (hasMore && pageNum <= maxPages) {
-        await sleep(3000); // Allow JS rendering
+        // DOM Stability Detection (Wait until job cards stop changing for 2 seconds)
+        let lastCardCount = -1;
+        let stabilityCount = 0;
+        for (let i = 0; i < 15; i++) {
+          const cardCount = await page.evaluate(() => {
+            return document.querySelectorAll('a[href*="job"], a[href*="career"], a[href*="position"], li, tr').length;
+          });
+          if (cardCount === lastCardCount && cardCount > 0) {
+            stabilityCount++;
+            if (stabilityCount >= 2) break; // stable for 2 seconds
+          } else {
+            stabilityCount = 0;
+            lastCardCount = cardCount;
+          }
+          await sleep(1000);
+        }
         
         // Auto-scroll to trigger lazy loading if any
         await page.evaluate(async () => {

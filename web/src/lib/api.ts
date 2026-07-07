@@ -1,6 +1,8 @@
-import jobsData from '../data/jobs.json';
-import companiesData from '../data/companies.json';
-import logsData from '../data/scrape_logs.json';
+'use server';
+
+import fs from 'fs';
+import path from 'path';
+import * as xlsx from 'xlsx';
 
 // Type definitions to ensure TypeScript compiler satisfies previous interfaces
 interface Job {
@@ -42,10 +44,55 @@ interface Job {
   hrLinkedin?: string;
 }
 
-// Convert untyped static data imports to typed arrays
-const typedJobs = jobsData as Job[];
-const typedCompanies = companiesData as any[];
-const typedLogs = logsData as any[];
+const cache = {
+  jobs: { data: [] as Job[], mtime: 0 },
+  companies: { data: [] as any[], mtime: 0 },
+  logs: { data: [] as any[], mtime: 0 },
+  excelIds: { data: new Set<string>(), mtime: 0 }
+};
+
+function readData(filename: string, cacheKey: 'jobs' | 'companies' | 'logs') {
+  const filePath = path.join(process.cwd(), 'src/data', filename);
+  if (!fs.existsSync(filePath)) return [];
+  
+  const stats = fs.statSync(filePath);
+  if (stats.mtimeMs > cache[cacheKey].mtime) {
+    cache[cacheKey].data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    cache[cacheKey].mtime = stats.mtimeMs;
+  }
+  return cache[cacheKey].data;
+}
+
+function getTypedJobs(): Job[] { return readData('jobs.json', 'jobs'); }
+function getTypedCompanies(): any[] { return readData('companies.json', 'companies'); }
+function getTypedLogs(): any[] { return readData('scrape_logs.json', 'logs'); }
+
+function getCachedExcelIds(): Set<string> {
+  const excelPath = path.join(process.cwd(), '../companies.xlsx');
+  if (!fs.existsSync(excelPath)) return new Set();
+
+  const stats = fs.statSync(excelPath);
+  if (stats.mtimeMs > cache.excelIds.mtime) {
+    const workbook = xlsx.readFile(excelPath);
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const data = xlsx.utils.sheet_to_json(sheet);
+    
+    const ids = new Set<string>();
+    data.forEach((row: any) => {
+      const name = row.name || row.Company || 'Unknown';
+      const slug = String(name || '')
+        .toLowerCase()
+        .replace(/&/g, ' and ')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
+      ids.add(row.id || slug);
+    });
+    
+    cache.excelIds.data = ids;
+    cache.excelIds.mtime = stats.mtimeMs;
+  }
+  return cache.excelIds.data;
+}
 
 export async function fetchJobs(filters: {
   page?: number;
@@ -60,6 +107,7 @@ export async function fetchJobs(filters: {
   sortBy?: string;
   industry?: string;
   isNew?: string;
+  hasHrLinkedin?: string;
 } = {}) {
   await new Promise(resolve => setTimeout(resolve, 50));
 
@@ -67,7 +115,7 @@ export async function fetchJobs(filters: {
   const limit = filters.limit || 10;
   const sortBy = filters.sortBy || 'recent';
 
-  let list = [...typedJobs];
+  let list = [...getTypedJobs()];
 
   // Deduplicate by company, title, and city/location to prevent duplicate listings
   const seenKeys = new Set<string>();
@@ -84,6 +132,9 @@ export async function fetchJobs(filters: {
   // Apply filters
   if (filters.isNew === 'true') {
     list = list.filter(j => j.isNew === true);
+  }
+  if (filters.hasHrLinkedin === 'true') {
+    list = list.filter(j => !!j.hrLinkedin);
   }
   if (filters.company) {
     list = list.filter(j => j.companyId === filters.company);
@@ -164,12 +215,12 @@ export async function fetchJobs(filters: {
 export async function fetchJob(id: string) {
   await new Promise(resolve => setTimeout(resolve, 50));
   
-  const job = typedJobs.find(j => j.id === id);
+  const job = getTypedJobs().find(j => j.id === id);
   if (!job) {
     throw new Error('Job listing not found.');
   }
 
-  const similarJobs = typedJobs
+  const similarJobs = getTypedJobs()
     .filter(j => j.companyId === job.companyId && j.id !== id)
     .slice(0, 3);
 
@@ -181,7 +232,8 @@ export async function fetchJob(id: string) {
 
 export async function fetchCompanies() {
   await new Promise(resolve => setTimeout(resolve, 30));
-  const sortedComps = [...typedCompanies];
+  const excelIds = getCachedExcelIds();
+  const sortedComps = [...getTypedCompanies()].filter(c => excelIds.has(c.id));
   sortedComps.sort((a, b) => a.name.localeCompare(b.name));
   return sortedComps;
 }
@@ -205,7 +257,7 @@ export async function fetchFilters() {
   const remoteStatuses = new Set<string>(['Onsite', 'Hybrid', 'Remote']);
   const industries = new Set<string>();
 
-  typedJobs.forEach(job => {
+  getTypedJobs().forEach(job => {
     if (job.city) cities.add(job.city);
     if (job.department) departments.add(job.department);
     if (job.remoteStatus) remoteStatuses.add(job.remoteStatus);
@@ -242,5 +294,5 @@ export async function uploadExcelCompanies(companies: { company: string; url: st
 }
 
 export async function fetchScrapeLogs(limit: number = 30) {
-  return typedLogs.slice(0, limit);
+  return getTypedLogs().slice(0, limit);
 }
