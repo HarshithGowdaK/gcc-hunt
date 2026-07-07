@@ -2,11 +2,12 @@
 
 const fs = require('fs');
 const path = require('path');
+const zlib = require('zlib');
 
 class Storage {
   constructor() {
     this.dataDir = path.join(__dirname, '../../web/src/data');
-    this.jobsFile = path.join(this.dataDir, 'jobs.json');
+    this.jobsFile = path.join(this.dataDir, 'jobs.json.gz');
     this.logsFile = path.join(this.dataDir, 'scrape_logs.json');
     this.companiesFile = path.join(this.dataDir, 'companies.json');
 
@@ -25,7 +26,8 @@ class Storage {
     let previousJobs = [];
     try {
       if (fs.existsSync(this.jobsFile)) {
-        previousJobs = JSON.parse(fs.readFileSync(this.jobsFile, 'utf8'));
+        const compressed = fs.readFileSync(this.jobsFile);
+        previousJobs = JSON.parse(zlib.gunzipSync(compressed).toString('utf8'));
       }
       this.jobs = [];
       this.previousJobs = previousJobs;
@@ -170,7 +172,8 @@ class Storage {
     const tempLogs = this.logsFile + '.tmp';
     const tempCompanies = this.companiesFile + '.tmp';
 
-    fs.writeFileSync(tempJobs, JSON.stringify(finalJobs, null, 2), 'utf8');
+    const compressed = zlib.gzipSync(JSON.stringify(finalJobs, null, 2));
+    fs.writeFileSync(tempJobs, compressed);
     fs.renameSync(tempJobs, this.jobsFile);
 
     fs.writeFileSync(tempLogs, JSON.stringify(this.logs, null, 2), 'utf8');

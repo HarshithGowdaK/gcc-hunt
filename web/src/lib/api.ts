@@ -2,7 +2,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import * as xlsx from 'xlsx';
+import zlib from 'zlib';
 
 // Type definitions to ensure TypeScript compiler satisfies previous interfaces
 interface Job {
@@ -47,12 +47,25 @@ interface Job {
 const cache = {
   jobs: { data: [] as Job[], mtime: 0 },
   companies: { data: [] as any[], mtime: 0 },
-  logs: { data: [] as any[], mtime: 0 },
-  excelIds: { data: new Set<string>(), mtime: 0 }
+  logs: { data: [] as any[], mtime: 0 }
 };
 
 function readData(filename: string, cacheKey: 'jobs' | 'companies' | 'logs') {
   const filePath = path.join(process.cwd(), 'src/data', filename);
+  
+  if (filename === 'jobs.json') {
+    const gzPath = filePath + '.gz';
+    if (fs.existsSync(gzPath)) {
+      const stats = fs.statSync(gzPath);
+      if (stats.mtimeMs > cache[cacheKey].mtime) {
+        const compressed = fs.readFileSync(gzPath);
+        cache[cacheKey].data = JSON.parse(zlib.gunzipSync(compressed).toString('utf8'));
+        cache[cacheKey].mtime = stats.mtimeMs;
+      }
+      return cache[cacheKey].data;
+    }
+  }
+
   if (!fs.existsSync(filePath)) return [];
   
   const stats = fs.statSync(filePath);
@@ -66,33 +79,6 @@ function readData(filename: string, cacheKey: 'jobs' | 'companies' | 'logs') {
 function getTypedJobs(): Job[] { return readData('jobs.json', 'jobs'); }
 function getTypedCompanies(): any[] { return readData('companies.json', 'companies'); }
 function getTypedLogs(): any[] { return readData('scrape_logs.json', 'logs'); }
-
-function getCachedExcelIds(): Set<string> {
-  const excelPath = path.join(process.cwd(), '../companies.xlsx');
-  if (!fs.existsSync(excelPath)) return new Set();
-
-  const stats = fs.statSync(excelPath);
-  if (stats.mtimeMs > cache.excelIds.mtime) {
-    const workbook = xlsx.readFile(excelPath);
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const data = xlsx.utils.sheet_to_json(sheet);
-    
-    const ids = new Set<string>();
-    data.forEach((row: any) => {
-      const name = row.name || row.Company || 'Unknown';
-      const slug = String(name || '')
-        .toLowerCase()
-        .replace(/&/g, ' and ')
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-|-$/g, '');
-      ids.add(row.id || slug);
-    });
-    
-    cache.excelIds.data = ids;
-    cache.excelIds.mtime = stats.mtimeMs;
-  }
-  return cache.excelIds.data;
-}
 
 export async function fetchJobs(filters: {
   page?: number;
@@ -232,8 +218,7 @@ export async function fetchJob(id: string) {
 
 export async function fetchCompanies() {
   await new Promise(resolve => setTimeout(resolve, 30));
-  const excelIds = getCachedExcelIds();
-  const sortedComps = [...getTypedCompanies()].filter(c => excelIds.has(c.id));
+  const sortedComps = [...getTypedCompanies()];
   sortedComps.sort((a, b) => a.name.localeCompare(b.name));
   return sortedComps;
 }
