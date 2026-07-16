@@ -59,7 +59,7 @@ const {
   extractExperience,
   normaliseAILevel,
   SENIORITY_LEVELS,
-} = require('./classifier');
+} = require('../src/extraction/ai/classifier');
 
 let xlsx, playwright, axios;
 try {

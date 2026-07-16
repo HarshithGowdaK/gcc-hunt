@@ -1,7 +1,7 @@
 const BaseAdapter = require('./BaseAdapter');
-const CloudflareResilience = require('../core/CloudflareResilience');
-const JobHelpers = require('../core/JobHelpers');
-const { sleep, getScrapeLimit } = require('../core/utils');
+const CloudflareResilience = require('../../browser/proxies/CloudflareResilience');
+const JobHelpers = require('../../shared/JobHelpers');
+const { sleep, getScrapeLimit } = require('../../shared/utils');
 
 class BrassringAdapter extends BaseAdapter {
   static atsName = 'brassring';

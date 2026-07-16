@@ -1,7 +1,7 @@
 const BaseAdapter = require('./BaseAdapter');
-const CloudflareResilience = require('../core/CloudflareResilience');
-const { sleep, getScrapeLimit } = require('../core/utils');
-const JobHelpers = require('../core/JobHelpers');
+const CloudflareResilience = require('../../browser/proxies/CloudflareResilience');
+const { sleep, getScrapeLimit } = require('../../shared/utils');
+const JobHelpers = require('../../shared/JobHelpers');
 
 class GenericAdapter extends BaseAdapter {
   static atsName = 'generic';

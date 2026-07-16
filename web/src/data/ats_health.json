@@ -1,5 +1,235 @@
 [
   {
+    "timestamp": "2026-07-15T16:53:22.711Z",
+    "stats": {
+      "generic": {
+        "companies": 750,
+        "jobsAccepted": 7954,
+        "failures": 10672,
+        "timeoutFailures": 17,
+        "genericFailures": {
+          "noCards": 368,
+          "selectorMiss": 117,
+          "blocked": 0,
+          "timeout": 17,
+          "other": 79
+        },
+        "successRate": "42.7%",
+        "timeoutRate": "0.1%"
+      },
+      "workday": {
+        "companies": 45,
+        "jobsAccepted": 3022,
+        "failures": 3837,
+        "timeoutFailures": 0,
+        "genericFailures": {
+          "noCards": 0,
+          "selectorMiss": 0,
+          "blocked": 0,
+          "timeout": 0,
+          "other": 0
+        },
+        "successRate": "44.1%",
+        "timeoutRate": "0.0%"
+      },
+      "phenom": {
+        "companies": 38,
+        "jobsAccepted": 392,
+        "failures": 2345,
+        "timeoutFailures": 0,
+        "genericFailures": {
+          "noCards": 0,
+          "selectorMiss": 0,
+          "blocked": 0,
+          "timeout": 0,
+          "other": 0
+        },
+        "successRate": "14.3%",
+        "timeoutRate": "0.0%"
+      },
+      "brassring": {
+        "companies": 5,
+        "jobsAccepted": 49,
+        "failures": 42,
+        "timeoutFailures": 0,
+        "genericFailures": {
+          "noCards": 0,
+          "selectorMiss": 0,
+          "blocked": 0,
+          "timeout": 0,
+          "other": 0
+        },
+        "successRate": "53.8%",
+        "timeoutRate": "0.0%"
+      },
+      "icims": {
+        "companies": 7,
+        "jobsAccepted": 47,
+        "failures": 251,
+        "timeoutFailures": 0,
+        "genericFailures": {
+          "noCards": 0,
+          "selectorMiss": 0,
+          "blocked": 0,
+          "timeout": 0,
+          "other": 0
+        },
+        "successRate": "15.8%",
+        "timeoutRate": "0.0%"
+      },
+      "greenhouse": {
+        "companies": 19,
+        "jobsAccepted": 185,
+        "failures": 879,
+        "timeoutFailures": 0,
+        "genericFailures": {
+          "noCards": 0,
+          "selectorMiss": 0,
+          "blocked": 0,
+          "timeout": 0,
+          "other": 0
+        },
+        "successRate": "17.4%",
+        "timeoutRate": "0.0%"
+      },
+      "successfactors": {
+        "companies": 27,
+        "jobsAccepted": 259,
+        "failures": 263,
+        "timeoutFailures": 0,
+        "genericFailures": {
+          "noCards": 0,
+          "selectorMiss": 0,
+          "blocked": 0,
+          "timeout": 0,
+          "other": 0
+        },
+        "successRate": "49.6%",
+        "timeoutRate": "0.0%"
+      },
+      "oracle": {
+        "companies": 12,
+        "jobsAccepted": 0,
+        "failures": 12,
+        "timeoutFailures": 0,
+        "genericFailures": {
+          "noCards": 0,
+          "selectorMiss": 0,
+          "blocked": 0,
+          "timeout": 0,
+          "other": 0
+        },
+        "successRate": "0.0%",
+        "timeoutRate": "0.0%"
+      },
+      "beamery": {
+        "companies": 6,
+        "jobsAccepted": 141,
+        "failures": 0,
+        "timeoutFailures": 0,
+        "genericFailures": {
+          "noCards": 0,
+          "selectorMiss": 0,
+          "blocked": 0,
+          "timeout": 0,
+          "other": 0
+        },
+        "successRate": "100.0%",
+        "timeoutRate": "0.0%"
+      },
+      "avature": {
+        "companies": 4,
+        "jobsAccepted": 16,
+        "failures": 15,
+        "timeoutFailures": 0,
+        "genericFailures": {
+          "noCards": 0,
+          "selectorMiss": 0,
+          "blocked": 0,
+          "timeout": 0,
+          "other": 0
+        },
+        "successRate": "51.6%",
+        "timeoutRate": "0.0%"
+      },
+      "lever": {
+        "companies": 1,
+        "jobsAccepted": 0,
+        "failures": 55,
+        "timeoutFailures": 0,
+        "genericFailures": {
+          "noCards": 0,
+          "selectorMiss": 0,
+          "blocked": 0,
+          "timeout": 0,
+          "other": 0
+        },
+        "successRate": "0.0%",
+        "timeoutRate": "0.0%"
+      },
+      "smartrecruiters": {
+        "companies": 2,
+        "jobsAccepted": 0,
+        "failures": 400,
+        "timeoutFailures": 0,
+        "genericFailures": {
+          "noCards": 0,
+          "selectorMiss": 0,
+          "blocked": 0,
+          "timeout": 0,
+          "other": 0
+        },
+        "successRate": "0.0%",
+        "timeoutRate": "0.0%"
+      },
+      "cornerstone": {
+        "companies": 1,
+        "jobsAccepted": 0,
+        "failures": 127,
+        "timeoutFailures": 0,
+        "genericFailures": {
+          "noCards": 0,
+          "selectorMiss": 0,
+          "blocked": 0,
+          "timeout": 0,
+          "other": 0
+        },
+        "successRate": "0.0%",
+        "timeoutRate": "0.0%"
+      },
+      "taleo": {
+        "companies": 1,
+        "jobsAccepted": 0,
+        "failures": 14,
+        "timeoutFailures": 0,
+        "genericFailures": {
+          "noCards": 0,
+          "selectorMiss": 0,
+          "blocked": 0,
+          "timeout": 0,
+          "other": 0
+        },
+        "successRate": "0.0%",
+        "timeoutRate": "0.0%"
+      },
+      "jobvite": {
+        "companies": 2,
+        "jobsAccepted": 0,
+        "failures": 8,
+        "timeoutFailures": 0,
+        "genericFailures": {
+          "noCards": 0,
+          "selectorMiss": 0,
+          "blocked": 0,
+          "timeout": 0,
+          "other": 0
+        },
+        "successRate": "0.0%",
+        "timeoutRate": "0.0%"
+      }
+    }
+  },
+  {
     "timestamp": "2026-07-06T14:54:12.962Z",
     "stats": {
       "workday": {

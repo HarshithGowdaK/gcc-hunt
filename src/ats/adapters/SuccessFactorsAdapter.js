@@ -1,6 +1,6 @@
-const { axiosRequest, getScrapeLimit } = require('../core/utils');
+const { axiosRequest, getScrapeLimit } = require('../../shared/utils');
 const BaseAdapter = require('./BaseAdapter');
-const JobHelpers = require('../core/JobHelpers');
+const JobHelpers = require('../../shared/JobHelpers');
 
 const AXIOS_HEADERS = {
   'Accept': 'application/json, text/plain, */*',
@@ -151,7 +151,7 @@ class SuccessFactorsAdapter extends BaseAdapter {
     }
 
     // Fall back to Playwright if HTTP failed
-    const CloudflareResilience = require('../core/CloudflareResilience');
+    const CloudflareResilience = require('../../browser/proxies/CloudflareResilience');
     const context = await CloudflareResilience.getContext();
     const page = await context.newPage();
     let rawText = '';

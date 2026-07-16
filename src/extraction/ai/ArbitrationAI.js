@@ -1,15 +1,15 @@
 'use strict';
 
 const OpenAI = require('openai');
-const { classifyWithValidation } = require('../classifier');
-const JobHelpers = require('./JobHelpers');
+const { classifyWithValidation } = require('./classifier');
+const JobHelpers = require('../../shared/JobHelpers');
 
 const openai = new OpenAI({
   apiKey: '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',
   baseURL: 'https://integrate.api.nvidia.com/v1',
 });
 
-const Observability = require('./Observability');
+const Observability = require('../../monitoring/Observability');
 
 async function runLLMExtraction(description, title, companyId, maxCalls) {
   const metrics = Observability.getCompanyMetrics(companyId);

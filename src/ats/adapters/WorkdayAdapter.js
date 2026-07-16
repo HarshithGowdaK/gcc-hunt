@@ -1,4 +1,4 @@
-const { axiosRequest, sleep, getScrapeLimit } = require('../core/utils');
+const { axiosRequest, sleep, getScrapeLimit } = require('../../shared/utils');
 const BaseAdapter = require('./BaseAdapter');
 
 const AXIOS_HEADERS = {
@@ -256,7 +256,7 @@ class WorkdayAdapter extends BaseAdapter {
   }
 
   async _discoverJobsViaBrowser() {
-    const CloudflareResilience = require('../core/CloudflareResilience');
+    const CloudflareResilience = require('../../browser/proxies/CloudflareResilience');
     const context = await CloudflareResilience.getContext();
     const page = await context.newPage();
     const parsed = new URL(this.careersUrl);

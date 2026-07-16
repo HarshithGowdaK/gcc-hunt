@@ -1,6 +1,6 @@
 const axios = require('axios');
 const BaseAdapter = require('./BaseAdapter');
-const { withRetry, getScrapeLimit } = require('../core/utils');
+const { withRetry, getScrapeLimit } = require('../../shared/utils');
 
 const AXIOS_HEADERS = {
   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',

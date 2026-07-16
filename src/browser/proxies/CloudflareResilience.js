@@ -1,7 +1,7 @@
 'use strict';
 
 const playwright = require('playwright');
-const { sleep } = require('./utils');
+const { sleep } = require('../../shared/utils');
 
 class CloudflareResilience {
   constructor() {

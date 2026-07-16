@@ -1,8 +1,8 @@
 'use strict';
 
-const { generateJobId } = require('./utils');
-const JobHelpers = require('./JobHelpers');
-const EngineLocation = require('./EngineLocation');
+const { generateJobId } = require('../shared/utils');
+const JobHelpers = require('../shared/JobHelpers');
+const EngineLocation = require('../extraction/parser/EngineLocation');
 
 function extractDescriptionSections(fullText) {
   if (!fullText) return { description: '', requirements: '', qualifications: '' };

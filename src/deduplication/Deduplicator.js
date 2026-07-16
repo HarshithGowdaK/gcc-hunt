@@ -1,7 +1,7 @@
 'use strict';
 
 const crypto = require('crypto');
-const Storage = require('./Storage');
+const Storage = require('../storage/Storage');
 
 class Deduplicator {
   _normalizeString(str) {

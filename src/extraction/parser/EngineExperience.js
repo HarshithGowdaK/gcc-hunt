@@ -4,7 +4,7 @@ const {
   classifyWithValidation,
   extractExperienceDetails,
   SENIORITY_LEVELS,
-} = require('../classifier');
+} = require('../ai/classifier');
 
 /**
  * Experience Intelligence Engine — delegates to the production classifier

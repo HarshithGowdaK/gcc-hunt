@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const EngineLocation = require('./core/EngineLocation');
+const EngineLocation = require('../src/extraction/parser/EngineLocation');
 const { classifyWithValidation } = require('./classifier');
 
 const jobsFile = path.join(__dirname, '../web/src/data/jobs.json');

@@ -4,19 +4,19 @@ const fs = require('fs');
 const path = require('path');
 const xlsx = require('xlsx');
 
-const Queues = require('./core/Queues');
-const CircuitBreakers = require('./core/CircuitBreakers');
-const Observability = require('./core/Observability');
-const Storage = require('./core/Storage');
-const ATSRegistry = require('./core/ATSRegistry');
-const CloudflareResilience = require('./core/CloudflareResilience');
-const AdapterRegistry = require('./core/AdapterRegistry');
-const EngineLocation = require('./core/EngineLocation');
-const EngineExperience = require('./core/EngineExperience');
-const ArbitrationAI = require('./core/ArbitrationAI');
-const Deduplicator = require('./core/Deduplicator');
-const JobHelpers = require('./core/JobHelpers');
-const { buildJobRecord } = require('./core/JobNormalizer');
+const Queues = require('./Queues');
+const CircuitBreakers = require('../shared/CircuitBreakers');
+const Observability = require('../monitoring/Observability');
+const Storage = require('../storage/Storage');
+const ATSRegistry = require('../ats/detector/ATSRegistry');
+const CloudflareResilience = require('../browser/proxies/CloudflareResilience');
+const AdapterRegistry = require('../ats/detector/AdapterRegistry');
+const EngineLocation = require('../extraction/parser/EngineLocation');
+const EngineExperience = require('../extraction/parser/EngineExperience');
+const ArbitrationAI = require('../extraction/ai/ArbitrationAI');
+const Deduplicator = require('../deduplication/Deduplicator');
+const JobHelpers = require('../shared/JobHelpers');
+const { buildJobRecord } = require('../normalization/JobNormalizer');
 
 function slugifyCompanyId(name, fallback) {
   const slug = String(name || '')
@@ -28,7 +28,7 @@ function slugifyCompanyId(name, fallback) {
 }
 
 function loadCompaniesFromExcel() {
-  const excelPath = path.join(__dirname, '../companies.xlsx');
+  const excelPath = path.join(__dirname, '../../companies.xlsx');
   if (!fs.existsSync(excelPath)) return null;
   const workbook = xlsx.readFile(excelPath);
   const sheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -45,7 +45,7 @@ function loadCompaniesFromExcel() {
 }
 
 function loadCompaniesFromJson() {
-  const jsonPath = path.join(__dirname, '../web/src/data/companies.json');
+  const jsonPath = path.join(__dirname, '../../web/src/data/companies.json');
   if (!fs.existsSync(jsonPath)) return [];
   const data = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
   return data

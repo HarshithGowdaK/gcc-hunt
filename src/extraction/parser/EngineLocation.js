@@ -1,6 +1,6 @@
 'use strict';
 
-const JobHelpers = require('./JobHelpers');
+const JobHelpers = require('../../shared/JobHelpers');
 
 class EngineLocation {
   constructor() {
